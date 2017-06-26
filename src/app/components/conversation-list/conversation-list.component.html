@@ -1,0 +1,33 @@
+<perfect-scrollbar class="conversation-container">
+    <ul class="conversation-list">
+        <li *ngFor="let item of conversationList;let i = index;" (click)="selectTarget(item)" [ngClass]="{'active': item.key == active.key || item.gid == active.key}" class="display-flex menu-hover">
+            <div class="conversation-avatar">
+                <img *ngIf="item.type == 3" [src]="item.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                <img *ngIf="item.type == 4" [src]="groupAvatar" (error)="avatarErrorIcon($event)" alt="">
+                <span class="conversation-unreadNum" *ngIf="item.unreadNum && !item.noDisturb">{{item.unreadNum}}</span>
+                <span class="conversation-dot" *ngIf="item.unreadNum && item.noDisturb"></span>
+            </div>
+            <div class="flex-1">
+                <div class="display-flex">
+                    <p class="conversation-nickname flex-1" *ngIf="item.nickName && item.type === 3">{{item.nickName}}</p>
+                    <p class="conversation-nickname flex-1" *ngIf="item.name && !item.nickName && item.type === 3">{{item.name}}</p>
+                    <p class="conversation-nickname flex-1" *ngIf="item.type === 4">{{item.name}}</p>
+                    <p class="conversation-time" *ngIf="item.recentMsg" [ngSwitch]="item.recentMsg.conversation_time_show">
+                        <time *ngSwitchCase="'year'">{{item.recentMsg.content.create_time | date:"yy-MM-dd"}}</time>
+                        <time *ngSwitchCase="'month'">{{item.recentMsg.content.create_time | date:"MM-dd"}}</time>
+                        <time *ngSwitchCase="'day'">{{item.recentMsg.content.create_time | day}}</time>
+                        <time *ngSwitchCase="'the day before'">前天</time>
+                        <time *ngSwitchCase="'yesterday'">昨天</time>
+                        <time *ngSwitchCase="'today'">{{item.recentMsg.content.create_time | date:"HH:mm"}}</time>
+                    </p>
+                </div>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'text' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span><span [innerHTML]="item.recentMsg.content.msg_body.text | tag"></span></p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'image' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>图片</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'file' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>文件</p>
+                <p class="conversation-draft" *ngIf="item.draft">[草稿] <span [innerHTML]="item.draft"></span></p>
+            </div>
+            <span class="conversation-delete" (click)="deleteThis($event,item)">×</span>
+            <span *ngIf="item.noDisturb" class="conversation-no-disturb"></span>
+        </li>
+    </ul>
+</perfect-scrollbar>

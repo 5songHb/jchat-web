@@ -1,0 +1,12 @@
+<perfect-scrollbar class="linkman-list-container">
+    <h2>联系人</h2>
+    <div *ngIf="conversation">
+        <div *ngFor="let item of conversation">
+            <div *ngIf="item.data.length > 0" class="linkman-list-letter">{{item.letter}}</div>
+            <div *ngFor="let data of item.data" class="linkman-list-name display-flex" (dblclick)="selectLinkmanItem(data)">
+                <img [src]="data.avatarUrl" (error)="avatarErrorIcon($event)" class="linkman-list-avatar" alt="">
+                <span class="flex-1">{{data.name}}</span>
+            </div>
+        </div>
+    </div>
+</perfect-scrollbar>

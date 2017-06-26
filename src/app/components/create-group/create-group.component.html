@@ -1,0 +1,55 @@
+<div class="modal-shadow">
+    <div class="modal-content create-group-container">
+        <h2 class="modal-title">
+            <span *ngIf="!createGroup.info.action">发起群聊</span>
+            <span *ngIf="createGroup.info.action === 'add'">添加群成员</span>
+            <span *ngIf="createGroup.info.action === 'many'">多人会话</span>
+            <span class="modal-close" (click)="cancelCreateGroup()"></span>
+        </h2>
+        <div class="create-group-main">
+            <div class="create-group-list">
+                <div class="craete-group-search">
+                    <search-member-component [searchResult]="searchResult" (searchKeyup)="searchKeyupEmit($event)" (clearInput)="clearInputEmit()" (searchBtn)="searchBtnEmit($event)" (changeChecked)="changeCheckedEmit($event)"></search-member-component>
+                </div>
+                <perfect-scrollbar class="create-group-scroll">
+                    <div *ngFor="let item of createGroup.list">
+                        <div class="create-group-letter" *ngIf="!item.allGroup && item.data.length > 0">{{item.letter}}</div>
+                        <div class="create-group-member" *ngIf="!item.allGroup && item.data.length > 0">
+                            <div *ngFor="let user of item.data; let num = index" class="create-group-item">
+                                <div class="display-flex" *ngIf="user.show && user.type === 3">
+                                    <div class="create-group-avatar">
+                                        <img [src]="user.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                                    </div>
+                                    <div class="flex-1">{{user.nickName ? user.nickName : user.name}}</div>
+                                    <div>
+                                        <input class="create-group-select-label" type="checkbox" (change)="selectItem($event,user)" [checked]="user.checked" [disabled]="user.disabled">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </perfect-scrollbar>
+            </div>
+            <div class="create-group-select">
+                <p class="create-group-select-title">已选成员</p>
+                <perfect-scrollbar class="create-group-scroll-select">
+                    <div *ngFor="let user of selectList" class="create-group-item">
+                        <div class="display-flex">
+                            <div class="create-group-avatar">
+                                <img [src]="user.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="flex-1">{{user.nickName ? user.nickName : user.name}}</div>
+                            <div class="create-group-cancel-select" *ngIf="!createGroup.info.activeSingle || (createGroup.info.activeSingle.key && user.key != createGroup.info.activeSingle.key)" (click)="cancelSelect(user)"></div>
+                        </div>
+                    </div>
+                </perfect-scrollbar>
+            </div>
+        </div>
+        <p class="modal-btn modal-input create-group-name">
+            <span class="float-left" *ngIf="!createGroup.info.action">群名称：</span>
+            <input *ngIf="!createGroup.info.action" type="text" class="input-focus float-left" [(ngModel)]="groupName" placeholder="请输入群组名称">
+            <button type="button" (click)="confirmCreateGroup()" class="btn-confirm btn-active float-right">确定</button>                     
+            <button type="button" (click)="cancelCreateGroup()" class="btn-cancel btn-white float-right">取消</button>         
+        </p>
+    </div>
+</div>

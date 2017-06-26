@@ -1,0 +1,155 @@
+<div class="chat-panel-container display-flex flex-direction-vertical">
+    <div class="chat-panel-board flex-1 display-flex flex-direction-vertical">
+        <div class="chat-panel-setting">
+            <span *ngIf="active.type === 3" (click)="watchOtherInfo(active.name)" class="chat-panel-username">{{active.nickName ? active.nickName : active.name}}</span>
+            <span *ngIf="active.type === 4">{{active.nickName ? active.nickName : active.name}}</span>
+            <button class="chat-panel-setting-btn" [hoverEvent]="groupConversationHover" *ngIf="active.type === 3" (click)="addGroupAction()">
+                <hover-tip-component *ngIf="groupConversationHover.show" [hoverInfo]="groupConversationHover"></hover-tip-component>
+            </button>
+            <button class="chat-panel-group-setting" [hoverEvent]="groupSettingHover" *ngIf="active.type === 4" (click)="groupSettingAction()">
+                <hover-tip-component *ngIf="groupSettingHover.show" [hoverInfo]="groupSettingHover"></hover-tip-component>
+            </button>
+        </div>
+        <div class="chat-panel-message-borad flex-1" id="imgViewer">
+            <perfect-scrollbar class="chat-panel-scroll" style="width: 100%;height: 100%;" (ps-y-reach-start)="scrollTopEvent()" (ps-y-reach-end)="scrollBottomEvent()">
+                <div class="chat-panel-see-more" *ngIf="loadingFlag === 1">查看更多</div>
+                <div class="chat-panel-see-more-loading" *ngIf="loadingFlag === 2">
+                    <div></div>
+                </div>
+                <div class="chat-panel-see-more" *ngIf="loadingFlag === 3">没有更多了</div>
+                <div *ngFor="let i of msg; let num = index;">
+                    <div class="chat-panel-you-msg chat-panel-msg" *ngIf="global.user != i.content.from_id">
+                        <!-- 时间 -->
+                        <p class="chat-panel-time" *ngIf="i.time_show" [ngSwitch]="i.time_show">
+                            <time *ngSwitchCase="'year'">{{i.content.create_time | date:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.content.create_time | date:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.content.create_time | day}} {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.content.create_time | date:"HH:mm"}}</time>
+                        </p>
+                        <!-- 文本消息 -->
+                        <div *ngIf="i.content.msg_body.text" class="clearfix">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="chat-panel-msgText-you float-left" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
+                                <p class="chat-panel-text-msg" [innerHTML]="i.content.msg_body.text | tag" [ngClass]="{'chat-panel-jpush-emoji': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}"></p>
+                            </div>
+                        </div>
+                        <!-- 图片消息 -->
+                        <div *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}" class="clearfix">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-left">
+                                <img title="点击查看大图" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                            </div>
+                        </div>
+                        <!-- 文件消息 -->
+                        <div *ngIf="i.content.msg_type == 'file'" class="clearfix">
+                            <div class="chat-panel-fromId-you float-left" (click)="watchOtherInfo(i.content.from_id)">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-left chat-panel-file-you">
+                                <div class="display-flex chat-panel-file-icon-you" [title]="i.content.msg_body.fname">
+                                    <img src="../../../assets/images/file-send.png" alt="">
+                                    <p class="flex-1">{{i.content.msg_body.fname}}</p>
+                                </div>
+                                <div class="chat-panel-range">
+                                    <div>
+                                        <span class="float-left">{{(i.content.msg_body.fsize/1024).toFixed(0) + 'KB'}}</span>
+                                        <span class="float-right">已接收</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="float-left" [href]="i.content.msg_body.media_url" download="aa.png">下载文件</a>                            
+                        </div>
+                        <!-- 地理定位 -->
+                        <div *ngIf="i.content.msg_type === 'location'" class="chat-panel-location clearfix">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
+                                <div class="chat-panel-map-wrap float-left">
+                                    <div [id]="'allmap' + num" class="float-left chat-panel-allmap"></div>
+                                    <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
+                                </div>
+                            </a>                                
+                        </div>
+                    </div>
+                    <div class="chat-panel-me-msg chat-panel-msg" *ngIf="global.user === i.content.from_id">
+                        <!-- 时间 -->
+                        <p class="chat-panel-time" *ngIf="i.time_show" [ngSwitch]="i.time_show">
+                            <time *ngSwitchCase="'year'">{{i.content.create_time | date:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.content.create_time | date:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.content.create_time | day}} {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.content.create_time | date:"HH:mm"}}</time>
+                        </p>
+                        <!-- 文本消息 -->
+                        <div *ngIf="i.content.msg_body.text" class="clearfix">
+                            <div class="float-right chat-panel-fromId-me" (click)="watchSelfInfo()">
+                                <img class="chat-panel-avatar" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="chat-panel-msgText-me float-right" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
+                                <div *ngIf="i.success === 1" class="chat-panel-send-loading"></div>                                
+                                <div *ngIf="i.success === 3" class="chat-panel-send-error align-items-center display-flex" (click)="repeatSendMsgAction(i)"></div>                                
+                                <p class="chat-panel-text-msg" [innerHTML]="i.content.msg_body.text | tag" [ngClass]="{'chat-panel-jpush-emoji': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}"></p>
+                            </div>
+                        </div>
+                        <!-- 图片消息 -->
+                        <div class="chat-panel-img-me clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}">
+                            <div class="chat-panel-fromId-me float-right" (click)="watchSelfInfo()">
+                                <img class="chat-panel-avatar" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-right chat-panel-message-img-wrap" [ngClass]="{'chat-panel-message-img-loading': i.success === 1}">
+                                <div *ngIf="i.success === 3" class="chat-panel-send-error" (click)="repeatSendPicAction(i)"></div>
+                                <div>
+                                    <img class="chat-panel-message-img" title="点击查看大图" [src]="i.content.msg_body.media_url" alt="">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 文件消息 -->
+                        <div *ngIf="i.content.msg_type == 'file'" class="clearfix">
+                            <div class="chat-panel-fromId-me float-right" (click)="watchSelfInfo()">
+                                <img class="chat-panel-avatar" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-right chat-panel-file-me">
+                                <div *ngIf="i.success === 1" class="chat-panel-send-loading"></div>
+                                <div *ngIf="i.success === 3" class="chat-panel-send-error" (click)="repeatSendFileAction(i)"></div>
+                                <div class="display-flex chat-panel-file-icon-me" [title]="i.content.msg_body.fname">
+                                    <img src="../../../assets/images/file-send.png" alt="">
+                                    <p class="flex-1">{{i.content.msg_body.fname}}</p>
+                                </div>
+                                <div class="chat-panel-range">
+                                    <p  *ngIf="i.success === 1"></p>
+                                    <div>
+                                        <span class="float-left">{{(i.content.msg_body.fsize/1024).toFixed(0) + 'KB'}}</span>
+                                        <span class="float-right" *ngIf="i.msg_type">已发送</span>
+                                        <span class="float-right" *ngIf="!i.msg_type">{{i.success === 3 ? '发送失败' : (i.success === 2 ? '已发送' : '正在发送')}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </perfect-scrollbar>
+        </div>
+    </div>
+    <div class="chat-panel-message-input">
+        <div class="chat-panel-send-file">
+            <emoji-component *ngIf="emojiInfo.show" [emojiInfo]="emojiInfo" (jpushEmojiSelect)="jpushEmojiSelectEmit($event)"></emoji-component>            
+            <button title="表情" class="chat-panel-emoji-btn" [ngClass]="{'active': emojiInfo.show }" type="button" (click)="showEmojiPanel($event)"></button>
+            <input type="file" id="sendFile" class="chat-panel-singleFile" (click)="inputNoBlurAction()" (change) = "sendFileAction($event)" value="发送图片">
+            <label title="文件" for="sendFile" class="chat-panel-singleFile-label" [ngClass]="{'active': filePanelShow}"></label>
+            <input type="file" id="sendPic" class="chat-panel-singlePic" (click)="inputNoBlurAction()" (change) = "sendPicAction($event)" value="发送图片">
+            <label title="图片" for="sendPic" class="chat-panel-singlePic-label"></label>
+        </div>
+        <perfect-scrollbar class="chat-panel-content-scroll" style="height: 127px; width:100%;">
+            <pre class="chat-panel-content-text" myModel [myModel]="messageList[active.activeIndex]" id="contentDiv" spellcheck="false" contenteditable="true" (keydown)="preKeydown($event)" (blur)="msgContentChange($event)" (focus)="msgContentFocus()" (click)="msgContentClick($event)"></pre>
+        </perfect-scrollbar>
+        <button class="chat-panel-send-btn btn-white" type="button" (click) = "sendMsgAction()">发送</button>
+    </div>
+</div>

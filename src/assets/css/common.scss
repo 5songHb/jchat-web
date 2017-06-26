@@ -1,0 +1,671 @@
+@import './base-color';
+
+html{
+    height: 100%;
+    width: 100%;
+}
+body {
+    background: url(../images/body-background.jpg) left top no-repeat;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+    font-family: PingFangSC-Regular;
+}
+button{
+    border: none;
+}
+input{
+    border: none;
+    font-size: 12px;
+    color: #8A8C8C;
+}
+input:focus{
+    border: none;
+    outline: none;
+}
+input:active{
+    border: none;
+}
+button{
+    border: none;
+    cursor: pointer;
+}
+button:focus{
+    outline: none;
+}
+// button
+.btn-active{
+    height: 30px; 
+    background: $green-color;
+    font-size: 14px;
+    color: #fff;
+    border: 1px solid $green-color;
+    border-radius: 3px;
+    &:hover{
+        background: $green-hover-color !important;
+    }
+}
+.btn-white{
+    height: 30px;    
+    font-size: 14px;
+    color: #2C2C2C;
+    border: 1px solid #C8C8C8;
+    background: #fff;
+    border-radius: 3px;
+    &:hover{
+        background: $gray-hover-color !important;
+    }
+}
+// input
+.input-focus:focus{
+    border-color: $green-color !important;
+}
+.input-error{
+    border-color: $error-color !important;
+}
+// menu-hover
+.menu-hover:hover{
+    background: #F3F7FB !important;
+}
+.btn-primary-lg{
+    height: 43px;
+    width: 207px;
+    border-radius: 3px;
+    background-color: #3e81dd;
+    color: #fff;
+    font-size: 16px;
+}
+.btn-primary-lg.disabled{
+    background-color: #ccc;
+    cursor: default;
+}
+
+a{
+    text-decoration: none;
+    color: #333;
+    cursor: default;  
+}
+a:focus{
+    outline: none;
+}
+a:active{
+    color:#333;
+}
+p{
+    margin: 0;
+}
+ul,li,ol{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.display-flex {
+    display: -webkit-box;
+    /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+    display: -moz-box;
+    /* 老版本语法: Firefox (buggy) */
+    display: -ms-flexbox;
+    /* 混合版本语法: IE 10 */
+    display: -webkit-flex;
+    /* 新版本语法: Chrome 21+ */
+    display: flex;
+    /* 新版本语法: Opera 12.1, Firefox 22+ */
+}
+
+.flex-direction-row {
+    -webkit-box-direction: normal;
+    -webkit-box-orient: horizontal;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+
+.flex-direction-vertical {
+    -webkit-box-direction: normal;
+    -webkit-box-orient: vertical;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
+
+.align-items-start {
+    -webkit-box-align: start;
+    -moz-align-items: start;
+    -ms-align-items: start;
+    -webkit-align-items: start;
+    align-items: start;
+}
+
+.align-items-center {
+    -webkit-box-align: center;
+    -moz-align-items: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.justify-content-center {
+    -webkit-box-pack: center;
+    -moz-justify-content: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.justify-content-end {
+    -webkit-box-pack: end;
+    -moz-justify-content: flex-end;
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end;
+    justify-content: end;
+}
+
+.justify-content-top {
+    -webkit-box-pack: top;
+    -moz-justify-content: top;
+    -ms-flex-pack: top;
+    -webkit-justify-content: top;
+    justify-content: top;
+}
+
+.justify-content-justify {
+    box-pack: justify;
+    -webkit-box-pack: justify;
+    -moz-box-pack: justify;
+    -ms-flex-pack: justify;
+    -o-box-pack: justify;
+    justify-content: space-between;
+}
+
+.flex-1 {
+    -webkit-box-flex: 1;
+    -moz-flex: 1;
+    -ms-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: hidden;
+}
+
+.flex-wrap {
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+}
+.float-left{
+    float: left;
+}
+.float-right{
+    float: right;
+}
+.clearfix:after{
+    content: '';
+    clear: both;
+    width: 0;
+    height: 0;
+    display: block;
+    visibility: hidden;
+}
+// 百度地图
+.BMap_cpyCtrl  
+{  
+    display:none;   
+} 
+.chat-panel-location .BMap_mask{
+    cursor: default;
+}
+.anchorBL{  
+    display:none;   
+}
+// 模态框
+.modal-shadow{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 99999;
+    .modal-content{
+        background: #FFFFFF;
+        box-shadow: 1px 1px 5px 2px rgba(0,0,0,0.20);
+        border-radius: 4px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        width: 414px;
+        padding: 0 20px 32px 20px;
+        box-sizing: border-box;
+        .modal-title{
+            font-weight: 100;
+            height: 50px;
+            line-height: 50px;
+            border-bottom: 1px solid #D9DEE4;
+            font-size: 14px;
+            color: #2C2C2C;
+            position: relative;
+            margin: 0;
+        }
+        .modal-close{
+            width: 14px;
+            height: 14px;
+            content: '';
+            display: block;
+            position: absolute;
+            top: 18px;
+            right: 4px;
+            background: url(../images/modal-close.png) center center no-repeat;
+            cursor: pointer;
+        }
+        .modal-input{
+            text-align: center;
+            input{
+                width: 320px;
+                height: 42px;
+                border: 1px solid #D9DEE4;
+                border-radius: 2px;
+                padding-left: 12px;
+                font-size: 12px;
+                box-sizing: border-box;
+            }
+        }
+        .modal-warn-tip{
+            line-height: 22px;
+            margin: 38px 0 35px 0;
+            text-align: center;
+            font-size: 16px;
+            color: #2C2C2C;
+        }
+        .modal-btn{
+            text-align: center;
+            margin-top: 28px;
+            .btn-confirm{
+                width: 90px;
+                height: 30px;
+            }
+            .btn-cancel{
+                width: 90px;
+                margin-right: 20px;
+            }
+        }
+    }
+}
+
+// 模拟滚动条
+.chat-panel-scroll .ps-content{
+    padding-right: 20px;
+}
+.conversation-recentMsg img{
+    width: 17px;
+    position: relative;
+    top: 4px;
+}
+.chat-panel-content-scroll .ps-content{
+    min-height: 127px;
+}
+.chat-panel-content-scroll .ps-content pre{
+    min-height: 127px;
+}
+.chat-panel-msgText-me img{
+    vertical-align: middle;
+}
+.chat-panel-msgText-you img{
+    vertical-align: middle;
+}
+.chat-panel-jpush-emoji{
+    img{
+        width: 100%;
+    }
+}
+// emoji
+.emoji-face-normal{
+    width: 20px;
+    height: 20px;
+    background-image: url(../images/emoji-input.png);
+    background-repeat: no-repeat;
+}
+.emoji-face-input0{
+    background-position:0 0;
+}
+.emoji-face-input1{
+    background-position:-24px 0;
+}
+.emoji-face-input2{
+    background-position:-48px 0;
+}
+.emoji-face-input3{
+    background-position:-72px 0;
+}
+.emoji-face-input4{
+    background-position:-96px 0;
+}
+.emoji-face-input5{
+    background-position:-120px 0;
+}
+.emoji-face-input6{
+    background-position:-144px 0;
+}
+.emoji-face-input7{
+    background-position:-168px 0;
+}
+.emoji-face-input8{
+    background-position:-192px 0;
+}
+.emoji-face-input9{
+    background-position:-216px 0;
+}
+.emoji-face-input10{
+    background-position:-240px 0;
+}
+.emoji-face-input11{
+    background-position:-264px 0;
+}
+.emoji-face-input12{
+    background-position:-288px 0;
+}
+.emoji-face-input13{
+    background-position:-312px 0;
+}
+.emoji-face-input14{
+    background-position:-336px 0;
+}
+.emoji-face-input15{
+    background-position:0 -24px;
+}
+.emoji-face-input16{
+    background-position:-24px -24px;
+}
+.emoji-face-input17{
+    background-position:-48px -24px;
+}
+.emoji-face-input18{
+    background-position:-72px -24px;
+}
+.emoji-face-input19{
+    background-position:-96px -24px;
+}
+.emoji-face-input20{
+    background-position:-120px -24px;
+}
+.emoji-face-input21{
+    background-position:-144px -24px;
+}
+.emoji-face-input22{
+    background-position:-168px -24px;
+}
+.emoji-face-input23{
+    background-position:-192px -24px;
+}
+.emoji-face-input24{
+    background-position:-216px -24px;
+}
+.emoji-face-input25{
+    background-position:-240px -24px;
+}
+.emoji-face-input26{
+    background-position:-264px -24px;
+}
+.emoji-face-input27{
+    background-position:-288px -24px;
+}
+.emoji-face-input28{
+    background-position:-312px -24px;
+}
+.emoji-face-input29{
+    background-position:-336px -24px;
+}
+.emoji-face-input30{
+    background-position:0 -48px;
+}
+.emoji-face-input31{
+    background-position:-24px -48px;
+}
+.emoji-face-input32{
+    background-position:-48px -48px;
+}
+.emoji-face-input33{
+    background-position:-72px -48px;
+}
+.emoji-face-input34{
+    background-position:-96px -48px;
+}
+.emoji-face-input35{
+    background-position:-120px -48px;
+}
+.emoji-face-input36{
+    background-position:-144px -48px;
+}
+.emoji-face-input37{
+    background-position:-168px -48px;
+}
+.emoji-face-input38{
+    background-position:-192px -48px;
+}
+.emoji-face-input39{
+    background-position:-216px -48px;
+}
+.emoji-face-input40{
+    background-position:-240px -48px;
+}
+.emoji-face-input41{
+    background-position:-264px -48px;
+}
+.emoji-face-input42{
+    background-position:-288px -48px;
+}
+.emoji-face-input43{
+    background-position:-312px -48px;
+}
+.emoji-face-input44{
+    background-position:-336px -48px;
+}
+.emoji-face-input45{
+    background-position:0 -72px;
+}
+.emoji-face-input46{
+    background-position:-24px -72px;
+}
+.emoji-face-input47{
+    background-position:-48px -72px;
+}
+.emoji-face-input48{
+    background-position:-72px -72px;
+}
+.emoji-face-input49{
+    background-position:-96px -72px;
+}
+.emoji-face-input50{
+    background-position:-120px -72px;
+}
+.emoji-face-input51{
+    background-position:-144px -72px;
+}
+.emoji-face-input52{
+    background-position:-168px -72px;
+}
+.emoji-face-input53{
+    background-position:-192px -72px;
+}
+.emoji-face-input54{
+    background-position:-216px -72px;
+}
+.emoji-face-input55{
+    background-position:-240px -72px;
+}
+.emoji-face-input56{
+    background-position:-264px -72px;
+}
+.emoji-face-input57{
+    background-position:-288px -72px;
+}
+.emoji-face-input58{
+    background-position:-312px -72px;
+}
+.emoji-face-input59{
+    background-position:-336px -72px;
+}
+.emoji-face-input60{
+    background-position:0 -96px;
+}
+.emoji-face-input61{
+    background-position:-24px -96px;
+}
+.emoji-face-input62{
+    background-position:-48px -96px;
+}
+.emoji-face-input63{
+    background-position:-72px -96px;
+}
+.emoji-face-input64{
+    background-position:-96px -96px;
+}
+.emoji-face-input65{
+    background-position:-120px -96px;
+}
+.emoji-face-input66{
+    background-position:-144px -96px;
+}
+.emoji-face-input67{
+    background-position:-168px -96px;
+}
+.emoji-face-input68{
+    background-position:-192px -96px;
+}
+.emoji-face-input69{
+    background-position:-216px -96px;
+}
+.emoji-face-input70{
+    background-position:-240px -96px;
+}
+.emoji-face-input71{
+    background-position:-264px -96px;
+}
+.emoji-face-input72{
+    background-position:-288px -96px;
+}
+.emoji-face-input73{
+    background-position:-312px -96px;
+}
+.emoji-face-input74{
+    background-position:-336px -96px;
+}
+.emoji-face-input75{
+    background-position:0 -120px;
+}
+.emoji-face-input76{
+    background-position:-24px -120px;
+}
+.emoji-face-input77{
+    background-position:-48px -120px;
+}
+.emoji-face-input78{
+    background-position:-72px -120px;
+}
+.emoji-face-input79{
+    background-position:-96px -120px;
+}
+.emoji-face-input80{
+    background-position:-120px -120px;
+}
+.emoji-face-input81{
+    background-position:-144px -120px;
+}
+.emoji-face-input82{
+    background-position:-168px -120px;
+}
+.emoji-face-input83{
+    background-position:-192px -120px;
+}
+.emoji-face-input84{
+    background-position:-216px -120px;
+}
+.emoji-face-input85{
+    background-position:-240px -120px;
+}
+.emoji-face-input86{
+    background-position:-264px -120px;
+}
+.emoji-face-input87{
+    background-position:-288px -120px;
+}
+.emoji-face-input88{
+    background-position:-312px -120px;
+}
+.emoji-face-input89{
+    background-position:-336px -120px;
+}
+.emoji-face-input90{
+    background-position:0 -144px;
+}
+.emoji-face-input91{
+    background-position:-24px -144px;
+}
+.emoji-face-input92{
+    background-position:-48px -144px;
+}
+.emoji-face-input93{
+    background-position:-72px -144px;
+}
+.emoji-face-input94{
+    background-position:-96px -144px;
+}
+.emoji-face-input95{
+    background-position:-120px -144px;
+}
+.emoji-face-input96{
+    background-position:-144px -144px;
+}
+.emoji-face-input97{
+    background-position:-168px -144px;
+}
+.emoji-face-input98{
+    background-position:-192px -144px;
+}
+.emoji-face-input99{
+    background-position:-216px -144px;
+}
+.emoji-face-input100{
+    background-position:-240px -144px;
+}
+.emoji-face-input101{
+    background-position:-264px -144px;
+}
+.emoji-face-input102{
+    background-position:-288px -144px;
+}
+.emoji-face-input103{
+    background-position:-312px -144px;
+}
+.emoji-face-input104{
+    background-position:-336px -144px;
+}
+.emoji-face-input105{
+    background-position:0 -168px;
+}
+.emoji-face-input106{
+    background-position:-24px -168px;
+}
+.emoji-face-input107{
+    background-position:-48px -168px;
+}
+.emoji-face-input108{
+    background-position:-72px -168px;
+}
+.emoji-face-input109{
+    background-position:-96px -168px;
+}
+.emoji-face-input110{
+    background-position:-120px -168px;
+}
+.emoji-face-input111{
+    background-position:-144px -168px;
+}
+.emoji-face-input112{
+    background-position:-168px -168px;
+}
+
+
+
+

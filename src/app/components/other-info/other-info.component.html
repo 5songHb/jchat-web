@@ -1,0 +1,34 @@
+<div class="modal-shadow">
+    <div class="other-info-container modal-content">
+        <span class="modal-close" (click)="otherClose()"></span>
+        <div class="other-info-avatar">
+            <div class="other-info-show-avatar">
+                <img [src]="otherInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+            </div>
+            <div class="other-info-avatar-username">
+                {{otherInfo.nickname ? otherInfo.nickname : otherInfo.username}}
+                <div class="self-info-blacklist-icon" [hoverEvent]="addBlackHover" (click)="addBlack()">
+                    <hover-tip-component *ngIf="addBlackHover.show" [hoverInfo]="addBlackHover"></hover-tip-component>
+                </div>
+            </div>
+            <p class="other-info-signature">
+                <span>{{otherInfo.signature ? otherInfo.signature : '暂无签名'}}</span>
+            </p>
+        </div>
+        <p class="other-info-p display-flex">
+            <span class="other-info-fixed-width">用户名：</span>
+            <span class="flex-1" [ngClass]="{'gray': isEdit}">{{otherInfo.username}}</span>
+        </p>
+        <p class="other-info-p display-flex">
+            <span class="other-info-fixed-width">性&ensp;&ensp;别：</span>
+            <span class="flex-1">{{otherInfo.gender}}</span>       
+        </p>
+        <p class="other-info-p display-flex">
+            <span class="other-info-fixed-width">地&ensp;&ensp;区：</span>
+            <span class="flex-1">{{otherInfo.region ? otherInfo.region : '无'}}</span>
+        </p>
+        <p class="modal-btn">        
+            <button type="button" class="btn-active" (click)="sendMsgBtn()">发消息</button>
+        </p>
+    </div>
+</div>
