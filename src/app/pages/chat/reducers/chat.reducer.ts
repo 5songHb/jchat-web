@@ -210,7 +210,6 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.groupName:
             state.activePerson.name = state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo.name = payload.name;
-            
             break;
         // 成功获取个人信息
         case mainAction.showSelfInfo:

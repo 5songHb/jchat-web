@@ -1,19 +1,19 @@
 {
-  "name": "ng2-jmessage",
+  "name": "ng2-jchat",
   "version": "1.0.0",
-  "description": "jmessage",
+  "description": "jchat",
   "main": "index.js",
   "author": "xuwenqing <xuwenqing@jpush.cn>",
   "repository": {
     "type": "git",
-    "url": "http://ssh-gitlab.jpushoa.com/front-end/ng2-spa-seed.git"
+    "url": "http://gitlab.jpushoa.com/xuwq/ng2-jchat.git"
   },
   "bugs": {
-    "url": "http://gitlab.jpushoa.com/front-end/ng2-spa-seed/issues"
+    "url": "http://gitlab.jpushoa.com/xuwq/ng2-jchat/issues"
   },
   "keywords": [
     "ng2",
-    "spa"
+    "jchat"
   ],
   "scripts": {
     "dev": "webpack-dev-server --inline --hot --progress --profile --colors",
