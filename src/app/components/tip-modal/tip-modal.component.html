@@ -6,8 +6,9 @@
         </h2>
         <p class="modal-warn-tip">{{info.tip}}</p>
         <p class="modal-btn">
-            <button type="button" (click)="modalTip()" class="btn-cancel btn-white">取消</button>
-            <button type="button" (click)="modalTip(info)" class="btn-confirm btn-active">确定</button>            
+            <button *ngIf="!info.button" type="button" (click)="modalTip()" class="btn-cancel btn-white">取消</button>
+            <button *ngIf="!info.button" type="button" (click)="modalTip(info)" class="btn-confirm btn-active">确定</button>            
+            <button *ngIf="info.button && info.button === 'confirm'" type="button" (click)="modalTip()" class="btn-confirm btn-active">确定</button>
         </p>
     </div>
 </div>

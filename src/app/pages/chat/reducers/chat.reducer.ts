@@ -16,7 +16,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 state.conversation = payload.conversation;
             }else if(!payload.storage && payload.noDisturb){
                 addNoDisturb(state, payload.noDisturb);
-            }else if(state.messageList.length > 0 && payload.storage){
+            }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
                 unreadNum(state, payload);
                 console.log('00000000000', state.conversation, state.messageList);
                 filterRecentMsg(state);
@@ -30,9 +30,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 登陆后，离线消息同步消息列表
             if(!payload.storage){
                 state.messageList = payload;
-            }else if(state.conversation.length > 0 && payload.storage){
+            }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
                 unreadNum(state, payload);
-                console.log('00000000000');
+                console.log('11111111111', state.conversation, state.messageList);
                 filterRecentMsg(state);
                 state.msgId = filterMsgId(state, 'init');
             }
@@ -440,8 +440,9 @@ function sendMsgComplete(state: ChatStore, payload){
 }
 // 删除本地的会话列表
 function deleteConversationItem(state: ChatStore, payload){
+    console.log(333, payload)
     for(let i=0;i<state.conversation.length;i++){
-        if(state.conversation[i].key == payload.item.key){
+        if(state.conversation[i].key == payload.item.key || state.conversation[i].key == payload.item.uid){
             state.conversation.splice(i,1);
             break;
         }
@@ -463,7 +464,7 @@ function addMessage(state: ChatStore, payload){
                     payload.msgs.time_show = 'today';
                     msgs.push(payload.msgs);
                     state.newMessage = payload.msgs;
-                    return ;
+                    break ;
                 }
                 if((payload.msgs.content.create_time - msgs[msgs.length - 1].content.create_time) / 1000 / 60 > 5){
                     payload.msgs.time_show = 'today';

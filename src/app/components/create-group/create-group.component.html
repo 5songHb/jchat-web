@@ -47,7 +47,7 @@
         </div>
         <p class="modal-btn modal-input create-group-name">
             <span class="float-left" *ngIf="!createGroup.info.action">群名称：</span>
-            <input *ngIf="!createGroup.info.action" type="text" class="input-focus float-left" [(ngModel)]="groupName" placeholder="请输入群组名称">
+            <input *ngIf="!createGroup.info.action" type="text" maxlength="20" class="input-focus float-left" [(ngModel)]="groupName" placeholder="请输入群组名称">
             <button type="button" (click)="confirmCreateGroup()" class="btn-confirm btn-active float-right">确定</button>                     
             <button type="button" (click)="cancelCreateGroup()" class="btn-cancel btn-white float-right">取消</button>         
         </p>

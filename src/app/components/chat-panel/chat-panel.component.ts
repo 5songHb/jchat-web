@@ -3,6 +3,8 @@ import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfec
 import { Store } from '@ngrx/store';
 import { AppStore } from '../../app.store';
 import { chatAction } from '../../pages/chat/actions';
+import { contactAction } from '../../pages/contact/actions';
+import { mainAction } from '../../pages/main/actions';
 
 import { global, emojiConfig, jpushConfig } from '../../services/common';
 import { Util } from '../../services/util';
@@ -119,7 +121,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
-                // let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                // let msgs = chatState.messageList[this.active.activeIndex].msgs;
                 this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
                 for(let i=0;i<this.msg.length;i++){
                     if(this.msg[i].content.msg_type == 'location'){
@@ -153,7 +155,22 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
 
                 // 发送群组文件消息
             case chatAction.sendGroupFile:
+
+            case mainAction.selectSearchUser:
+
+            case mainAction.createSingleChatSuccess:
+
+            case mainAction.createGroupSuccess:
+
+            case chatAction.createOtherChat:
+
+            case contactAction.selectContactItem:
                 this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
+                setTimeout(function(){
+                    this.componentScroll.update();
+                    this.componentScroll.scrollToBottom();
+                    document.getElementById('contentDiv').focus();
+                }.bind(this), 200);
                 break;
         }
     }
@@ -209,6 +226,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
                 this.change = this.active.change;
                 // document.getElementById('msgContent').focus();
                 document.getElementById('contentDiv').focus();
+                this.util.focusLast(this.contentDiv);
             }.bind(this),150);
         }
     }

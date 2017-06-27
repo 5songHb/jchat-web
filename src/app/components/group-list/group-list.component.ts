@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
+const avatarErrorIcon = require('../../../assets/images/group-avatar.png');
 
 @Component({
     selector: 'group-list-component',

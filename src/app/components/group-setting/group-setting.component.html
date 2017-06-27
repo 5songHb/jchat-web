@@ -6,7 +6,7 @@
             <p class="clearfix group-setting-text">
                 <span class="float-left">群名称&nbsp;:&nbsp;</span>
                 <span class="float-left group-setting-name-text" [hidden]="modifyGroupNameShow" (click)="modifyGroupNameAction()" [title]="groupSetting.groupInfo.name">{{groupSetting.groupInfo.name}}</span>
-                <input class="float-left group-setting-name-input input-focus" id="groupSettingNameInput" [hidden]="!modifyGroupNameShow" type="text" [ngModel]="groupSetting.groupInfo.name" (blur)="modifyGroupNameBlur($event)">
+                <input maxlength="20" class="float-left group-setting-name-input input-focus" id="groupSettingNameInput" [hidden]="!modifyGroupNameShow" type="text" [ngModel]="groupSetting.groupInfo.name" (blur)="modifyGroupNameBlur($event)">
             </p>
             <p class="clearfix group-setting-text">
                 <span class="float-left">群描述&nbsp;:&nbsp;</span>

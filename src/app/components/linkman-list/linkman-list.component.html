@@ -3,8 +3,9 @@
     <div *ngIf="conversation">
         <div *ngFor="let item of conversation">
             <div *ngIf="item.data.length > 0" class="linkman-list-letter">{{item.letter}}</div>
-            <div *ngFor="let data of item.data" class="linkman-list-name display-flex" (dblclick)="selectLinkmanItem(data)">
-                <img [src]="data.avatarUrl" (error)="avatarErrorIcon($event)" class="linkman-list-avatar" alt="">
+            <div *ngFor="let data of item.data" class="linkman-list-name display-flex" (click)="selectLinkmanItem(data)">
+                <img *ngIf="data.type === 3" [src]="data.avatarUrl" (error)="avatarErrorIcon($event)" class="linkman-list-avatar" alt="">
+                <img *ngIf="data.type === 4" src="../../../assets/images/group-avatar.png" class="linkman-list-avatar" alt="">
                 <span class="flex-1">{{data.name}}</span>
             </div>
         </div>

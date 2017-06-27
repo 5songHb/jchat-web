@@ -205,14 +205,6 @@ export class MainEffect {
     private modifyPassword$: Observable<Action> = this.actions$
         .ofType(mainAction.modifyPassword)
         .map(toPayload)
-        .filter((passwordInfo) => {
-            if(!passwordInfo.old_pwd || !passwordInfo.new_pwd){
-                alert('密码不能为空');
-                return false;
-            }else{
-                return passwordInfo;
-            }
-        })
         .switchMap((passwordInfo) => {
             let that = this;
             let passwordInfoObj = global.JIM.updateSelfPwd({
@@ -226,7 +218,18 @@ export class MainEffect {
                     type: mainAction.modifyPasswordShow, 
                     payload: false
                 });
-                that.router.navigate(['/login']);
+                that.store$.dispatch({
+                    type: mainAction.showModalTip,
+                    payload: {
+                        show: true,
+                        info: {
+                            title: '修改密码成功',
+                            tip: '修改密码成功',
+                            actionType: '[main] modify password alert',
+                            button: 'confirm'
+                        }
+                    }
+                })
                 console.log(data);
             }).onFail(function(data) {
                 console.log('error:' + JSON.stringify(data));
