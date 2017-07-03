@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, HostListener } from '@angular/core';
 
 import { Util } from '../../services/util';
+import { imgRouter } from '../../services/common';
 
 @Component({
     selector: 'emoji-component',
@@ -14,6 +15,7 @@ export class EmojiComponent implements OnInit {
     @Output()
         private jpushEmojiSelect: EventEmitter<any> = new EventEmitter();
     private util = new Util();
+    private imgRouter = imgRouter;
     private tab = 0;
 
     constructor() {
@@ -38,7 +40,7 @@ export class EmojiComponent implements OnInit {
     }
     private emojiSelectAction(item){
         let contentId = document.getElementById(this.emojiInfo.contentId),
-            insertHtml = `<img src="../../assets/images/spacer.gif" class="emoji-face-normal emoji-face-input${item.imgNum - 1}" />`;
+            insertHtml = `<img src="${imgRouter}assets/images/spacer.gif" class="emoji-face-normal emoji-face-input${item.imgNum - 1}" />`;
         this.util.insertAtCursor(contentId,insertHtml,false);
     }
     private jpushEmojiSelectAction(item){

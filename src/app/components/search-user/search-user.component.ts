@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -10,7 +10,8 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
         trigger('flyIn', [
             state('in', style({transform: 'translateX(-260px)'})),
             state('out', style({transform: 'translateX(0)'})),
-            transition('out => in', animate(200))
+            transition('out => in', animate(200)),
+            transition('in => out', animate(200))
         ])
     ]
 })
@@ -38,12 +39,18 @@ export class SearchUserComponent implements OnInit {
             .debounceTime(300)
             .subscribe((event:any) => {
                 this.searchUser.emit(event.target.value);
-            }); 
+            });
     }
     ngOnChanges(){
         if(!this.searchUserResult.isSearch){
             this.searchKeyword = '';
         }
+    }
+    @HostListener('window:click') onClickWindow(){
+        this.searchKeyword = '';
+        this.searchUser.emit(this.searchKeyword);
+        this.inputAnimate = 'out';
+        this.searchInputIsShow = true;
     }
     private singleShowAll(){
         if(this.singleShowText === '显示全部'){
@@ -69,6 +76,7 @@ export class SearchUserComponent implements OnInit {
     private clearInput(){
         this.searchKeyword = '';
         this.searchUser.emit(this.searchKeyword);
+        document.getElementById('searchInput').focus();
     }
     private selectSearchItem(item){
         this.selectUserResult.emit(item);
@@ -79,5 +87,8 @@ export class SearchUserComponent implements OnInit {
         setTimeout(function(){
             document.getElementById('searchInput').focus();
         },200);
+    }
+    private stopPropagation(event){
+        event.stopPropagation();
     }
 }

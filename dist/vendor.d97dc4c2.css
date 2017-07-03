@@ -1,0 +1,1073 @@
+/*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
+
+/* Document
+   ========================================================================== */
+
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in
+ *    IE on Windows Phone and in iOS.
+ */
+
+html {
+  line-height: 1.15; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/* Sections
+   ========================================================================== */
+
+/**
+ * Remove the margin in all browsers (opinionated).
+ */
+
+body {
+  margin: 0;
+}
+
+/**
+ * Add the correct display in IE 9-.
+ */
+
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block;
+}
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+/* Grouping content
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in IE.
+ */
+
+figcaption,
+figure,
+main { /* 1 */
+  display: block;
+}
+
+/**
+ * Add the correct margin in IE 8.
+ */
+
+figure {
+  margin: 1em 40px;
+}
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+
+hr {
+  box-sizing: content-box; /* 1 */
+  height: 0; /* 1 */
+  overflow: visible; /* 2 */
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+pre {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/* Text-level semantics
+   ========================================================================== */
+
+/**
+ * 1. Remove the gray background on active links in IE 10.
+ * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.
+ */
+
+a {
+  background-color: transparent; /* 1 */
+  -webkit-text-decoration-skip: objects; /* 2 */
+}
+
+/**
+ * 1. Remove the bottom border in Chrome 57- and Firefox 39-.
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+
+abbr[title] {
+  border-bottom: none; /* 1 */
+  text-decoration: underline; /* 2 */
+  text-decoration: underline dotted; /* 2 */
+}
+
+/**
+ * Prevent the duplicate application of `bolder` by the next rule in Safari 6.
+ */
+
+b,
+strong {
+  font-weight: inherit;
+}
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+code,
+kbd,
+samp {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/**
+ * Add the correct font style in Android 4.3-.
+ */
+
+dfn {
+  font-style: italic;
+}
+
+/**
+ * Add the correct background and color in IE 9-.
+ */
+
+mark {
+  background-color: #ff0;
+  color: #000;
+}
+
+/**
+ * Add the correct font size in all browsers.
+ */
+
+small {
+  font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Embedded content
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 9-.
+ */
+
+audio,
+video {
+  display: inline-block;
+}
+
+/**
+ * Add the correct display in iOS 4-7.
+ */
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+/**
+ * Remove the border on images inside links in IE 10-.
+ */
+
+img {
+  border-style: none;
+}
+
+/**
+ * Hide the overflow in IE.
+ */
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+/* Forms
+   ========================================================================== */
+
+/**
+ * 1. Change the font styles in all browsers (opinionated).
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: sans-serif; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+
+button,
+input { /* 1 */
+  overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+  text-transform: none;
+}
+
+/**
+ * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
+ *    controls in Android 4.
+ * 2. Correct the inability to style clickable types in iOS and Safari.
+ */
+
+button,
+html [type="button"], /* 1 */
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+}
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+/**
+ * Correct the padding in Firefox.
+ */
+
+fieldset {
+  padding: 0.35em 0.75em 0.625em;
+}
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+
+legend {
+  box-sizing: border-box; /* 1 */
+  color: inherit; /* 2 */
+  display: table; /* 1 */
+  max-width: 100%; /* 1 */
+  padding: 0; /* 3 */
+  white-space: normal; /* 1 */
+}
+
+/**
+ * 1. Add the correct display in IE 9-.
+ * 2. Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+
+progress {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+
+/**
+ * Remove the default vertical scrollbar in IE.
+ */
+
+textarea {
+  overflow: auto;
+}
+
+/**
+ * 1. Add the correct box sizing in IE 10-.
+ * 2. Remove the padding in IE 10-.
+ */
+
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+
+[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/**
+ * Remove the inner padding and cancel buttons in Chrome and Safari on macOS.
+ */
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/* Interactive
+   ========================================================================== */
+
+/*
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in Edge, IE, and Firefox.
+ */
+
+details, /* 1 */
+menu {
+  display: block;
+}
+
+/*
+ * Add the correct display in all browsers.
+ */
+
+summary {
+  display: list-item;
+}
+
+/* Scripting
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 9-.
+ */
+
+canvas {
+  display: inline-block;
+}
+
+/**
+ * Add the correct display in IE.
+ */
+
+template {
+  display: none;
+}
+
+/* Hidden
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 10-.
+ */
+
+[hidden] {
+  display: none;
+}@charset "UTF-8";
+html {
+  height: 100%;
+  width: 100%; }
+
+body {
+  background: url(http://7xo28s.com1.z0.glb.clouddn.com/web-jchat/0.0.1/assets/images/body-background.9f4c9564.jpg) left top no-repeat;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  font-family: PingFangSC-Regular; }
+
+button {
+  border: none; }
+
+input {
+  border: none;
+  font-size: 12px;
+  color: #2c2c2c; }
+
+input:focus {
+  border: none;
+  outline: none; }
+
+input:active {
+  border: none; }
+
+button {
+  border: none;
+  cursor: pointer; }
+
+button:focus {
+  outline: none; }
+
+.btn-active {
+  height: 30px;
+  background: #2DD0CF;
+  font-size: 14px;
+  color: #fff;
+  border: 1px solid #2DD0CF;
+  border-radius: 3px; }
+  .btn-active:hover {
+    background: #02BDBC !important; }
+
+.btn-white {
+  height: 30px;
+  font-size: 14px;
+  color: #2C2C2C;
+  border: 1px solid #C8C8C8;
+  background: #fff;
+  border-radius: 3px; }
+  .btn-white:hover {
+    background: #F2F6FB !important; }
+
+.input-focus:focus {
+  border-color: #2DD0CF !important;
+  background-color: #fff !important; }
+
+.input-error {
+  border-color: #EB424C !important; }
+
+.menu-hover:hover {
+  background: #F3F7FB !important; }
+
+.btn-primary-lg {
+  height: 43px;
+  width: 207px;
+  border-radius: 3px;
+  background-color: #3e81dd;
+  color: #fff;
+  font-size: 16px; }
+
+.btn-primary-lg.disabled {
+  background-color: #ccc;
+  cursor: default; }
+
+a {
+  text-decoration: none;
+  color: #333;
+  cursor: default; }
+
+a:focus {
+  outline: none; }
+
+a:active {
+  color: #333; }
+
+p {
+  margin: 0; }
+
+ul, li, ol {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+
+.display-flex {
+  display: -webkit-box;
+  /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+  display: -moz-box;
+  /* 老版本语法: Firefox (buggy) */
+  display: -ms-flexbox;
+  /* 混合版本语法: IE 10 */
+  display: -webkit-flex;
+  /* 新版本语法: Chrome 21+ */
+  display: flex;
+  /* 新版本语法: Opera 12.1, Firefox 22+ */ }
+
+.flex-direction-row {
+  -webkit-box-direction: normal;
+  -webkit-box-orient: horizontal;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row; }
+
+.flex-direction-vertical {
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column; }
+
+.align-items-start {
+  -webkit-box-align: start;
+  -moz-align-items: start;
+  -ms-align-items: start;
+  -webkit-align-items: start;
+  align-items: start; }
+
+.align-items-center {
+  -webkit-box-align: center;
+  -moz-align-items: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center; }
+
+.justify-content-center {
+  -webkit-box-pack: center;
+  -moz-justify-content: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center; }
+
+.justify-content-end {
+  -webkit-box-pack: end;
+  -moz-justify-content: flex-end;
+  -ms-flex-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: end; }
+
+.justify-content-top {
+  -webkit-box-pack: top;
+  -moz-justify-content: top;
+  -ms-flex-pack: top;
+  -webkit-justify-content: top;
+  justify-content: top; }
+
+.justify-content-justify {
+  box-pack: justify;
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+  -ms-flex-pack: justify;
+  -o-box-pack: justify;
+  justify-content: space-between; }
+
+.flex-1 {
+  -webkit-box-flex: 1;
+  -moz-flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  overflow: hidden; }
+
+.flex-wrap {
+  -moz-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap; }
+
+.float-left {
+  float: left; }
+
+.float-right {
+  float: right; }
+
+.clearfix:after {
+  content: '';
+  clear: both;
+  width: 0;
+  height: 0;
+  display: block;
+  visibility: hidden; }
+
+.BMap_cpyCtrl {
+  display: none; }
+
+.chat-panel-location .BMap_mask {
+  cursor: default; }
+
+.anchorBL {
+  display: none; }
+
+.modal-shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99999; }
+  .modal-shadow .modal-content {
+    background: #FFFFFF;
+    box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 414px;
+    padding: 0 20px 32px 20px;
+    box-sizing: border-box; }
+    .modal-shadow .modal-content .modal-title {
+      font-weight: 100;
+      height: 50px;
+      line-height: 50px;
+      border-bottom: 1px solid #D9DEE4;
+      font-size: 14px;
+      color: #2C2C2C;
+      position: relative;
+      margin: 0; }
+    .modal-shadow .modal-content .modal-close {
+      width: 14px;
+      height: 14px;
+      content: '';
+      display: block;
+      position: absolute;
+      top: 18px;
+      right: 4px;
+      background: url(http://7xo28s.com1.z0.glb.clouddn.com/web-jchat/0.0.1/assets/images/modal-close.3e0ddefb.png) center center no-repeat;
+      cursor: pointer; }
+    .modal-shadow .modal-content .modal-input {
+      text-align: center; }
+      .modal-shadow .modal-content .modal-input input {
+        width: 320px;
+        height: 42px;
+        border: 1px solid #D9DEE4;
+        border-radius: 2px;
+        padding-left: 12px;
+        font-size: 12px;
+        box-sizing: border-box; }
+    .modal-shadow .modal-content .modal-warn-tip {
+      line-height: 22px;
+      margin: 38px 0 35px 0;
+      text-align: center;
+      font-size: 16px;
+      color: #2C2C2C; }
+    .modal-shadow .modal-content .modal-btn {
+      text-align: center;
+      margin-top: 28px; }
+      .modal-shadow .modal-content .modal-btn .btn-confirm {
+        width: 90px;
+        height: 30px; }
+      .modal-shadow .modal-content .modal-btn .btn-cancel {
+        width: 90px;
+        margin-right: 20px; }
+
+.chat-panel-scroll .ps-content {
+  padding-right: 20px; }
+
+.conversation-recentMsg img {
+  width: 20px;
+  position: relative;
+  top: 4px; }
+
+.chat-panel-msgText-me img {
+  vertical-align: middle; }
+
+.chat-panel-msgText-you img {
+  vertical-align: middle; }
+
+.chat-panel-jpush-emoji img {
+  width: 100%; }
+
+.emoji-face-normal {
+  width: 20px;
+  height: 20px;
+  background-image: url(http://7xo28s.com1.z0.glb.clouddn.com/web-jchat/0.0.1/assets/images/emoji-input.a1b86877.png);
+  background-repeat: no-repeat; }
+
+.emoji-face-input0 {
+  background-position: 0 0; }
+
+.emoji-face-input1 {
+  background-position: -24px 0; }
+
+.emoji-face-input2 {
+  background-position: -48px 0; }
+
+.emoji-face-input3 {
+  background-position: -72px 0; }
+
+.emoji-face-input4 {
+  background-position: -96px 0; }
+
+.emoji-face-input5 {
+  background-position: -120px 0; }
+
+.emoji-face-input6 {
+  background-position: -144px 0; }
+
+.emoji-face-input7 {
+  background-position: -168px 0; }
+
+.emoji-face-input8 {
+  background-position: -192px 0; }
+
+.emoji-face-input9 {
+  background-position: -216px 0; }
+
+.emoji-face-input10 {
+  background-position: -240px 0; }
+
+.emoji-face-input11 {
+  background-position: -264px 0; }
+
+.emoji-face-input12 {
+  background-position: -288px 0; }
+
+.emoji-face-input13 {
+  background-position: -312px 0; }
+
+.emoji-face-input14 {
+  background-position: -336px 0; }
+
+.emoji-face-input15 {
+  background-position: 0 -24px; }
+
+.emoji-face-input16 {
+  background-position: -24px -24px; }
+
+.emoji-face-input17 {
+  background-position: -48px -24px; }
+
+.emoji-face-input18 {
+  background-position: -72px -24px; }
+
+.emoji-face-input19 {
+  background-position: -96px -24px; }
+
+.emoji-face-input20 {
+  background-position: -120px -24px; }
+
+.emoji-face-input21 {
+  background-position: -144px -24px; }
+
+.emoji-face-input22 {
+  background-position: -168px -24px; }
+
+.emoji-face-input23 {
+  background-position: -192px -24px; }
+
+.emoji-face-input24 {
+  background-position: -216px -24px; }
+
+.emoji-face-input25 {
+  background-position: -240px -24px; }
+
+.emoji-face-input26 {
+  background-position: -264px -24px; }
+
+.emoji-face-input27 {
+  background-position: -288px -24px; }
+
+.emoji-face-input28 {
+  background-position: -312px -24px; }
+
+.emoji-face-input29 {
+  background-position: -336px -24px; }
+
+.emoji-face-input30 {
+  background-position: 0 -48px; }
+
+.emoji-face-input31 {
+  background-position: -24px -48px; }
+
+.emoji-face-input32 {
+  background-position: -48px -48px; }
+
+.emoji-face-input33 {
+  background-position: -72px -48px; }
+
+.emoji-face-input34 {
+  background-position: -96px -48px; }
+
+.emoji-face-input35 {
+  background-position: -120px -48px; }
+
+.emoji-face-input36 {
+  background-position: -144px -48px; }
+
+.emoji-face-input37 {
+  background-position: -168px -48px; }
+
+.emoji-face-input38 {
+  background-position: -192px -48px; }
+
+.emoji-face-input39 {
+  background-position: -216px -48px; }
+
+.emoji-face-input40 {
+  background-position: -240px -48px; }
+
+.emoji-face-input41 {
+  background-position: -264px -48px; }
+
+.emoji-face-input42 {
+  background-position: -288px -48px; }
+
+.emoji-face-input43 {
+  background-position: -312px -48px; }
+
+.emoji-face-input44 {
+  background-position: -336px -48px; }
+
+.emoji-face-input45 {
+  background-position: 0 -72px; }
+
+.emoji-face-input46 {
+  background-position: -24px -72px; }
+
+.emoji-face-input47 {
+  background-position: -48px -72px; }
+
+.emoji-face-input48 {
+  background-position: -72px -72px; }
+
+.emoji-face-input49 {
+  background-position: -96px -72px; }
+
+.emoji-face-input50 {
+  background-position: -120px -72px; }
+
+.emoji-face-input51 {
+  background-position: -144px -72px; }
+
+.emoji-face-input52 {
+  background-position: -168px -72px; }
+
+.emoji-face-input53 {
+  background-position: -192px -72px; }
+
+.emoji-face-input54 {
+  background-position: -216px -72px; }
+
+.emoji-face-input55 {
+  background-position: -240px -72px; }
+
+.emoji-face-input56 {
+  background-position: -264px -72px; }
+
+.emoji-face-input57 {
+  background-position: -288px -72px; }
+
+.emoji-face-input58 {
+  background-position: -312px -72px; }
+
+.emoji-face-input59 {
+  background-position: -336px -72px; }
+
+.emoji-face-input60 {
+  background-position: 0 -96px; }
+
+.emoji-face-input61 {
+  background-position: -24px -96px; }
+
+.emoji-face-input62 {
+  background-position: -48px -96px; }
+
+.emoji-face-input63 {
+  background-position: -72px -96px; }
+
+.emoji-face-input64 {
+  background-position: -96px -96px; }
+
+.emoji-face-input65 {
+  background-position: -120px -96px; }
+
+.emoji-face-input66 {
+  background-position: -144px -96px; }
+
+.emoji-face-input67 {
+  background-position: -168px -96px; }
+
+.emoji-face-input68 {
+  background-position: -192px -96px; }
+
+.emoji-face-input69 {
+  background-position: -216px -96px; }
+
+.emoji-face-input70 {
+  background-position: -240px -96px; }
+
+.emoji-face-input71 {
+  background-position: -264px -96px; }
+
+.emoji-face-input72 {
+  background-position: -288px -96px; }
+
+.emoji-face-input73 {
+  background-position: -312px -96px; }
+
+.emoji-face-input74 {
+  background-position: -336px -96px; }
+
+.emoji-face-input75 {
+  background-position: 0 -120px; }
+
+.emoji-face-input76 {
+  background-position: -24px -120px; }
+
+.emoji-face-input77 {
+  background-position: -48px -120px; }
+
+.emoji-face-input78 {
+  background-position: -72px -120px; }
+
+.emoji-face-input79 {
+  background-position: -96px -120px; }
+
+.emoji-face-input80 {
+  background-position: -120px -120px; }
+
+.emoji-face-input81 {
+  background-position: -144px -120px; }
+
+.emoji-face-input82 {
+  background-position: -168px -120px; }
+
+.emoji-face-input83 {
+  background-position: -192px -120px; }
+
+.emoji-face-input84 {
+  background-position: -216px -120px; }
+
+.emoji-face-input85 {
+  background-position: -240px -120px; }
+
+.emoji-face-input86 {
+  background-position: -264px -120px; }
+
+.emoji-face-input87 {
+  background-position: -288px -120px; }
+
+.emoji-face-input88 {
+  background-position: -312px -120px; }
+
+.emoji-face-input89 {
+  background-position: -336px -120px; }
+
+.emoji-face-input90 {
+  background-position: 0 -144px; }
+
+.emoji-face-input91 {
+  background-position: -24px -144px; }
+
+.emoji-face-input92 {
+  background-position: -48px -144px; }
+
+.emoji-face-input93 {
+  background-position: -72px -144px; }
+
+.emoji-face-input94 {
+  background-position: -96px -144px; }
+
+.emoji-face-input95 {
+  background-position: -120px -144px; }
+
+.emoji-face-input96 {
+  background-position: -144px -144px; }
+
+.emoji-face-input97 {
+  background-position: -168px -144px; }
+
+.emoji-face-input98 {
+  background-position: -192px -144px; }
+
+.emoji-face-input99 {
+  background-position: -216px -144px; }
+
+.emoji-face-input100 {
+  background-position: -240px -144px; }
+
+.emoji-face-input101 {
+  background-position: -264px -144px; }
+
+.emoji-face-input102 {
+  background-position: -288px -144px; }
+
+.emoji-face-input103 {
+  background-position: -312px -144px; }
+
+.emoji-face-input104 {
+  background-position: -336px -144px; }
+
+.emoji-face-input105 {
+  background-position: 0 -168px; }
+
+.emoji-face-input106 {
+  background-position: -24px -168px; }
+
+.emoji-face-input107 {
+  background-position: -48px -168px; }
+
+.emoji-face-input108 {
+  background-position: -72px -168px; }
+
+.emoji-face-input109 {
+  background-position: -96px -168px; }
+
+.emoji-face-input110 {
+  background-position: -120px -168px; }
+
+.emoji-face-input111 {
+  background-position: -144px -168px; }
+
+.emoji-face-input112 {
+  background-position: -168px -168px; }

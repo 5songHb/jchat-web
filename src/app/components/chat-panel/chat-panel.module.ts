@@ -15,6 +15,8 @@ import { EmojiModule } from '../emoji';
 import { HoverTipModule } from '../hover-tip';
 import { HoverEventModule } from '../../directives';
 // import '../../../assets/css/viewer.min.css';
+import { ImageViewerModule } from '../image-viewer';
+
 
 @NgModule({
   declarations: [
@@ -31,7 +33,8 @@ import { HoverEventModule } from '../../directives';
     HoverTipModule,
     HoverEventModule,
     DayPipeModule,
-    TagPipeModule
+    TagPipeModule,
+    ImageViewerModule
   ],
   exports: [
       ChatPanelComponent

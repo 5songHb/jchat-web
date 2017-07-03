@@ -1,13 +1,13 @@
 <div class="search-user-container">
     <h1 class="float-left search-user-title">JCHAT</h1>
-    <div [@flyIn]="inputAnimate" class="search-user-input-wrap float-right">
-        <input id="searchInput" [(ngModel)]="searchKeyword" spellcheck="false" class="search-user-input input-focus" type="text" placeholder="搜索">
+    <div (click)="stopPropagation($event)" [@flyIn]="inputAnimate" class="search-user-input-wrap float-right">
+        <input spellcheck="false" id="searchInput" [(ngModel)]="searchKeyword" spellcheck="false" class="search-user-input input-focus" type="text" placeholder="搜索">
         <span (click)="clearInput()" *ngIf="searchUserResult.isSearch"></span>
         <p></p>
     </div>
-    <div *ngIf="searchInputIsShow" class="search-user-btn" (click)="showSearchInput()">搜索</div>
-    <p class="search-user-no-result" *ngIf="searchUserResult.isSearch && searchUserResult.result.singleArr.length === 0 && searchUserResult.result.groupArr.length === 0">找不到匹配的结果</p>    
-    <perfect-scrollbar class="search-user-result" *ngIf="searchUserResult.isSearch && searchUserResult.result.singleArr.length > 0 && searchUserResult.result.groupArr.length > 0">
+    <div (click)="stopPropagation($event)" *ngIf="searchInputIsShow" class="search-user-btn" (click)="showSearchInput()">搜索</div>
+    <p (click)="stopPropagation($event)" class="search-user-no-result" *ngIf="searchUserResult.isSearch && searchUserResult.result.singleArr.length === 0 && searchUserResult.result.groupArr.length === 0">找不到匹配的结果</p>    
+    <perfect-scrollbar (click)="stopPropagation($event)" class="search-user-result" *ngIf="searchUserResult.isSearch && (searchUserResult.result.singleArr.length > 0 || searchUserResult.result.groupArr.length > 0)">
         <div class="search-user-show" *ngIf="searchUserResult.result.singleArr.length > 0">
             联系人
             <span class="float-right" *ngIf="searchUserResult.result.singleArr.length > 4" (click)="singleShowAll()">{{singleShowText}}</span>

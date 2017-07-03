@@ -30,6 +30,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 登陆后，离线消息同步消息列表
             if(!payload.storage){
                 state.messageList = payload;
+                state.imageViewer = filterImageViewer(state);
             }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
                 unreadNum(state, payload);
                 console.log('11111111111', state.conversation, state.messageList);
@@ -151,10 +152,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.messageList[state.activePerson.activeIndex].groupSetting.show = payload.show;
             break;
         case mainAction.createSingleChatSuccess:
-            state.activePerson = payload;             
-            selectUserResult(state, payload);
-            state.defaultPanelIsShow = false;
-            changeActivePerson(state);
+            state.otherInfo.info = payload;
+            state.otherInfo.show = true;
             break;
         case mainAction.createGroupSuccess:
             state.activePerson = payload;
@@ -240,6 +239,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 }
             }
             break;
+        
         default:
     }
     return state;
@@ -289,6 +289,23 @@ function addNoDisturb(state: ChatStore, noDisturb){
         }
     }
 }
+function filterImageViewer(state: ChatStore){
+    if(state.activePerson.activeIndex < 0){
+        return [];
+    }
+    let imgResult = [];
+    for(let j=0;j<state.messageList[state.activePerson.activeIndex].msgs.length;j++){
+        let content = state.messageList[state.activePerson.activeIndex].msgs[j].content;
+        if(content.msg_type === 'image'){
+            imgResult.push({
+                src: content.msg_body.media_url,
+                width: content.msg_body.width,
+                height: content.msg_body.height
+            })
+        }
+    }
+    return imgResult;
+}
 function changeActivePerson(state: ChatStore){
     if(state.activePerson.group === true && state.activePerson.gid){
         state.activePerson.key = state.activePerson.gid;         
@@ -299,18 +316,16 @@ function changeActivePerson(state: ChatStore){
             break;
         }
     }
+    state.imageViewer = filterImageViewer(state);
 }
 function filterRecentMsg(state: ChatStore){
-    console.log('000011111', state.conversation.length, state.messageList.length)
     for(let i=0;i<state.conversation.length;i++){
         for(let j=0;j<state.messageList.length;j++){
             if(state.conversation[i].key == state.messageList[j].key){
                 let msgs = state.messageList[j].msgs;
-                console.log('0');
                 if(msgs.length > 0){
-                    console.log(1);
-                    msgs[msgs.length - 1].conversation_time_show = util.reducerDate(msgs[msgs.length - 1].content.create_time);
-                    state.conversation[i].recentMsg = msgs[msgs.length - 1];               
+                    msgs[msgs.length - 1].conversation_time_show = util.reducerDate(msgs[msgs.length - 1].ctime_ms);
+                    state.conversation[i].recentMsg = msgs[msgs.length - 1];
                 }
                 break;                
             }
@@ -455,10 +470,16 @@ function deleteConversationItem(state: ChatStore, payload){
 function addMessage(state: ChatStore, payload){
     // 自己发消息将消息添加到消息列表   
     if(payload.key){
-        console.log(55555, payload)
+        // 更新imageViewer的数组
+        if(payload.msgs && payload.msgs.content.from_id === global.user && payload.msgs.content.msg_type === 'image'){
+            state.imageViewer.push({
+                src: payload.msgs.content.msg_body.media_url,
+                width: payload.msgs.content.msg_body.width,
+                height: payload.msgs.content.msg_body.height
+            })
+        }
         for(let i=0;i<state.messageList.length;i++){
             if(state.messageList[i].key == payload.key && state.messageList[i].key){
-                console.log(77777, payload.key)
                 let msgs = state.messageList[i].msgs;
                 if(msgs.length === 0){
                     payload.msgs.time_show = 'today';
@@ -466,7 +487,7 @@ function addMessage(state: ChatStore, payload){
                     state.newMessage = payload.msgs;
                     break ;
                 }
-                if((payload.msgs.content.create_time - msgs[msgs.length - 1].content.create_time) / 1000 / 60 > 5){
+                if((payload.msgs.ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
                     payload.msgs.time_show = 'today';
                 }
                 // payload.msgs.content.msg_body.text = payload.msgs.content.msg_body.text.replace('[a]','haha');
@@ -477,7 +498,7 @@ function addMessage(state: ChatStore, payload){
         // 将当前会话放在第一位
         for(let a=0;a<state.conversation.length;a++){
             if(state.conversation[a].key == payload.key){
-                payload.msgs.conversation_time_show = util.reducerDate(payload.msgs.content.create_time);
+                payload.msgs.conversation_time_show = util.reducerDate(payload.msgs.ctime_ms);
                 state.conversation[a].recentMsg = payload.msgs;
                 let item = state.conversation.splice(a,1);
                 state.conversation.unshift(item[0]);
@@ -494,6 +515,22 @@ function addMessage(state: ChatStore, payload){
     // 接收到别人的消息添加到消息列表        
     }else{
         for(let j=0;j<payload.messages.length;j++){
+            // 更新imageViewer的数组
+            if(payload.messages[j].msg_type === 3 && payload.messages[j].from_uid == state.activePerson.key && payload.messages[j].content.msg_type === 'image'){
+                state.imageViewer.push({
+                    src: payload.messages[j].content.msg_body.media_url,
+                    width: payload.messages[j].content.msg_body.width,
+                    height: payload.messages[j].content.msg_body.height
+                })
+            }
+            if(payload.messages[j].msg_type === 4 && payload.messages[j].from_gid == state.activePerson.key && payload.messages[j].content.msg_type === 'image'){
+                state.imageViewer.push({
+                    src: payload.messages[j].content.msg_body.media_url,
+                    width: payload.messages[j].content.msg_body.width,
+                    height: payload.messages[j].content.msg_body.height
+                })
+            }
+
             let flag = false;    
             // 如果发送人在会话列表里
             for(let i=0;i<state.messageList.length;i++){
@@ -501,7 +538,7 @@ function addMessage(state: ChatStore, payload){
                     singleMsg = payload.messages[j].msg_type === 3 && state.messageList[i].key == payload.messages[j].from_uid;
                 if(groupMsg || singleMsg){
                     let msgs = state.messageList[i].msgs;
-                    if((payload.messages[j].content.create_time - msgs[msgs.length - 1].content.create_time) / 1000 / 60 > 5){
+                    if(msgs.length === 0 || (payload.messages[j].ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
                         payload.messages[j].time_show = 'today';
                     }
                     payload.messages[j].content.avatarUrl = state.selfInfo.info.avatarUrl;
@@ -526,7 +563,7 @@ function addMessage(state: ChatStore, payload){
                     }
                     let item = state.conversation.splice(a,1);
                     state.conversation.unshift(item[0]);
-                    payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].content.create_time);
+                    payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].ctime_ms);
                     state.conversation[0].recentMsg = payload.messages[j];
                     return ;                    
                 }
@@ -539,20 +576,21 @@ function addMessage(state: ChatStore, payload){
                     msgs: [
                         payload.messages[j]
                     ],
-                    draft: ''
+                    draft: '',
+                    content: payload.messages[j].content
                 }
                 state.newMessage = msg;
                 state.messageList.push(msg);
                 let conversationItem = {
                     avatar: "",
                     key: payload.messages[j].from_uid,
-                    mtime: payload.messages[j].content.create_time,
+                    mtime: payload.messages[j].ctime_ms,
                     name: payload.messages[j].content.from_id,
                     nickName: payload.messages[j].content.from_name,
                     type: payload.messages[j].msg_type
                 }
                 state.conversation.unshift(conversationItem);
-                payload.messages[j].time_show = util.reducerDate(payload.messages[j].content.create_time);
+                payload.messages[j].time_show = util.reducerDate(payload.messages[j].ctime_ms);
                 state.conversation[0].recentMsg = payload.messages[j];
             }
         }

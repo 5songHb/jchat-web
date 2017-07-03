@@ -15,13 +15,17 @@ export class TipModalComponent implements OnInit {
 
     }
     ngOnInit() {
-        
+        if(this.info.success){
+            setTimeout(function(){
+                this.modalTipEmit.emit();
+            }.bind(this), 1500);
+        }
     }
     private modalTip(info){
         if(info){
             this.modalTipEmit.emit(info);
         }else{
-            this.modalTipEmit.emit();            
+            this.modalTipEmit.emit();
         }
     }
 }

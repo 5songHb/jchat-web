@@ -131,14 +131,6 @@ export class MainEffect {
     private createGroup$: Observable<Action> = this.actions$
         .ofType(mainAction.createGroup)
         .map(toPayload)
-        .filter((groupInfo) => {
-            if(!groupInfo.groupName){
-                alert('群名称不能为空');
-                return false;
-            }else{
-                return groupInfo;
-            }
-        })
         .switchMap((groupInfo) => {
             let that = this;
             let createGroupObj = global.JIM.createGroup({
@@ -156,18 +148,27 @@ export class MainEffect {
                     group: true,
                     type: 4
                 }
-                global.JIM.addGroupMembers({
-                    'gid': data.gid,
-                    'member_usernames': groupInfo.memberUsernames
-                }).onSuccess(function(data) {
+                // 如果有其他成员
+                if(groupInfo.memberUsernames.length > 0){
+                    global.JIM.addGroupMembers({
+                        'gid': data.gid,
+                        'member_usernames': groupInfo.memberUsernames
+                    }).onSuccess(function(data) {
+                        that.store$.dispatch({
+                            type: mainAction.createGroupSuccess, 
+                            payload: groupObj
+                        });
+                        console.log('success:' + JSON.stringify(data));
+                    }).onFail(function(data) {
+                        console.log('error:' + JSON.stringify(data))
+                    });
+                }else{
                     that.store$.dispatch({
                         type: mainAction.createGroupSuccess, 
                         payload: groupObj
                     });
-                    console.log('success:' + JSON.stringify(data));
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data))
-                });
+                }
+                
             }).onFail(function(data) {
                 console.log('error:' + JSON.stringify(data));
             });
@@ -223,10 +224,10 @@ export class MainEffect {
                     payload: {
                         show: true,
                         info: {
-                            title: '修改密码成功',
-                            tip: '修改密码成功',
+                            title: '提示',
+                            tip: '密码修改成功',
                             actionType: '[main] modify password alert',
-                            button: 'confirm'
+                            success: 1// 1 代表成功 2代表失败
                         }
                     }
                 })
@@ -253,17 +254,35 @@ export class MainEffect {
             }).onSuccess(function(data) {
                 let user = data.user_info,
                     item = {
-                        avatar: "",
+                        avatar: user.avatar,
                         key: user.key || user.uid,
                         mtime: user.mtime,
                         name: user.username,
                         nickName: user.nickname,
-                        type: 3
+                        username: user.username,
+                        nickname: user.nickname,
+                        type: 3,
+                        signature: user.signature,
+                        gender: user.gender,
+                        region: user.region,
+                        avatarUrl: ''
                     }
+                if(item.avatar){
+                    global.JIM.getResource({'media_id' : data.user_info.avatar})
+                    .onSuccess(function(urlInfo){
+                        item.avatarUrl = urlInfo.url;
+                        that.store$.dispatch({
+                            type: mainAction.createSingleChatSuccess,
+                            payload: item
+                        });
+                    }).onFail(function(error){
+
+                    });
+                }
                 that.store$.dispatch({
                     type: mainAction.createSingleChatSuccess,
                     payload: item
-                })
+                });
             }).onFail(function(data) {
                 if(data.code == 882002){
                     that.store$.dispatch({

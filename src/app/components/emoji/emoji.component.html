@@ -9,7 +9,7 @@
     <div *ngIf="tab === 1">
         <perfect-scrollbar class="emoji-jpush-scroll">
             <ul class="emoji-jpush">
-                <li *ngFor="let item of emojiInfo.jpushAlias" [title]="item.text" [ngStyle]="{'background': '#fff url(' + emojiInfo.jpushPath+item.imgNum + '.png) top left no-repeat', 'background-size': '95px'}">
+                <li *ngFor="let item of emojiInfo.jpushAlias" [title]="item.text" [ngStyle]="{'background': '#fff url('+ imgRouter +'assets/images/jpush/' + item.imgNum + '.png) top left no-repeat', 'background-size': '95px'}">
                     <a href="javascript:;" (click)="jpushEmojiSelectAction(item)"></a>
                 </li>
             </ul>

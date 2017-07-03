@@ -1,11 +1,11 @@
 {
     "dev": {
-        "url": "http://7xo28s.com1.z0.glb.clouddn.com/iapp/",
+        "url": "http://7xo28s.com1.z0.glb.clouddn.com/web-jchat/",
         "ak": "n0xHeJp2B4bPQkQH9T89t2IsxkGAwZjO66dmWtzk",
         "sk": "WOOFQZb_-lalCibXnMMyNfke2BUoyqV7uPzzTPjP",
         "bk": "test",
         "remote": "xxxx",
-        "branch": "xxxx",
+        "branch": "dev",
         "api": "xxxx",
         "env": "dev"
     },

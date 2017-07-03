@@ -6,7 +6,6 @@ import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfec
 import { AppStore } from '../../app.store';
 import { chatAction } from '../../pages/chat/actions';
 import { global } from '../../services/common';
-
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
 @Component({
@@ -58,11 +57,12 @@ export class GroupSettingComponent implements OnInit {
         tip: '群主',
         position: {
             left: -10,
-            top: 18
+            top: 23
         },
         show: false
     };
     private modifyGroupNameShow = false;
+    private dec = '';
     constructor(
         private store$: Store<AppStore>
     ) {

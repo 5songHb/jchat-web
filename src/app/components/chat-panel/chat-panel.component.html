@@ -12,25 +12,25 @@
         </div>
         <div class="chat-panel-message-borad flex-1" id="imgViewer">
             <perfect-scrollbar class="chat-panel-scroll" style="width: 100%;height: 100%;" (ps-y-reach-start)="scrollTopEvent()" (ps-y-reach-end)="scrollBottomEvent()">
-                <div class="chat-panel-see-more" *ngIf="loadingFlag === 1">查看更多</div>
+                <div class="chat-panel-see-more" *ngIf="loadingFlag === 1 && this.msg.length >= 20">查看更多</div>
                 <div class="chat-panel-see-more-loading" *ngIf="loadingFlag === 2">
                     <div></div>
                 </div>
-                <div class="chat-panel-see-more" *ngIf="loadingFlag === 3">没有更多了</div>
+                <div class="chat-panel-see-more no-more" *ngIf="loadingFlag === 3 || this.msg.length < 20">没有更多了</div>
                 <div *ngFor="let i of msg; let num = index;">
                     <div class="chat-panel-you-msg chat-panel-msg" *ngIf="global.user != i.content.from_id">
                         <!-- 时间 -->
                         <p class="chat-panel-time" *ngIf="i.time_show" [ngSwitch]="i.time_show">
-                            <time *ngSwitchCase="'year'">{{i.content.create_time | date:"yy-MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'month'">{{i.content.create_time | date:"MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'day'">{{i.content.create_time | day}} {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'the day before'">前天 {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'yesterday'">昨天 {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'today'">{{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'year'">{{i.ctime_ms | date:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.ctime_ms | date:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.ctime_ms | date:"HH:mm"}}</time>
                         </p>
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_body.text" class="clearfix">
-                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="chat-panel-msgText-you float-left" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
@@ -39,16 +39,16 @@
                         </div>
                         <!-- 图片消息 -->
                         <div *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}" class="clearfix">
-                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left">
-                                <img title="点击查看大图" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                                <img title="点击查看大图" (click)="imageViewerShow(i.content.msg_body.media_url)" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
                             </div>
                         </div>
                         <!-- 文件消息 -->
                         <div *ngIf="i.content.msg_type == 'file'" class="clearfix">
-                            <div class="chat-panel-fromId-you float-left" (click)="watchOtherInfo(i.content.from_id)">
+                            <div class="chat-panel-fromId-you float-left" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left chat-panel-file-you">
@@ -63,30 +63,42 @@
                                     </div>
                                 </div>
                             </div>
-                            <a class="float-left" [href]="i.content.msg_body.media_url" download="aa.png">下载文件</a>                            
+                            <a class="float-left chat-panel-download-file" [href]="i.content.msg_body.media_url" download=""></a>                            
                         </div>
                         <!-- 地理定位 -->
                         <div *ngIf="i.content.msg_type === 'location'" class="chat-panel-location clearfix">
-                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
-                            <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
                                 <div class="chat-panel-map-wrap float-left">
-                                    <div [id]="'allmap' + num" class="float-left chat-panel-allmap"></div>
+                                    <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
+                                        <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
+                                    </a>                                    
                                     <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
                                 </div>
-                            </a>                                
+                        </div>
+                        <!-- 语音 -->
+                        <div *ngIf="i.content.msg_type === 'voice'" class="chat-panel-voice clearfix">
+                            <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-left chat-panel-voice-sound">
+                                <p (click)="playVoice(num)" [ngStyle]="{'width': i.content.msg_body.duration * 20 + 'px'}">
+                                    <span class="float-right">{{i.content.msg_body.duration}}''</span>
+                                </p>
+                                <audio [id]="'audio' + num" [src]="i.content.msg_body.media_url"></audio>
+                            </div>                      
                         </div>
                     </div>
                     <div class="chat-panel-me-msg chat-panel-msg" *ngIf="global.user === i.content.from_id">
                         <!-- 时间 -->
                         <p class="chat-panel-time" *ngIf="i.time_show" [ngSwitch]="i.time_show">
-                            <time *ngSwitchCase="'year'">{{i.content.create_time | date:"yy-MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'month'">{{i.content.create_time | date:"MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'day'">{{i.content.create_time | day}} {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'the day before'">前天 {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'yesterday'">昨天 {{i.content.create_time | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'today'">{{i.content.create_time | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'year'">{{i.ctime_ms | date:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.ctime_ms | date:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.ctime_ms | date:"HH:mm"}}</time>
                         </p>
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_body.text" class="clearfix">
@@ -107,7 +119,7 @@
                             <div class="float-right chat-panel-message-img-wrap" [ngClass]="{'chat-panel-message-img-loading': i.success === 1}">
                                 <div *ngIf="i.success === 3" class="chat-panel-send-error" (click)="repeatSendPicAction(i)"></div>
                                 <div>
-                                    <img class="chat-panel-message-img" title="点击查看大图" [src]="i.content.msg_body.media_url" alt="">
+                                    <img class="chat-panel-message-img" (click)="imageViewerShow(i.content.msg_body.media_url)" title="点击查看大图" [src]="i.content.msg_body.media_url" alt="">
                                 </div>
                             </div>
                         </div>
@@ -147,9 +159,12 @@
             <input type="file" id="sendPic" class="chat-panel-singlePic" (click)="inputNoBlurAction()" (change) = "sendPicAction($event)" value="发送图片">
             <label title="图片" for="sendPic" class="chat-panel-singlePic-label"></label>
         </div>
-        <perfect-scrollbar class="chat-panel-content-scroll" style="height: 127px; width:100%;">
-            <pre class="chat-panel-content-text" myModel [myModel]="messageList[active.activeIndex]" id="contentDiv" spellcheck="false" contenteditable="true" (keydown)="preKeydown($event)" (blur)="msgContentChange($event)" (focus)="msgContentFocus()" (click)="msgContentClick($event)"></pre>
-        </perfect-scrollbar>
+        <div class="chat-panel-text-container" (click)="contentFocus()">
+            <perfect-scrollbar class="chat-panel-content-scroll">
+                <pre class="chat-panel-content-text" myModel [myModel]="messageList[active.activeIndex]" id="contentDiv" spellcheck="false" contenteditable="true" (keydown)="preKeydown($event)" (blur)="msgContentChange($event)" (focus)="msgContentFocus()" (click)="msgContentClick($event)"></pre>
+            </perfect-scrollbar>
+        </div>
         <button class="chat-panel-send-btn btn-white" type="button" (click) = "sendMsgAction()">发送</button>
     </div>
 </div>
+<image-viewer-component *ngIf="imageViewer.show" [imageViewer]="imageViewer"></image-viewer-component>

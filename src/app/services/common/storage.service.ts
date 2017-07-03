@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class StorageService {
     constructor(){}
 
-    public set (key: string, data: string, useCookie?: boolean,time?:any,path?:any) {
+    public set (key: string, data: string, useCookie?: boolean, time?:any, path?:any) {
         if ( localStorage && !useCookie ) {
             try {
                 localStorage.setItem(key, data);
@@ -43,7 +43,7 @@ export class StorageService {
         return null;
     }
 
-    public remove (key: string, useCookie?: boolean,path?:any) {
+    public remove (key: string, useCookie?: boolean, path?:any) {
         if ( localStorage && !useCookie ) {
             let value = localStorage.getItem(key);
             if ( value ) {

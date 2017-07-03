@@ -203,6 +203,7 @@ export class Util {
      * return 排好序的数组array
      */
     sortByLetter(payload){
+        console.log(555555, payload)
         let letter = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
             result = [],
             defaultResult = {
@@ -218,6 +219,9 @@ export class Util {
             for(let i=0;i<payload.length;i++){
                 let name = payload[i].name,
                     firstLetter = name.charAt(0);
+                if(name === '' && j === 0)
+                    defaultResult.data.push(payload[i]);
+                if(name === '') continue;
                 if(name.match(/^[a-zA-Z]/)){
                     if(firstLetter.toUpperCase() === letter[j])
                     temp.data.push(payload[i]);
@@ -270,7 +274,7 @@ export class Util {
         // 百度地图API功能
         let point = new BMap.Point(obj.longitude, obj.latitude);
 	    let map = new BMap.Map(obj.id);
-        map.centerAndZoom(point,11);
+        map.centerAndZoom(point,13);
         if(obj.scroll){
             map.enableScrollWheelZoom(true);
         }
@@ -295,22 +299,24 @@ export class Util {
             now = new Date(),
             msgYear = time.getFullYear(),
             nowYear = now.getFullYear(),
-            msgMonth = time.getMonth() + 1,
-            nowMonth = now.getMonth() + 1,
-            msgDate = time.getDate(),
-            nowDate = now.getDate(),
-            msgDay = time.getDay();
+            nowHour = now.getHours(),
+            nowMinute = now.getMinutes(),
+            nowSecond = now.getSeconds(),
+            nowTime = now.getTime(),
+            todayTime = nowHour * 60 * 1000 * 60 + nowMinute * 1000 * 60 + nowSecond * 1000,
+            gapDate = (nowTime - todayTime - msgTime) / 1000 / 60 / 60 / 24;
+            
         if(msgYear !== nowYear){
             return 'year';                                
-        }else if(msgMonth !== nowMonth || (msgMonth === nowMonth && nowDate - msgDate > 6)){
+        }else if(gapDate > 6){
             return 'month';
-        }else if(nowDate - msgDate <= 6 && nowDate - msgDate > 2){
+        }else if(gapDate <= 6 && gapDate > 2){
             return 'day';
-        }else if(nowDate - msgDate === 2){
+        }else if(gapDate <= 2 && gapDate > 1){
             return 'the day before';
-        }else if(nowDate - msgDate === 1){
+        }else if(gapDate <= 1 && gapDate > 0){
             return 'yesterday';
-        }else if(nowDate === msgDate){
+        }else if(gapDate <= 0){
             return 'today';
         }
     }

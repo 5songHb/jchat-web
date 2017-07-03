@@ -17,7 +17,7 @@ button{
 input{
     border: none;
     font-size: 12px;
-    color: #8A8C8C;
+    color: #2c2c2c;
 }
 input:focus{
     border: none;
@@ -59,6 +59,7 @@ button:focus{
 // input
 .input-focus:focus{
     border-color: $green-color !important;
+    background-color: #fff !important;
 }
 .input-error{
     border-color: $error-color !important;
@@ -211,9 +212,6 @@ ul,li,ol{
 .BMap_cpyCtrl  
 {  
     display:none;   
-} 
-.chat-panel-location .BMap_mask{
-    cursor: default;
 }
 .anchorBL{  
     display:none;   
@@ -301,12 +299,6 @@ ul,li,ol{
     width: 20px;
     position: relative;
     top: 4px;
-}
-.chat-panel-content-scroll .ps-content{
-    min-height: 127px;
-}
-.chat-panel-content-scroll .ps-content pre{
-    min-height: 127px;
 }
 .chat-panel-msgText-me img{
     vertical-align: middle;

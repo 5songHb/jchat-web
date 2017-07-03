@@ -180,9 +180,11 @@ export class ChatComponent implements OnInit {
                 this.otherInfo = chatState.otherInfo;
                 break;
             case  mainAction.createSingleChatSuccess:
-                this.conversationList = chatState.conversation;
-                this.changeActivePerson(chatState);
-                this.defaultPanelIsShow = chatState.defaultPanelIsShow;
+                this.otherInfo = chatState.otherInfo;
+                console.log(5555555, this.otherInfo)                
+                // this.conversationList = chatState.conversation;
+                // this.changeActivePerson(chatState);
+                // this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 break;
             case chatAction.groupSetting:
                 this.groupSetting = Object.assign({}, this.groupSetting, chatState.messageList[chatState.activePerson.activeIndex].groupSetting);
@@ -198,6 +200,7 @@ export class ChatComponent implements OnInit {
                 break;
             case chatAction.createOtherChat:
                 this.changeActivePerson(chatState);
+                this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 break;
             case mainAction.exitGroupSuccess:
                 this.conversationList = chatState.conversation;
@@ -312,6 +315,7 @@ export class ChatComponent implements OnInit {
                     text: data.content
                 }
             },
+            ctime_ms: (new Date()).getTime(),
             success: 1,
             msgKey: this.msgKey ++
         }
@@ -412,6 +416,7 @@ export class ChatComponent implements OnInit {
                         height: value.height
                     }
                 },
+                ctime_ms: (new Date()).getTime(),
                 success: 1,
                 msgKey: that.msgKey ++
             }
@@ -463,18 +468,19 @@ export class ChatComponent implements OnInit {
         let msgs;        
         if(!data.repeatSend){
             msgs  = {
-            content: {
-                create_time: (new Date()).getTime(),
-                msg_type: 'file',
-                from_id: global.user,
-                msg_body: {
-                    fname: data.fileData.name,
-                    fsize: data.fileData.size
-                }
-            },
-            success: 1,
-            msgKey: this.msgKey ++
-        }
+                content: {
+                    create_time: (new Date()).getTime(),
+                    msg_type: 'file',
+                    from_id: global.user,
+                    msg_body: {
+                        fname: data.fileData.name,
+                        fsize: data.fileData.size
+                    }
+                },
+                ctime_ms: (new Date()).getTime(),
+                success: 1,
+                msgKey: this.msgKey ++
+            }
         }
         if(this.active.type == 3 && !data.repeatSend){
             let singleFile = {

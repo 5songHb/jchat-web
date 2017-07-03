@@ -190,7 +190,7 @@ gulp.task('upload', function () {
             bucket: config[type].bk,
             private: false
         }, {
-            dir: 'iapp/' + config.v + '/',
+            dir: 'web-jchat/' + config.v + '/',
             versioning: false,
             versionFile: './config/images/images.json',
             ignore: [],

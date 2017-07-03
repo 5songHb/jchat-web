@@ -137,12 +137,12 @@ export class MainComponent implements OnInit, OnDestroy {
         //     that.storageService.set(md5('afterFiveMinutes-password'), global.password, true, now);
         // });
     }
-    @HostListener('window:click') onClick(){
+    @HostListener('window:click') onClickWindow(){
         this.settingMenu.show = false;
         this.chatMenu.show = false;
     }
     // 关闭窗口时存cookie，五分钟之内进入页面还可以免登陆
-    @HostListener('window:beforeunload') onBeforeunload(){
+    @HostListener('window:beforeunload') onBeforeunloadWindow(){
         let now = 5 * 60 * 1000;
         this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, now);
         this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, now);
@@ -250,7 +250,6 @@ export class MainComponent implements OnInit, OnDestroy {
         });
     }
     private selfInfoEmit(newInfo){
-        console.log(newInfo)
         this.store$.dispatch({
             type: mainAction.showSelfInfo, 
             payload: {
@@ -469,14 +468,16 @@ export class MainComponent implements OnInit, OnDestroy {
                 })
                 break;
             case 2:
+                // 展示全局的模态框
                 this.store$.dispatch({
                     type: mainAction.showModalTip,
                     payload: {
                         show: true,
                         info: {
-                            title: '退出jmessage',
-                            tip: '是否确定退出jmessage？',
-                            actionType: '[main] logout show'
+                            title: '退出jmessage',          //模态框标题
+                            tip: '是否确定退出jmessage？',   //模态框内容
+                            actionType: '[main] logout show'//哪种操作，点击确定时可以执行对应操作
+                            // success: 1 / 2               //成功的提示框/失败的提示框，会自动消失
                         }
                     }
                 })

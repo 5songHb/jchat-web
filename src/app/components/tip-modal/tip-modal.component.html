@@ -1,14 +1,17 @@
 <div class="modal-shadow">
-    <div class="modal-content">
+    <div class="modal-content" [ngClass]="{'paddingBottomNone': this.info.success}">
         <h2 class="modal-title">
             {{info.title}}
             <span class="modal-close" (click)="modalTip()"></span>
         </h2>
-        <p class="modal-warn-tip">{{info.tip}}</p>
-        <p class="modal-btn">
-            <button *ngIf="!info.button" type="button" (click)="modalTip()" class="btn-cancel btn-white">取消</button>
-            <button *ngIf="!info.button" type="button" (click)="modalTip(info)" class="btn-confirm btn-active">确定</button>            
-            <button *ngIf="info.button && info.button === 'confirm'" type="button" (click)="modalTip()" class="btn-confirm btn-active">确定</button>
+        <p class="modal-warn-tip">
+            <img src="../../../assets/images/success-tip.png" class="tip-modal-success" *ngIf="this.info.success === 1">
+            <img src="../../../assets/images/send-message-error.png" class="tip-modal-error" *ngIf="this.info.success === 2">
+            {{info.tip}}
+            </p>
+        <p class="modal-btn" *ngIf="!info.success">
+            <button type="button" (click)="modalTip()" class="btn-cancel btn-white">取消</button>
+            <button type="button" (click)="modalTip(info)" class="btn-confirm btn-active">确定</button>            
         </p>
     </div>
 </div>

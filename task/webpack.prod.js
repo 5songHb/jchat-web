@@ -15,7 +15,7 @@ module.exports = function (config, v) {
         entry: {
             polyfills: path.resolve(__dirname, '../src/config/polyfills'),
             vendor: path.resolve(__dirname, '../src/config/vendor'),
-            app: path.resolve(__dirname, '../src/main.aot')
+            app: path.resolve(__dirname, '../src/main.jit')
         },
         output: {
             path: path.resolve(__dirname, '../dist'),
@@ -39,12 +39,12 @@ module.exports = function (config, v) {
                     options: {
                         loader: 'async-import',
                         genDir: 'compiled',
-                        aot: true
+                        aot: false
                     }
                 }, {
                     loader: 'awesome-typescript-loader',
                     options: {
-                        configFileName: 'tsconfig.aot.json'
+                        configFileName: 'tsconfig.json'
                     }
                 }, {
                     loader: 'angular2-template-loader'
@@ -99,11 +99,11 @@ module.exports = function (config, v) {
                 from: path.resolve(__dirname, '../src/assets/images/'),
                 to: './assets/images/',
             }]),
-            new ngcWebpack.NgcWebpackPlugin({
-                disabled: false,
-                tsConfig: path.resolve(__dirname, '../tsconfig.aot.json'),
-                resourceOverride: path.resolve(__dirname, '../src/config/resource-override.js'),
-            }),
+            // new ngcWebpack.NgcWebpackPlugin({
+            //     disabled: false,
+            //     tsConfig: path.resolve(__dirname, '../tsconfig.json'),
+            //     resourceOverride: path.resolve(__dirname, '../src/config/resource-override.js'),
+            // }),
             new CheckerPlugin(),
             new OptimizeJsPlugin({
                 sourceMap: false

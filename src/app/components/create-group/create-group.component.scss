@@ -69,6 +69,11 @@
         span{
             font-size: 14px;
             color: #808080;
+            &.error{
+                font-size: 12px;
+                color: #EB424C;
+                margin-left: 10px;
+            }
         }
         input{
             height: 30px;
@@ -115,6 +120,10 @@
                 &:checked:after{
                     background: #fff url(../../../assets/images/select-member-active.png) center center no-repeat;
                 }
+                &:disabled:after{
+                    background-image: url(../../../assets/images/has-select.png);
+                    cursor: default;
+                }
             }
             .create-group-cancel-select{
                 cursor: pointer;
@@ -124,7 +133,7 @@
                 background-size: 22px;
                 margin-top: 14px;
                 &:hover{
-                    background-image: url(../../assets/images/cancel-select-active.png);
+                    background-image: url(../../../assets/images/cancel-select-active.png);
                 }
             }
         }

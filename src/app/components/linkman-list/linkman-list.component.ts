@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -8,15 +8,24 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     styleUrls: ['./linkman-list.component.scss']
 })
 
-export class LinkmanListComponent implements OnInit {
+export class LinkmanListComponent implements OnInit, OnChanges {
     @Input()
         private conversation;
     @Output()
         private selectLinkmanItemEmit: EventEmitter<any> = new EventEmitter();
+    private isEmpty = false;
     constructor() {
 
     }
     public ngOnInit() {
+    }
+    ngOnChanges(){
+        for(let i=0;i<this.conversation.length;i++){
+            if(this.conversation[i].data.length > 0){
+                this.isEmpty = true;
+                break;
+            }
+        }
     }
     private avatarErrorIcon(event){
         event.target.src = avatarErrorIcon;

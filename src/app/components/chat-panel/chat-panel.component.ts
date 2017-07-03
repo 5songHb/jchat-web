@@ -8,9 +8,8 @@ import { mainAction } from '../../pages/main/actions';
 
 import { global, emojiConfig, jpushConfig } from '../../services/common';
 import { Util } from '../../services/util';
-// import { JsonpService } from '../../services/request/jsonp.service';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
-// const Viewer = require('viewerjs');
+import { imgRouter } from '../../services/common';
 
 @Component({
     selector: 'chat-panel-component',
@@ -56,7 +55,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         },
         emojiAlias: emojiConfig,
         jpushAlias: jpushConfig,
-        jpushPath: '../../assets/images/jpush/',
         content: '',
         contentId: 'contentDiv'
     };
@@ -81,9 +79,13 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     };
     private loadingFlag = 1;
     private loadingCount = 1;
+    private imageViewer = {
+        result: [],
+        active: {},
+        show: false
+    }
     constructor(
-        private store$: Store<AppStore>,
-        // private jsonpService: JsonpService
+        private store$: Store<AppStore>
     ) {
 
     }
@@ -93,13 +95,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             this.messageList[this.active.activeIndex].draft = '';
         }
         this.contentDiv = document.getElementById('contentDiv');
-        // let html = document.getElementsByTagName('html')[0],
-        //     that = this;
-        // html.addEventListener('click',function(){
-        //     that.inputToLast = true;
-        // },false);
     }
-    @HostListener('window:click') onClick(){
+    @HostListener('window:click') onClickWindow(){
         this.inputToLast = true;
     }
     private subscribeStore(){
@@ -115,28 +112,22 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         console.log('chat-panel',chatState.actionType);
         switch(chatState.actionType){
             case chatAction.receiveMessage:
-                // 经纬度转换成地图
-                this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
+                this.msg.push(chatState.newMessage);
+                // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
-                // let msgs = chatState.messageList[this.active.activeIndex].msgs;
-                this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
-                for(let i=0;i<this.msg.length;i++){
-                    if(this.msg[i].content.msg_type == 'location'){
-                        setTimeout(function(){
-                            this.util.theLocation({
-                                id: 'allmap'+i,
-                                longitude: this.msg[i].content.msg_body.longitude,
-                                latitude: this.msg[i].content.msg_body.latitude
-                            });
-                        }.bind(this),100);
-                    }
+                this.loadingCount = 1;
+                let msgs = this.messageList[chatState.activePerson.activeIndex].msgs;                
+                if(msgs.length > 20){
+                    this.msg = msgs.slice(msgs.length - 20);
+                }else{
+                    this.msg = msgs;
                 }
+                this.allPointerToMap(true);
+                this.imageViewer.result = chatState.imageViewer;
                 break;
-            case chatAction.receiveMessage:
-            
             case chatAction.sendGroupFile:
 
             case chatAction.sendSingleMessage:
@@ -155,7 +146,13 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
 
                 // 发送群组文件消息
             case chatAction.sendGroupFile:
-
+                setTimeout(function(){
+                    this.componentScroll.update();
+                    this.componentScroll.scrollToBottom();
+                    document.getElementById('contentDiv').focus();
+                }.bind(this), 200);
+                this.imageViewer.result = chatState.imageViewer;
+                break;
             case mainAction.selectSearchUser:
 
             case mainAction.createSingleChatSuccess:
@@ -165,66 +162,79 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             case chatAction.createOtherChat:
 
             case contactAction.selectContactItem:
-                this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
+                this.loadingFlag = 1;
+                this.loadingCount = 1;
                 setTimeout(function(){
+                    this.allPointerToMap(true);
                     this.componentScroll.update();
                     this.componentScroll.scrollToBottom();
                     document.getElementById('contentDiv').focus();
                 }.bind(this), 200);
+                this.imageViewer.result = chatState.imageViewer;
+                break;
+            case chatAction.getAllMessageSuccess:
+                if(chatState.imageViewer !== []){
+                    this.imageViewer.result = chatState.imageViewer;
+                }
                 break;
         }
     }
+    private imageViewerShow(src){
+        for(let i=0;i<this.imageViewer.result.length;i++){
+            if(this.imageViewer.result[i].src === src){
+                this.imageViewer.active = this.imageViewer.result[i];
+                break;
+            }
+        }
+        this.imageViewer.show = true;
+    }
+    private allPointerToMap(timeout ?: boolean){
+        for(let i=0;i<this.msg.length;i++){
+            if(this.msg[i].content.msg_type === 'location'){
+                if(timeout){
+                    setTimeout(function(){
+                        this.util.theLocation({
+                            id: 'allmap' + i,
+                            longitude: this.msg[i].content.msg_body.longitude,
+                            latitude: this.msg[i].content.msg_body.latitude
+                        });
+                    }.bind(this), 100);
+                }else{
+                    this.util.theLocation({
+                        id: 'allmap' + i,
+                        longitude: this.msg[i].content.msg_body.longitude,
+                        latitude: this.msg[i].content.msg_body.latitude
+                    });
+                }
+            }
+        }
+    }
     private pointerToMap(chatState){
-        if(chatState.newMessage.content.msg_type == 'location'){
+        if(chatState.newMessage.content.msg_type == 'location' && this.active.name === chatState.newMessage.content.from_id){
             setTimeout(function(){
                 this.util.theLocation({
-                    id: 'allmap' + (chatState.messageList[this.active.activeIndex].msgs.length - 1).toString(),
+                    id: 'allmap' + (this.msg.length - 1).toString(),
                     longitude: chatState.newMessage.content.msg_body.longitude,
                     latitude: chatState.newMessage.content.msg_body.latitude
-                });                
+                });
             }.bind(this),100);
-            // this.jsonpService.get(`http://api.map.baidu.com/geocoder/v2/?callback=JSONP_CALLBACK&location=${chatState.newMessage.content.msg_body.latitude},${chatState.newMessage.content.msg_body.longitude}&output=json&pois=1&ak=30jUnHmbTPaaVDsCqGITmEW6VsvzQvH3`)
-            //     .subscribe((data) => {
-            //         let msgs = chatState.messageList[this.active.activeIndex].msgs;
-            //         if(data.result.formatted_address == ''){
-            //             data.result.formatted_address = chatState.newMessage.content.msg_body.label;
-            //         }
-            //         msgs[msgs.length - 1].content.msg_body.address = data.result.formatted_address;
-            //     })
         }
     }
     ngAfterViewInit(){
-        // let viewer = new Viewer(
-        //     document.getElementById('imgViewer'),{
-        //     navbar: false,
-        //     title: false,
-        //     zoomRatio: 0.4
-        // });
-        // this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
-        for(let i=0;i<this.msg .length;i++){
-            if(this.msg [i].content.msg_type == 'location'){
-                this.util.theLocation({
-                    id: 'allmap'+i,
-                    longitude: this.msg [i].content.msg_body.longitude,
-                    latitude:this.msg [i].content.msg_body.latitude
-                });
-                // this.jsonpService.get(`http://api.map.baidu.com/geocoder/v2/?callback=JSONP_CALLBACK&location=${msgs[i].content.msg_body.latitude},${msgs[i].content.msg_body.longitude}&output=json&pois=1&ak=30jUnHmbTPaaVDsCqGITmEW6VsvzQvH3`)
-                //     .subscribe((data) => {
-                //         msgs[i].content.msg_body.address = data.result.formatted_address;
-                //     })
-            }
-        }
+        this.allPointerToMap(false);
     }
     ngDoCheck(){
         if(!this.change && this.active.change || this.active.change !== this.change){
             this.componentScroll.update();
             this.componentScroll.scrollToBottom();
-            if(this.msg.length <= 20){
-                this.msg = this.messageList[this.active.activeIndex].msgs.slice(this.messageList[this.active.activeIndex].msgs.length - 20);
+            let msgs = this.messageList[this.active.activeIndex].msgs;
+            if(this.msg.length <= 20 && msgs.length > 20){
+                this.msg = msgs.slice(msgs.length - 20);
+            }else if(this.msg.length <= 20 && msgs.length < 20){
+                this.msg = msgs;                
             }
             setTimeout(function(){
                 this.change = this.active.change;
-                // document.getElementById('msgContent').focus();
                 document.getElementById('contentDiv').focus();
                 this.util.focusLast(this.contentDiv);
             }.bind(this),150);
@@ -250,7 +260,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     private jpushEmojiSelectEmit(item){
         this.sendMsg.emit({
-            content: `&lt;img src="../../assets/images/jpush/${item.imgNum}.png" class="jpush-emoji" /&gt;`
+            content: `&lt;img src="${imgRouter}assets/images/jpush/${item.imgNum}.png" class="jpush-emoji" /&gt;`
         });
         this.emojiInfo.show = false;
     }
@@ -277,9 +287,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         this.util.focusLast(this.contentDiv);
     }
     private msgContentChange(event){
-        let active = this.util.deepCopy(this.active);
-        // let value = event.target.value;
-        let value = event.target.innerHTML;
+        let active = Object.assign({}, this.active, {}),
+            value = event.target.innerHTML;
         setTimeout(function(){
             if(this.inputNoBlur){
                 if(this.flag === true){
@@ -301,23 +310,11 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private watchSelfInfo(){
         this.selfInfoEmit.emit();
     }
-    // private addBlack(){
-    //     this.addBlackList.emit();
-    // }
     private groupSettingAction(){
         this.groupSetting.emit();
     }
-    // private ctrlEnterAction(event){
-    //     if(event.keyCode == 13 && event.ctrlKey){
-    //         this.messageList[this.active.activeIndex].draft += '\n';
-    //     }else if(event.keyCode == 13 && !event.ctrlKey){
-    //         this.sendMsgAction();
-    //         return false;
-    //     }
-    // }
     private showEmojiPanel(event){
         this.inputNoBlur = false;
-        // document.getElementById('msgContent').focus();
         event.stopPropagation();
         this.contentDiv.focus();
         if(this.inputToLast){
@@ -377,30 +374,42 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         event.target.src = avatarErrorIcon;
     }
     private scrollTopEvent(){
-        if(!this.change && this.active.change || this.active.change !== this.change){
+        if(!this.change && this.active.change || this.active.change !== this.change)
             return;
-        }
-        if(this.loadingFlag === 3){
+        if(this.loadingFlag === 3)
             return ;
-        }
-        if(this.loadingFlag === 1){
-            this.loadingFlag = 2;            
+        if(this.loadingFlag === 1 && this.msg.length >= 20){
+            this.loadingFlag = 2;
             setTimeout(function(){
-                let length = this.messageList[this.active.activeIndex].msgs.length;
-                this.msg = this.messageList[this.active.activeIndex].msgs.slice(length - 20 * this.loadingCount ++ );
+                let msgs = this.messageList[this.active.activeIndex].msgs;
                 this.componentScroll.update();
-                if(length === this.msg.length){
-                    this.loadingFlag = 3;;
+                if(msgs.length === this.msg.length){
+                    this.loadingFlag = 3;
                 }else{
-                    this.loadingFlag = 1;
+                    if(msgs.length < 20 * ++ this.loadingCount){
+                        this.msg = msgs;
+                        this.loadingFlag = 3;
+                    }else{
+                        this.msg = msgs.slice(msgs.length - 20 * this.loadingCount ++ );
+                        this.loadingFlag = 1;
+                    }
                 }
             }.bind(this),1000);
         }
     }
     private scrollBottomEvent(){
-        console.log(9999999)
+        
     }
     private addGroupAction(){
         this.addGroup.emit();
+    }
+    private contentFocus(){
+        this.inputNoBlur = false;
+        this.contentDiv.focus();
+        this.util.focusLast(this.contentDiv);
+    }
+    private playVoice(index){
+        let audio = (document.getElementById('audio' + index) as HTMLAudioElement);
+        audio.play();
     }
 }

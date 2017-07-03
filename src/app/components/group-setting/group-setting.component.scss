@@ -37,7 +37,7 @@
             padding-right: 20px;
             .group-setting-name-text{
                 white-space: nowrap;
-                max-width: 172px;
+                max-width: 170px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 cursor: pointer;
@@ -59,6 +59,9 @@
             }
             .group-setting-dec{
                 cursor: pointer;
+                line-height: 20px;
+                margin: 7px 0;
+                max-width: 170px;
                 &:hover{
                     color: #2dd0cf;
                 }
@@ -120,7 +123,7 @@
                 .group-setting-delete{
                     font-weight: 700;
                     display: none;
-                    color: #f00;
+                    color: #EB424D;
                     cursor: pointer;
                     margin-right: 23px;
                 }
@@ -145,6 +148,9 @@
                 height: 30px;
                 font-size: 14px;
                 color: #FFFFFF;
+                &:hover{
+                    background-color: #d41f2b;
+                }
             }
         }
     }

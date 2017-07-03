@@ -40,7 +40,6 @@
             background-size: 18px;
             border-radius: 2px;
             font-size: 12px;
-            color: #808080;
         }
         .register-username{
             margin-bottom: 22px;
@@ -72,12 +71,18 @@
         }
         .register-btn{
             button{
-                background: #2DD0CF;
+                background-color: #2DD0CF;
                 border-radius: 2px;
                 width: 320px;
                 height: 42px;
                 font-size: 16px;
                 color: #FFFFFF;
+                &.disabled{
+                    color: #d9f6f6 !important;
+                    background-color: #81e3e2 !important;
+                    border-color: #81e3e2 !important;
+                    cursor: default;
+                }
             }
         }
         .register-to-login{
@@ -93,5 +98,33 @@
                 cursor: pointer;
             }
         }
+    }
+}
+.copyright-container{
+    height: 55px;
+    position: absolute;
+    bottom: 76px;
+    text-align: center;
+    width: 100%;
+    font-size: 14px;
+    color: #FFFFFF;
+    opacity: 0.7;
+    img{
+        margin-bottom: 8px;
+    }
+}
+@media (max-height:650px){
+    .copyright-container{
+        display: none;
+    }
+}
+@media (min-height:650px) and (max-height:720px){
+    .copyright-container{
+        bottom: 20px;
+    }
+}
+@media (min-height:720px) and (max-height:780px){
+    .copyright-container{
+        bottom: 45px;
     }
 }

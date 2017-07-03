@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { global, authPayload } from '../../services/common';
+import { Router } from '@angular/router';
+import { global, authPayload, StorageService } from '../../services/common';
 import { AppStore } from '../../app.store';
 import { registerAction } from './actions';
 
@@ -22,8 +23,14 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     }
     private registerStream;
     private isButtonAvailable = false;
+    private tipModal = {
+        show: false,
+        info: {}
+    }
     constructor(
-        private store$: Store<AppStore>
+        private store$: Store<AppStore>,
+        private router: Router,
+        private storageService: StorageService
     ) {}
     public ngOnInit() {
         this.JIMInit();
@@ -34,6 +41,8 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                 this.tip.passwordTip = registerState.passwordTip;
                 this.isButtonAvailable = registerState.isButtonAvailable;
                 this.tip.repeatPasswordTip = registerState.repeatPasswordTip;
+            }else{
+                this.tipModal = registerState.tipModal;
             }
             return state;
         }).subscribe((state) => {
@@ -94,6 +103,11 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                 password: this.info.password
             }
         });
+    }
+    private modalTipEmit(){
+        this.tipModal.show = false;
+        this.storageService.set('register-username', this.info.username);
+        this.router.navigate(['/login']);
     }
     public ngOnDestroy (){
         this.registerStream.unsubscribe();

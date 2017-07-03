@@ -30,6 +30,7 @@ export class CreateGroupComponent implements OnInit {
             list: []
         }
     };
+    private nameTip = false;
     constructor(
         private store$: Store<any>
     ) {
@@ -51,7 +52,7 @@ export class CreateGroupComponent implements OnInit {
                     let result = [];
                     result.push(mainState.createGroupSearch.info);
                     for(let i=0;i<this.selectList.length;i++){
-                        if(result[0].key === Number(this.selectList[i].key)){
+                        if(Number(result[0].key) === Number(this.selectList[i].key)){
                             result[0].checked = this.selectList[i].checked;
                             result[0].disabled = this.selectList[i].disabled;
                         }
@@ -70,7 +71,7 @@ export class CreateGroupComponent implements OnInit {
                 this.createGroup.list[i].data[j].checked = false;
                 this.createGroup.list[i].data[j].disabled = false;
                 this.createGroup.list[i].data[j].show = true;
-                if(this.createGroup.info.activeSingle && this.createGroup.info.activeSingle.key == this.createGroup.list[i].data[j].key){
+                if(Number(this.createGroup.info.activeSingle && this.createGroup.info.activeSingle.key) === Number(this.createGroup.list[i].data[j].key)){
                     this.createGroup.list[i].data[j].checked = true;
                     this.createGroup.list[i].data[j].disabled = true;
                     this.selectList.push(this.createGroup.info.activeSingle);
@@ -82,7 +83,7 @@ export class CreateGroupComponent implements OnInit {
             for(let i=0;i<this.createGroup.list.length;i++){
                 for(let j=0;j<this.createGroup.list[i].data.length;j++){
                     for(let a=0;a<this.createGroup.info.filter.length;a++){
-                        if(this.createGroup.info.filter[a].uid == this.createGroup.list[i].data[j].key || this.createGroup.info.filter[a].key == this.createGroup.list[i].data[j].key){
+                        if(Number(this.createGroup.info.filter[a].uid) === Number(this.createGroup.list[i].data[j].key) || Number(this.createGroup.info.filter[a].key) === Number(this.createGroup.list[i].data[j].key)){
                             this.createGroup.list[i].data[j].show = false;
                             break;
                         }
@@ -123,7 +124,7 @@ export class CreateGroupComponent implements OnInit {
         }else{
             item.checked = false;
             for(let i=0;i<this.selectList.length;i++){
-                if(item.key === this.selectList[i].key){
+                if(Number(item.key) === Number(this.selectList[i].key)){
                     this.selectList.splice(i, 1);
                     break;
                 }
@@ -132,7 +133,7 @@ export class CreateGroupComponent implements OnInit {
         for(let i=0;i<this.createGroup.list.length;i++){
             if(!this.createGroup.list[i].allGroup){
                 for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                    if(item.key === Number(this.createGroup.list[i].data[j].key)){
+                    if(Number(item.key) === Number(this.createGroup.list[i].data[j].key)){
                         if(this.createGroup.list[i].data[j].type === 3 && this.createGroup.list[i].data[j].checked){
                             this.createGroup.list[i].data[j].checked = false;
                             return ;
@@ -153,6 +154,12 @@ export class CreateGroupComponent implements OnInit {
         event.target.src = avatarErrorIcon;
     }
     private confirmCreateGroup(){
+        if(!this.createGroup.info.action && this.groupName.length === 0){
+            this.nameTip = true;
+            return ;
+        }else{
+            this.nameTip = false;
+        }
         let memberUsernames = [];
         for(let i=0;i<this.selectList.length;i++){
             memberUsernames.push({
@@ -173,7 +180,17 @@ export class CreateGroupComponent implements OnInit {
         }else if(this.createGroup.info.action && this.createGroup.info.action === 'many'){
             groupInfo.groupName = this.createGroup.info.selfInfo.nickname || this.createGroup.info.selfInfo.username;
             for(let i=0;i<this.selectList.length;i++){
-                groupInfo.groupName += '、' + this.selectList[i].nickName || this.selectList[i].name;
+                let name;
+                if(this.selectList[i].nickName && this.selectList[i].nickName !== ''){
+                    name = this.selectList[i].nickName;
+                }else if(this.selectList[i].nickname && this.selectList[i].nickname !== ''){
+                    name = this.selectList[i].nickname;
+                }else if(this.selectList[i].username && this.selectList[i].username !== ''){
+                    name = this.selectList[i].username;
+                }else if(this.selectList[i].name && this.selectList[i].name !== ''){
+                    name = this.selectList[i].name;
+                }
+                groupInfo.groupName += '、' + name;
             }
         }
         this.isCreateGroup.emit(groupInfo);
@@ -184,7 +201,7 @@ export class CreateGroupComponent implements OnInit {
     private selectItem(event, user){
         if(!event.target.checked){
             for(let i=0;i<this.selectList.length;i++){
-                if(this.selectList[i].key == user.key){
+                if(Number(this.selectList[i].key) === Number(user.key)){
                     this.selectList.splice(i, 1);
                     break;
                 }
@@ -201,7 +218,7 @@ export class CreateGroupComponent implements OnInit {
         }
         for(let i=0;i<this.createGroup.list.length;i++){
             for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(this.createGroup.list[i].data[j].key == user.key){
+                if(Number(this.createGroup.list[i].data[j].key) === Number(user.key)){
                     this.createGroup.list[i].data[j].checked = event.target.checked;
                     return ;
                 }
@@ -210,14 +227,14 @@ export class CreateGroupComponent implements OnInit {
     }
     private cancelSelect(user){
         for(let i=0;i<this.selectList.length;i++){
-            if(this.selectList[i].key == user.key){
+            if(Number(this.selectList[i].key) === Number(user.key)){
                 this.selectList.splice(i, 1);
                 break;
             }
         }
         for(let i=0;i<this.createGroup.list.length;i++){
             for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(this.createGroup.list[i].data[j].key == user.key){
+                if(Number(this.createGroup.list[i].data[j].key) === Number(user.key)){
                     this.createGroup.list[i].data[j].checked = false;
                     return ;
                 }

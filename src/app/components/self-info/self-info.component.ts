@@ -44,6 +44,7 @@ export class SelfInfoComponent implements OnInit {
         formData: {},
         url: ''
     };
+    private cameraShadow = true;
     constructor(
         
     ) {}
@@ -108,6 +109,7 @@ export class SelfInfoComponent implements OnInit {
             this.util.fileReader(selfAvatarInput).then((url: string) => {
                 (selfAvatarImg as HTMLImageElement).src = url;
                 this.newAvatar.url = url;
+                this.cameraShadow = false;
             })
         }
         this.newAvatar.formData = this.util.getFileFormData('selfAvatarInput');

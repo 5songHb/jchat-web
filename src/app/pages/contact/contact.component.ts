@@ -49,6 +49,9 @@ export class ContactComponent implements OnInit {
             case chatAction.dispatchConversationList:
                 this.conversation = contactState.conversation;
                 break;
+            case mainAction.createSingleChatSuccess:
+                this.conversation = contactState.conversation;
+                break;
         }
     }
     private selectContactItemEmit(item){

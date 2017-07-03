@@ -1,5 +1,5 @@
 <div class="search-member-search">
-    <input type="text" [(ngModel)]="searchKeyword" class="input-focus" [id]="searchResult.id">
+    <input spellcheck="false" type="text" [(ngModel)]="searchKeyword" class="input-focus" [id]="searchResult.id">
     <span (click)="searchBtnAction()"></span>
     <p (click)="clearInputAction()" *ngIf="searchResult.show"></p>
     <div class="search-member-no-serach-data" *ngIf="searchResult.result.length === 0 && searchResult.show">找不到匹配的结果</div>
@@ -10,7 +10,7 @@
                     <img [src]="item.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                 </div>
                 <p class="flex-1">{{item.nickName.indexOf(searchKeyword) !== -1 ? item.nickName : (item.username ? item.username : item.name)}}</p>
-                <input *ngIf="searchResult.checkbox" (click)="changeCheckedAction(item)"[checked]="item.checked" [disabled]="item.disabled" class="search-member-checkbox" type="checkbox">
+                <input spellcheck="false" *ngIf="searchResult.checkbox" (click)="changeCheckedAction(item)"[checked]="item.checked" [disabled]="item.disabled" class="search-member-checkbox" type="checkbox">
             </li>
         </ul>
     </perfect-scrollbar>

@@ -11,7 +11,6 @@ export const chatInit = {
         noDisturb: false,
         avatarUrl: ''
     },
-    imageViewerUrl: '',
     defaultPanelIsShow: true,
     actionType: '',
     otherInfo: {
@@ -33,5 +32,6 @@ export const chatInit = {
         info: {
             avatarUrl: ''
         }
-    }
+    },
+    imageViewer: []
 }

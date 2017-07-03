@@ -15,7 +15,6 @@ export interface ChatStore{
         type?: number;
     };
     groupList: Array<any>;
-    imageViewerUrl: string;
     defaultPanelIsShow: boolean;
     actionType: string;
     otherInfo: {
@@ -38,4 +37,5 @@ export interface ChatStore{
             avatarUrl: string
         };
     };
+    imageViewer: Array<any>;
 }

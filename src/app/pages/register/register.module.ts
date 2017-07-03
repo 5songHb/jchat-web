@@ -7,8 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 
 import { REGISTER_ROUTER } from './register.router';
 import { RegisterComponent } from './register.component';
-// import { loginReducer } from './reducers';
-// import { LoginEffect } from './effects';
+import { TipModalModule } from '../../components/tip-modal';
 
 @NgModule({
   declarations: [
@@ -19,8 +18,7 @@ import { RegisterComponent } from './register.component';
     CommonModule,
     FormsModule,
     RouterModule.forChild(REGISTER_ROUTER),
-    // StoreModule.provideStore({ loginReducer }),
-    // EffectsModule.run(LoginEffect)
+    TipModalModule
   ],
   providers: [
 

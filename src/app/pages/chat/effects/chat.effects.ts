@@ -100,10 +100,16 @@ export class ChatEffect {
                     global.JIM.getResource({'media_id' : msgBody.media_id})
                         .onSuccess(function(urlInfo){
                             msg[i].content.msg_body.media_url = urlInfo.url;
-                            that.store$.dispatch({type: chatAction.getAllMessageSuccess, payload: info.messageList});
+                            that.store$.dispatch({
+                                type: chatAction.getAllMessageSuccess,
+                                payload: info.messageList
+                            });
                         }).onFail(function(error){
                             msg[i].content.msg_body.media_url = '';
-                            that.store$.dispatch({type: chatAction.getAllMessageSuccess, payload: info.messageList});
+                            that.store$.dispatch({
+                                type: chatAction.getAllMessageSuccess,
+                                payload: info.messageList
+                            });
                         });
                 }
             }
@@ -151,38 +157,11 @@ export class ChatEffect {
             for(let i=0;i<data.length;i++){
                 for(let j=0;j<data[i].msgs.length;j++){
                     if(j+1 < data[i].msgs.length || data[i].msgs.length === 1){
-                        let index;
-                        if(j === 0){
-                            index = 0;
-                        }else{
-                            index = j + 1;
-                        }
-                        let time = new Date(data[i].msgs[index].ctime_ms),
-                            timeGap = (time.getTime() - data[i].msgs[j].ctime_ms)/1000/60;
-                        if(timeGap > 5 || j === 0){
-                            data[i].msgs[index].time_show = this.util.reducerDate(data[i].msgs[index].ctime_ms);
-                            // let now = new Date(),
-                            //     msgYear = time.getFullYear(),
-                            //     nowYear = now.getFullYear(),
-                            //     msgMonth = time.getMonth() + 1,
-                            //     nowMonth = now.getMonth() + 1,
-                            //     msgDate = time.getDate(),
-                            //     nowDate = now.getDate(),
-                            //     msgDay = time.getDay();
-                            // if(msgYear !== nowYear){
-                            //     data[i].msgs[index].time_show = 'year';                                
-                            // }else if(msgMonth !== nowMonth || (msgMonth === nowMonth && nowDate - msgDate > 6)){
-                            //     data[i].msgs[index].time_show = 'month';
-                            // }else if(nowDate - msgDate <= 6 && nowDate - msgDate > 2){
-                            //     data[i].msgs[index].time_show = 'day';
-                            // }else if(nowDate - msgDate === 2){
-                            //     data[i].msgs[index].time_show = 'the day before';
-                            // }else if(nowDate - msgDate === 1){
-                            //     data[i].msgs[index].time_show = 'yesterday';
-                            // }else if(nowDate === msgDate){
-                            //     data[i].msgs[index].time_show = 'today';
-                            // }
-                        }
+                        if(j === 0)
+                            data[i].msgs[j].time_show = this.util.reducerDate(data[i].msgs[j].ctime_ms);
+                        let timeGap = (data[i].msgs[j + 1].ctime_ms - data[i].msgs[j].ctime_ms) / 1000 / 60;
+                        if(timeGap > 5)
+                            data[i].msgs[j + 1].time_show = this.util.reducerDate(data[i].msgs[j + 1].ctime_ms);
                     }
                     // if(data[i].msgs[j].content.msg_body.media_id){
                     //     count ++;

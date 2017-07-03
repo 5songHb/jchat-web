@@ -29,7 +29,7 @@ export class OtherInfoComponent implements OnInit {
     ngOnChanges(){
         switch(this.otherInfo.gender){
             case 0 :
-                this.otherInfo.gender = '未知';
+                this.otherInfo.gender = '保密';
                 break;
             case 1 :
                 this.otherInfo.gender = '男';

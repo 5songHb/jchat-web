@@ -18,25 +18,30 @@ export class LoginEffect {
     private login$: Observable<Action> = this.actions$
         .ofType(loginAction.login)
         .map(toPayload)
-        .filter((val) => {
-                console.log(99999999)                                              
+        .filter((val) => {                                          
             if(!val.isButtonAvailable){
                 return false;
             }
             return val;
         })
-        .switchMap((val: {username: string,password: string, md5: boolean, isButtonAvailable: boolean, event: object}) => {
+        .switchMap((val) => {
             let that = this;
             let loginObj = global.JIM.login({
-                'username' : val.username,
-                'password' : val.password,
+                'username': val.username,
+                'password': val.password,
                 'is_md5': val.md5
             })
             .onSuccess(function(data) {
                 global.user = data.username;    
-                that.store$.dispatch({type: loginAction.loginSuccess, payload: val});
+                that.store$.dispatch({
+                    type: loginAction.loginSuccess,
+                    payload: val
+                });
             }).onFail(function(data) {
-                that.store$.dispatch({type: loginAction.loginFailed, payload: data});
+                that.store$.dispatch({
+                    type: loginAction.loginFailed,
+                    payload: data
+                });
             }).onTimeout(function(data) {
                 console.log('timeout:' + JSON.stringify(data));
             });

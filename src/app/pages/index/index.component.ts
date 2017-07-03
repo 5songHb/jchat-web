@@ -6,7 +6,7 @@ declare function JMessage(): void;
 @Component({
     selector: 'my-app',
     templateUrl: './index.component.html',
-    styleUrls: ['./index.component.css']
+    styleUrls: ['./index.component.scss']
 })
 export class AppComponent implements OnInit {
     constructor(){}

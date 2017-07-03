@@ -6,13 +6,13 @@
             <p class="clearfix group-setting-text">
                 <span class="float-left">群名称&nbsp;:&nbsp;</span>
                 <span class="float-left group-setting-name-text" [hidden]="modifyGroupNameShow" (click)="modifyGroupNameAction()" [title]="groupSetting.groupInfo.name">{{groupSetting.groupInfo.name}}</span>
-                <input maxlength="20" class="float-left group-setting-name-input input-focus" id="groupSettingNameInput" [hidden]="!modifyGroupNameShow" type="text" [ngModel]="groupSetting.groupInfo.name" (blur)="modifyGroupNameBlur($event)">
+                <input spellcheck="false" maxlength="20" class="float-left group-setting-name-input input-focus" id="groupSettingNameInput" [hidden]="!modifyGroupNameShow" type="text" [ngModel]="groupSetting.groupInfo.name" (blur)="modifyGroupNameBlur($event)">
             </p>
-            <p class="clearfix group-setting-text">
+            <div class="clearfix group-setting-text">
                 <span class="float-left">群描述&nbsp;:&nbsp;</span>
-                <span class="float-left group-setting-dec" (click)="modifyGroupDescriptionAction()">{{groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : '未填写'}}</span>
+                <span class="float-left group-setting-dec" id="groupSettingDec" [title]="groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : ''" (click)="modifyGroupDescriptionAction()">{{groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : '未填写'}}</span>
                 <!--<button type="button" (click)="modifyGroupDescriptionAction()">修改</button>-->
-            </p>
+            </div>
             <div class="clearfix group-setting-text">
                 <span class="float-left">屏蔽群消息&nbsp;:&nbsp;</span>
                 <switch-component [state]="groupSetting.active.noDisturb" (changeSwitch)="changeNoDisturbEmit()" class="float-right group-setting-switch"></switch-component>

@@ -5,7 +5,11 @@ const registerInit = {
     usernameTip: '',
     passwordTip: '',
     repeatPasswordTip: '',
-    isButtonAvailable: false
+    isButtonAvailable: false,
+    tipModal: {
+        show: false,
+        info: {}
+    }
 }
 export const registerReducer = (state: RegisterStore = registerInit, {type, payload}) => {
     switch (type) {
@@ -14,6 +18,7 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
         case registerAction.registerSuccess:
             state.isRegisterSuccess = true;
             state.usernameTip = '';
+            state.tipModal = payload;
             break;
         case registerAction.registerFailed:
             state.isRegisterSuccess = false;

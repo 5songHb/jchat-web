@@ -25,6 +25,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
         private router: Router
     ) {}
     public ngOnInit() {
+        if(this.storageService.get('register-username')){
+            this.username = this.storageService.get('register-username');
+            this.storageService.remove('register-username');
+        }
+        if(this.username !== '' && this.password !== ''){
+            this.isButtonAvailableAction();
+        }
         // JIM 初始化
         this.JIMInit();
         // 订阅state状态 方法1
@@ -80,7 +87,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         }).onSuccess(function(data) {
             let username = that.storageService.get(md5('jchat-remember-username'), true),
                 password = that.storageService.get(md5('jchat-remember-password'), true);
-            if(username && password){
+            if(username && password && this.username !== ''){
                 that.username = username;
                 that.rememberPassword = password;
                 that.password = password.substring(0, 6);
@@ -128,6 +135,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.loginStream.unsubscribe();
     }
     ngAfterViewInit(){
-        document.getElementById('loginUsername').focus();
+        if(this.username !== '' && this.password === ''){
+            document.getElementById('loginPassword').focus();
+        }else{
+            document.getElementById('loginUsername').focus();
+        }
     }
 }
