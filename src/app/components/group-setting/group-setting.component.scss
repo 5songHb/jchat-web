@@ -103,6 +103,7 @@
                 padding-left: 20px;                
                 font-size: 14px;
                 color: #2C2C2C;
+                position: relative;
                 .group-setting-avatar{
                     width: 30px;
                     height: 30px;
@@ -125,7 +126,10 @@
                     display: none;
                     color: #EB424D;
                     cursor: pointer;
-                    margin-right: 23px;
+                    position: absolute;
+                    line-height: 25px;
+                    top: 12px;
+                    left: 5px;
                 }
                 &:hover{
                     background-color: #F2F6FB;

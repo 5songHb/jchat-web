@@ -111,7 +111,9 @@ export class GroupSettingComponent implements OnInit {
     }
     private modifyGroupNameAction(){
         this.modifyGroupNameShow = true;
-        document.getElementById('groupSettingNameInput').focus();
+        setTimeout(function(){
+            document.getElementById('groupSettingNameInput').focus();
+        }, 0)
     }
     private modifyGroupNameBlur(event){
         this.modifyGroupName.emit(event.target.value);

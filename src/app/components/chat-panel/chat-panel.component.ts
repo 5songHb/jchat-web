@@ -112,14 +112,20 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         console.log('chat-panel',chatState.actionType);
         switch(chatState.actionType){
             case chatAction.receiveMessage:
-                this.msg.push(chatState.newMessage);
+                // this.msg.push(chatState.newMessage);
+                let msg = this.messageList[chatState.activePerson.activeIndex].msgs;
+                if(msg.length > 20){
+                    this.msg = msg.slice(msg.length - this.msg.length);
+                }else{
+                    this.msg = msg;
+                }
                 // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
-                let msgs = this.messageList[chatState.activePerson.activeIndex].msgs;                
+                let msgs = this.messageList[chatState.activePerson.activeIndex].msgs;
                 if(msgs.length > 20){
                     this.msg = msgs.slice(msgs.length - 20);
                 }else{
@@ -188,17 +194,21 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         }
         this.imageViewer.show = true;
     }
-    private allPointerToMap(timeout ?: boolean){
-        for(let i=0;i<this.msg.length;i++){
+    private allPointerToMap(timeout: boolean, index ?: number){
+        let num = index ? index : this.msg.length;
+        for(let i=0;i<num;i++){
             if(this.msg[i].content.msg_type === 'location'){
                 if(timeout){
-                    setTimeout(function(){
-                        this.util.theLocation({
-                            id: 'allmap' + i,
-                            longitude: this.msg[i].content.msg_body.longitude,
-                            latitude: this.msg[i].content.msg_body.latitude
-                        });
-                    }.bind(this), 100);
+                    let that = this;
+                    (function(i){
+                        setTimeout(function(){
+                            that.util.theLocation({
+                                id: 'allmap' + i,
+                                longitude: that.msg[i].content.msg_body.longitude,
+                                latitude: that.msg[i].content.msg_body.latitude
+                            });
+                        }, 1000);
+                    })(i);
                 }else{
                     this.util.theLocation({
                         id: 'allmap' + i,
@@ -221,7 +231,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         }
     }
     ngAfterViewInit(){
-        this.allPointerToMap(false);
+        this.allPointerToMap(true);
     }
     ngDoCheck(){
         if(!this.change && this.active.change || this.active.change !== this.change){
@@ -331,6 +341,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         event.stopPropagation();
         this.inputToLast = false;
     }
+    // ctrl + enter换行，enter发送消息
     private preKeydown(event){
         if(event.keyCode == 13 && event.ctrlKey){
             let contentId = document.getElementById(this.emojiInfo.contentId),
@@ -355,6 +366,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             event.preventDefault();
         }
     }
+    // 消息发送失败后点击重发消息
     private repeatSendMsgAction(item){
         item.success = 1;
         item.repeatSend = true;
@@ -373,19 +385,27 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private avatarErrorIcon(event){
         event.target.src = avatarErrorIcon;
     }
+    // 加载更多消息
     private scrollTopEvent(){
         if(!this.change && this.active.change || this.active.change !== this.change)
             return;
-        if(this.loadingFlag === 3)
+        /**
+         * this.loadingFlag
+         * value    1           2           3
+         * state 更多消息   正在加载消息  没有更多了
+         */
+        if(this.loadingFlag !== 1)
             return ;
         if(this.loadingFlag === 1 && this.msg.length >= 20){
             this.loadingFlag = 2;
+            let oldContentHeight = this.componentScroll.contentHeight;
             setTimeout(function(){
+                this.componentScroll.scrollTo(0, 3);
                 let msgs = this.messageList[this.active.activeIndex].msgs;
-                this.componentScroll.update();
                 if(msgs.length === this.msg.length){
                     this.loadingFlag = 3;
                 }else{
+                    let oldLength = this.msg.length;
                     if(msgs.length < 20 * ++ this.loadingCount){
                         this.msg = msgs;
                         this.loadingFlag = 3;
@@ -393,12 +413,20 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
                         this.msg = msgs.slice(msgs.length - 20 * this.loadingCount ++ );
                         this.loadingFlag = 1;
                     }
+                    this.componentScroll.update();
+                    let newLength = this.msg.length;
+                    this.allPointerToMap(newLength - oldLength);
+                    let that = this;
+                    return new Promise ((resolve, reject) => {
+                        setTimeout(function(){
+                            let newContentHeight = that.componentScroll.contentHeight;
+                            that.componentScroll.scrollTo(0, newContentHeight - oldContentHeight);
+                            resolve();
+                        }, 100);
+                    });
                 }
-            }.bind(this),1000);
+            }.bind(this), 500);
         }
-    }
-    private scrollBottomEvent(){
-        
     }
     private addGroupAction(){
         this.addGroup.emit();
@@ -410,6 +438,10 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     private playVoice(index){
         let audio = (document.getElementById('audio' + index) as HTMLAudioElement);
-        audio.play();
+        if (audio.paused) {
+            audio.play();
+        }else{
+            audio.pause();
+        }
     }
 }

@@ -13453,7 +13453,9 @@ exports.chatAction = {
     getSingleAvatarUrl: '[chat] get single avatar url',
     changeNoDisturb: '[chat] change no disturb',
     changeNoDisturbSuccess: '[chat] change no disturb success',
-    createOtherChat: '[chat] create other chat'
+    createOtherChat: '[chat] create other chat',
+    addGroupMembersEvent: '[chat] add group members event',
+    addGroupMembersEventSuccess: '[chat] add group members event success'
 };
 
 
@@ -13617,37 +13619,12 @@ var ChatEffect = (function () {
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < data[i].msgs.length; j++) {
                     if (j + 1 < data[i].msgs.length || data[i].msgs.length === 1) {
-                        var index = void 0;
-                        if (j === 0) {
-                            index = 0;
-                        }
-                        else {
-                            index = j + 1;
-                        }
-                        var time = new Date(data[i].msgs[index].ctime_ms), timeGap = (time.getTime() - data[i].msgs[j].ctime_ms) / 1000 / 60;
-                        if (timeGap > 5 || j === 0) {
-                            data[i].msgs[index].time_show = _this.util.reducerDate(data[i].msgs[index].ctime_ms);
-                            // let now = new Date(),
-                            //     msgYear = time.getFullYear(),
-                            //     nowYear = now.getFullYear(),
-                            //     msgMonth = time.getMonth() + 1,
-                            //     nowMonth = now.getMonth() + 1,
-                            //     msgDate = time.getDate(),
-                            //     nowDate = now.getDate(),
-                            //     msgDay = time.getDay();
-                            // if(msgYear !== nowYear){
-                            //     data[i].msgs[index].time_show = 'year';                                
-                            // }else if(msgMonth !== nowMonth || (msgMonth === nowMonth && nowDate - msgDate > 6)){
-                            //     data[i].msgs[index].time_show = 'month';
-                            // }else if(nowDate - msgDate <= 6 && nowDate - msgDate > 2){
-                            //     data[i].msgs[index].time_show = 'day';
-                            // }else if(nowDate - msgDate === 2){
-                            //     data[i].msgs[index].time_show = 'the day before';
-                            // }else if(nowDate - msgDate === 1){
-                            //     data[i].msgs[index].time_show = 'yesterday';
-                            // }else if(nowDate === msgDate){
-                            //     data[i].msgs[index].time_show = 'today';
-                            // }
+                        if (j === 0)
+                            data[i].msgs[j].time_show = _this.util.reducerDate(data[i].msgs[j].ctime_ms);
+                        if (j + 1 !== data[i].msgs.length) {
+                            var timeGap = (data[i].msgs[j + 1].ctime_ms - data[i].msgs[j].ctime_ms) / 1000 / 60;
+                            if (timeGap > 5)
+                                data[i].msgs[j + 1].time_show = _this.util.reducerDate(data[i].msgs[j + 1].ctime_ms);
                         }
                     }
                     // if(data[i].msgs[j].content.msg_body.media_id){
@@ -14073,6 +14050,27 @@ var ChatEffect = (function () {
                 return { type: '[chat] change no disturb useless' };
             }));
         }));
+        // 被添加进群时获取群信息
+        this.addGroupMembersEvent$ = this.actions$
+            .ofType(actions_1.chatAction.addGroupMembersEvent)
+            .map(effects_1.toPayload)
+            .switchMap((function (eventData) {
+            var that = _this, groupInfoObj = common_1.global.JIM.getGroupInfo({ 'gid': eventData.gid })
+                .onSuccess((function (data) {
+                eventData.name = data.group_info.name;
+                that.store$.dispatch({
+                    type: actions_1.chatAction.addGroupMembersEventSuccess,
+                    payload: eventData
+                });
+                console.log('success:' + JSON.stringify(data));
+            })).onFail((function (data) {
+                console.log('error:' + JSON.stringify(data));
+            }));
+            return rxjs_1.Observable.of('addGroupMembersEventObj')
+                .map((function () {
+                return { type: '[chat] add group members event useless' };
+            }));
+        }));
     }
     return ChatEffect;
 }());
@@ -14132,6 +14130,10 @@ tslib_1.__decorate([
     effects_1.Effect(),
     tslib_1.__metadata("design:type", rxjs_1.Observable)
 ], ChatEffect.prototype, "changeNoDisturb$", void 0);
+tslib_1.__decorate([
+    effects_1.Effect(),
+    tslib_1.__metadata("design:type", rxjs_1.Observable)
+], ChatEffect.prototype, "addGroupMembersEvent$", void 0);
 ChatEffect = tslib_1.__decorate([
     core_1.Injectable(),
     tslib_1.__metadata("design:paramtypes", [effects_1.Actions,
@@ -14314,15 +14316,18 @@ exports.chatReducer = function (state, _a) {
             state.msgId = filterMsgId(state, 'update', [{ key: state.activePerson.key }]);
             changeActivePerson(state);
             break;
-        // 删除本地会话列表
-        case actions_2.chatAction.deleteConversationItem:
-            deleteConversationItem(state, payload);
-            break;
         case actions_3.contactAction.selectContactItem:
+        case actions_1.mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
             state.activePerson = payload;
             selectUserResult(state, payload);
             changeActivePerson(state);
+            emptyUnreadNum(state, payload);
+            state.msgId = filterMsgId(state, 'update', [{ key: state.activePerson.key }]);
+            break;
+        // 删除本地会话列表
+        case actions_2.chatAction.deleteConversationItem:
+            deleteConversationItem(state, payload);
             break;
         case actions_2.chatAction.getResourceUrl:
             // 获取静态资源路径
@@ -14332,7 +14337,7 @@ exports.chatReducer = function (state, _a) {
         case actions_2.chatAction.saveDraft:
             state.messageList[payload[1].activeIndex].draft = payload[0];
             for (var i = 0; i < state.conversation.length; i++) {
-                if (payload[1].key == state.conversation[i].key) {
+                if (Number(payload[1].key) === Number(state.conversation[i].key)) {
                     state.conversation[i].draft = payload[0];
                 }
             }
@@ -14340,12 +14345,6 @@ exports.chatReducer = function (state, _a) {
         // 搜索用户
         case actions_1.mainAction.searchUser:
             state.searchUserResult = searchUser(state, payload);
-            break;
-        case actions_1.mainAction.selectSearchUser:
-            state.defaultPanelIsShow = false;
-            state.activePerson = payload;
-            selectUserResult(state, payload);
-            changeActivePerson(state);
             break;
         // 成功查看别人的信息
         case actions_2.chatAction.watchOtherInfoSuccess:
@@ -14410,7 +14409,7 @@ exports.chatReducer = function (state, _a) {
             state.defaultPanelIsShow = true;
             state.messageList[state.activePerson.activeIndex].groupSetting.show = false;
             for (var i = 0; i < state.groupList.length; i++) {
-                if (state.groupList[i].gid === payload.gid) {
+                if (Number(state.groupList[i].gid) === Number(payload.gid)) {
                     state.groupList.splice(i, 1);
                     break;
                 }
@@ -14458,21 +14457,49 @@ exports.chatReducer = function (state, _a) {
             break;
         case actions_2.chatAction.changeNoDisturbSuccess:
             for (var i = 0; i < state.conversation.length; i++) {
-                if (payload.key == state.conversation[i].key) {
+                if (Number(payload.key) === Number(state.conversation[i].key)) {
                     state.conversation[i].noDisturb = !state.conversation[i].noDisturb;
                     break;
                 }
             }
             break;
+        case actions_2.chatAction.addGroupMembersEventSuccess:
+            addGroupMembersEvent(state, payload);
+            break;
         default:
     }
     return state;
 };
+// 被添加进群的事件
+function addGroupMembersEvent(state, payload) {
+    var flag = true;
+    for (var i = 0; i < payload.to_usernames.length; i++) {
+        if (payload.to_usernames[i].username === common_1.global.user) {
+            flag = false;
+            break;
+        }
+    }
+    if (flag === false) {
+        var conversation = {
+            key: payload.gid,
+            name: payload.name,
+            type: 4,
+            unreadNum: 1
+        };
+        state.conversation.unshift(conversation);
+        state.messageList.push({
+            key: payload.gid,
+            msgs: [],
+            addGroupMembers: true
+        });
+    }
+}
 // 删除群成员
 function deleteGroupItem(state, payload) {
-    for (var i = 0; i < state.messageList[state.activePerson.activeIndex].groupSetting.memberList.length; i++) {
-        if (state.messageList[state.activePerson.activeIndex].groupSetting.memberList[i].uid === payload.deleteItem.uid) {
-            state.messageList[state.activePerson.activeIndex].groupSetting.memberList.splice(i, 1);
+    var memberList = state.messageList[state.activePerson.activeIndex].groupSetting.memberList;
+    for (var i = 0; i < memberList.length; i++) {
+        if (Number(memberList[i].uid) === Number(payload.deleteItem.uid)) {
+            memberList.splice(i, 1);
             break;
         }
     }
@@ -14482,7 +14509,7 @@ function completionMessageList(state) {
     for (var i = 0; i < state.conversation.length; i++) {
         var flag = false;
         for (var j = 0; j < state.messageList.length; j++) {
-            if (state.conversation[i].key == state.messageList[j].key) {
+            if (Number(state.conversation[i].key) === Number(state.messageList[j].key)) {
                 flag = true;
                 break;
             }
@@ -14498,7 +14525,7 @@ function completionMessageList(state) {
 function addNoDisturb(state, noDisturb) {
     for (var i = 0; i < noDisturb.users.length; i++) {
         for (var j = 0; j < state.conversation.length; j++) {
-            if (noDisturb.users[i].username == state.conversation[j].name && state.conversation[j].type == 3) {
+            if (Number(noDisturb.users[i].username) === Number(state.conversation[j].name) && state.conversation[j].type === 3) {
                 state.conversation[j].noDisturb = true;
                 break;
             }
@@ -14506,7 +14533,7 @@ function addNoDisturb(state, noDisturb) {
     }
     for (var i = 0; i < noDisturb.groups.length; i++) {
         for (var j = 0; j < state.conversation.length; j++) {
-            if (noDisturb.groups[i].gid == state.conversation[j].key && state.conversation[j].type == 4) {
+            if (Number(noDisturb.groups[i].gid) === Number(state.conversation[j].key) && state.conversation[j].type === 4) {
                 state.conversation[j].noDisturb = true;
                 break;
             }
@@ -14531,11 +14558,11 @@ function filterImageViewer(state) {
     return imgResult;
 }
 function changeActivePerson(state) {
-    if (state.activePerson.group === true && state.activePerson.gid) {
+    if (state.activePerson.type === 4 && state.activePerson.gid) {
         state.activePerson.key = state.activePerson.gid;
     }
     for (var i = 0; i < state.messageList.length; i++) {
-        if (state.messageList[i].key == state.activePerson.key) {
+        if (Number(state.messageList[i].key) === Number(state.activePerson.key)) {
             state.activePerson.activeIndex = i;
             break;
         }
@@ -14543,10 +14570,9 @@ function changeActivePerson(state) {
     state.imageViewer = filterImageViewer(state);
 }
 function filterRecentMsg(state) {
-    console.log('000011111', state.conversation.length, state.messageList.length);
     for (var i = 0; i < state.conversation.length; i++) {
         for (var j = 0; j < state.messageList.length; j++) {
-            if (state.conversation[i].key == state.messageList[j].key) {
+            if (Number(state.conversation[i].key) === Number(state.messageList[j].key)) {
                 var msgs = state.messageList[j].msgs;
                 if (msgs.length > 0) {
                     msgs[msgs.length - 1].conversation_time_show = util.reducerDate(msgs[msgs.length - 1].ctime_ms);
@@ -14562,7 +14588,7 @@ function filterMsgId(state, operation, payload) {
         var msgId = [];
         for (var i = 0; i < state.conversation.length; i++) {
             for (var j = 0; j < state.messageList.length; j++) {
-                if (state.conversation[i].key == state.messageList[j].key) {
+                if (Number(state.conversation[i].key) === Number(state.messageList[j].key)) {
                     var msgs = state.messageList[j].msgs;
                     if (!state.conversation[i].unreadNum && msgs.length > 0) {
                         msgId.push({
@@ -14595,7 +14621,7 @@ function filterMsgId(state, operation, payload) {
                     var flag = true;
                     if (msgId) {
                         for (var i_1 = 0; i_1 < state.msgId.length; i_1++) {
-                            if (state.msgId[i_1].key == payload[j].key) {
+                            if (Number(state.msgId[i_1].key) === Number(payload[j].key)) {
                                 flag = false;
                                 state.msgId[i_1] = {
                                     key: payload[j].key,
@@ -14636,10 +14662,10 @@ function unreadNum(state, payload) {
         var flag = false;
         // 当localstorage里面存储了该会话人的msgId
         for (var i = 0; i < payload.msgId.length; i++) {
-            if (state.messageList[a].key == payload.msgId[i].key) {
+            if (Number(state.messageList[a].key) === Number(payload.msgId[i].key)) {
                 flag = true;
                 for (var j = 0; j < state.messageList[a].msgs.length; j++) {
-                    if (state.messageList[a].msgs[j].msg_id == payload.msgId[i].msgId) {
+                    if (Number(state.messageList[a].msgs[j].msg_id) === Number(payload.msgId[i].msgId)) {
                         var unreadNum_1 = state.messageList[a].msgs.length - 1 - j;
                         for (var b = 0; b < state.conversation.length; b++) {
                             if (state.messageList[a].key == state.conversation[b].key) {
@@ -14656,7 +14682,7 @@ function unreadNum(state, payload) {
         // 当localstorage里面没有存储该会话人的msgId
         if (flag === false) {
             for (var b = 0; b < state.conversation.length; b++) {
-                if (state.messageList[a].key == state.conversation[b].key) {
+                if (Number(state.messageList[a].key) === Number(state.conversation[b].key)) {
                     state.conversation[b].unreadNum = state.messageList[a].msgs.length;
                     break;
                 }
@@ -14667,13 +14693,14 @@ function unreadNum(state, payload) {
 // 完成消息的发送接口的调用后返回状态
 function sendMsgComplete(state, payload) {
     for (var i = 0; i < state.messageList.length; i++) {
-        if (state.messageList[i].key == payload.key) {
-            for (var j = state.messageList[i].msgs.length - 1; j >= 0; j--) {
-                if (state.messageList[i].msgs[j].msgKey && payload.msgKey == state.messageList[i].msgs[j].msgKey) {
+        if (Number(state.messageList[i].key) === Number(payload.key)) {
+            var msgs = state.messageList[i].msgs;
+            for (var j = msgs.length - 1; j >= 0; j--) {
+                if (msgs[j].msgKey && Number(payload.msgKey) === Number(msgs[j].msgKey)) {
                     if (payload.msgId) {
-                        state.messageList[i].msgs[j].msg_id = payload.msgId;
+                        msgs[j].msg_id = payload.msgId;
                     }
-                    state.messageList[i].msgs[j].success = payload.success;
+                    msgs[j].success = payload.success;
                     return;
                 }
             }
@@ -14682,14 +14709,13 @@ function sendMsgComplete(state, payload) {
 }
 // 删除本地的会话列表
 function deleteConversationItem(state, payload) {
-    console.log(333, payload);
     for (var i = 0; i < state.conversation.length; i++) {
-        if (state.conversation[i].key == payload.item.key || state.conversation[i].key == payload.item.uid) {
+        if (Number(state.conversation[i].key) === Number(payload.item.key) || Number(state.conversation[i].key) === Number(payload.item.uid)) {
             state.conversation.splice(i, 1);
             break;
         }
     }
-    if (payload.item.key == state.activePerson.key) {
+    if (Number(payload.item.key) === Number(state.activePerson.key)) {
         state.defaultPanelIsShow = true;
     }
 }
@@ -14760,8 +14786,9 @@ function addMessage(state, payload) {
             }
             var flag = false;
             // 如果发送人在会话列表里
+            console.log(55555, payload);
             for (var i = 0; i < state.messageList.length; i++) {
-                var groupMsg = payload.messages[j].msg_type === 4 && state.messageList[i].key == payload.messages[j].from_gid, singleMsg = payload.messages[j].msg_type === 3 && state.messageList[i].key == payload.messages[j].from_uid;
+                var groupMsg = payload.messages[j].msg_type === 4 && Number(state.messageList[i].key) === Number(payload.messages[j].from_gid), singleMsg = payload.messages[j].msg_type === 3 && Number(state.messageList[i].key) === Number(payload.messages[j].from_uid);
                 if (groupMsg || singleMsg) {
                     var msgs = state.messageList[i].msgs;
                     if (msgs.length === 0 || (payload.messages[j].ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5) {
@@ -14777,7 +14804,7 @@ function addMessage(state, payload) {
             for (var a = 0; a < state.conversation.length; a++) {
                 var groupMsg = payload.messages[j].msg_type === 4 && state.conversation[a].key == payload.messages[j].from_gid, singleMsg = payload.messages[j].msg_type === 3 && state.conversation[a].key == payload.messages[j].from_uid;
                 if (groupMsg || singleMsg) {
-                    var groupNoActive = payload.messages[j].msg_type === 4 && state.activePerson.key != payload.messages[j].from_gid, singleNoActive = payload.messages[j].msg_type === 3 && state.activePerson.key != payload.messages[j].from_uid;
+                    var groupNoActive = payload.messages[j].msg_type === 4 && Number(state.activePerson.key) !== Number(payload.messages[j].from_gid), singleNoActive = payload.messages[j].msg_type === 3 && Number(state.activePerson.key) !== Number(payload.messages[j].from_uid);
                     if (groupNoActive || singleNoActive) {
                         if (!state.conversation[a].unreadNum) {
                             state.conversation[a].unreadNum = 1;
@@ -14793,29 +14820,50 @@ function addMessage(state, payload) {
                     return;
                 }
             }
+            console.log(flag);
             // 如果发送人不在会话列表里            
             if (flag === false) {
+                var msg = void 0, conversationItem = void 0;
+                if (payload.messages[j].msg_type === 3) {
+                    msg = {
+                        key: payload.messages[j].from_uid,
+                        msgs: [
+                            payload.messages[j]
+                        ],
+                        draft: '',
+                        content: payload.messages[j].content
+                    };
+                    conversationItem = {
+                        avatar: "",
+                        key: payload.messages[j].from_uid,
+                        mtime: payload.messages[j].ctime_ms,
+                        name: payload.messages[j].content.from_id,
+                        nickName: payload.messages[j].content.from_name,
+                        type: 3
+                    };
+                }
+                else {
+                    msg = {
+                        key: payload.messages[j].from_gid,
+                        msgs: [
+                            payload.messages[j]
+                        ],
+                        draft: '',
+                        content: payload.messages[j].content
+                    };
+                    conversationItem = {
+                        avatar: "",
+                        key: payload.messages[j].from_gid,
+                        mtime: payload.messages[j].ctime_ms,
+                        name: payload.messages[j].content.target_name,
+                        type: 4,
+                        unreadNum: 1
+                    };
+                }
                 payload.messages[j].time_show = 'today';
-                var msg = {
-                    key: payload.messages[j].from_uid,
-                    msgs: [
-                        payload.messages[j]
-                    ],
-                    draft: '',
-                    content: payload.messages[j].content
-                };
                 state.newMessage = msg;
                 state.messageList.push(msg);
-                var conversationItem = {
-                    avatar: "",
-                    key: payload.messages[j].from_uid,
-                    mtime: payload.messages[j].ctime_ms,
-                    name: payload.messages[j].content.from_id,
-                    nickName: payload.messages[j].content.from_name,
-                    type: payload.messages[j].msg_type
-                };
                 state.conversation.unshift(conversationItem);
-                payload.messages[j].time_show = util.reducerDate(payload.messages[j].ctime_ms);
                 state.conversation[0].recentMsg = payload.messages[j];
             }
         }
@@ -14825,7 +14873,7 @@ function addMessage(state, payload) {
 function messageListUrl(state, payload) {
     for (var i = 0; i < payload.length; i++) {
         for (var j = 0; j < state.messageList.length; j++) {
-            if (payload[i].key == state.messageList[j].key) {
+            if (Number(payload[i].key) === Number(state.messageList[j].key)) {
                 for (var a = 0; a < state.messageList[j].msgs.length; a++) {
                     if (payload[i].media_id == state.messageList[j].msgs[a].content.msg_body.media_id) {
                         state.messageList[j].msgs[a].content.msg_body.media_url = payload[i].url;
@@ -14881,7 +14929,7 @@ function selectUserResult(state, payload) {
     }
     var conversation = state.conversation, flag = false;
     for (var i = 0; i < conversation.length; i++) {
-        if ((conversation[i].key == payload.key && payload.key)) {
+        if ((Number(conversation[i].key) === Number(payload.key) && payload.key)) {
             var item = conversation.splice(i, 1);
             conversation.unshift(item[0]);
             flag = true;
@@ -14899,7 +14947,7 @@ function selectUserResult(state, payload) {
 // 切换当前会话时,清空未读消息数目
 function emptyUnreadNum(state, payload) {
     for (var i = 0; i < state.conversation.length; i++) {
-        if (state.conversation[i].key == payload.key) {
+        if (Number(state.conversation[i].key) === Number(payload.key)) {
             if (state.conversation[i].unreadNum) {
                 state.conversation[i].unreadNum = 0;
                 break;
@@ -17500,7 +17548,7 @@ var Util = (function () {
         // 百度地图API功能
         var point = new BMap.Point(obj.longitude, obj.latitude);
         var map = new BMap.Map(obj.id);
-        map.centerAndZoom(point, 11);
+        map.centerAndZoom(point, 13);
         if (obj.scroll) {
             map.enableScrollWheelZoom(true);
         }
@@ -17521,23 +17569,23 @@ var Util = (function () {
      * 今年之前的时间 --- year
      */
     Util.prototype.reducerDate = function (msgTime) {
-        var time = new Date(msgTime), now = new Date(), msgYear = time.getFullYear(), nowYear = now.getFullYear(), msgMonth = time.getMonth() + 1, nowMonth = now.getMonth() + 1, msgDate = time.getDate(), nowDate = now.getDate(), msgDay = time.getDay();
+        var time = new Date(msgTime), now = new Date(), msgYear = time.getFullYear(), nowYear = now.getFullYear(), nowHour = now.getHours(), nowMinute = now.getMinutes(), nowSecond = now.getSeconds(), nowTime = now.getTime(), todayTime = nowHour * 60 * 1000 * 60 + nowMinute * 1000 * 60 + nowSecond * 1000, gapDate = (nowTime - todayTime - msgTime) / 1000 / 60 / 60 / 24;
         if (msgYear !== nowYear) {
             return 'year';
         }
-        else if (msgMonth !== nowMonth || (msgMonth === nowMonth && nowDate - msgDate > 6)) {
+        else if (gapDate > 6) {
             return 'month';
         }
-        else if (nowDate - msgDate <= 6 && nowDate - msgDate > 2) {
+        else if (gapDate <= 6 && gapDate > 2) {
             return 'day';
         }
-        else if (nowDate - msgDate === 2) {
+        else if (gapDate <= 2 && gapDate > 1) {
             return 'the day before';
         }
-        else if (nowDate - msgDate === 1) {
+        else if (gapDate <= 1 && gapDate > 0) {
             return 'yesterday';
         }
-        else if (nowDate === msgDate) {
+        else if (gapDate <= 0) {
             return 'today';
         }
     };

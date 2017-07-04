@@ -11,12 +11,15 @@
             </button>
         </div>
         <div class="chat-panel-message-borad flex-1" id="imgViewer">
-            <perfect-scrollbar class="chat-panel-scroll" style="width: 100%;height: 100%;" (ps-y-reach-start)="scrollTopEvent()" (ps-y-reach-end)="scrollBottomEvent()">
+            <perfect-scrollbar class="chat-panel-scroll" style="width: 100%;height: 100%;" (ps-y-reach-start)="scrollTopEvent()">
                 <div class="chat-panel-see-more" *ngIf="loadingFlag === 1 && this.msg.length >= 20">查看更多</div>
                 <div class="chat-panel-see-more-loading" *ngIf="loadingFlag === 2">
                     <div></div>
                 </div>
-                <div class="chat-panel-see-more no-more" *ngIf="loadingFlag === 3 || this.msg.length < 20">没有更多了</div>
+                <div class="chat-panel-see-more no-more" *ngIf="loadingFlag === 3 || this.msg.length < 20">没有更多消息了</div>
+                <p class="chat-panel-add-members">
+                    <span *ngIf="messageList[active.activeIndex].addGroupMembers">您被添加进群聊了</span>
+                </p>
                 <div *ngFor="let i of msg; let num = index;">
                     <div class="chat-panel-you-msg chat-panel-msg" *ngIf="global.user != i.content.from_id">
                         <!-- 时间 -->
@@ -70,12 +73,12 @@
                             <div class="float-left chat-panel-fromId-you" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
-                                <div class="chat-panel-map-wrap float-left">
-                                    <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
-                                        <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
-                                    </a>                                    
-                                    <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
-                                </div>
+                            <div class="chat-panel-map-wrap float-left">
+                                <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
+                                    <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
+                                </a>                                    
+                                <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
+                            </div>
                         </div>
                         <!-- 语音 -->
                         <div *ngIf="i.content.msg_type === 'voice'" class="chat-panel-voice clearfix">
@@ -144,6 +147,30 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <!-- 地理定位 -->
+                        <div *ngIf="i.content.msg_type === 'location'" class="chat-panel-location clearfix">
+                            <div class="chat-panel-fromId-me float-right" (click)="watchSelfInfo()">
+                                <img class="chat-panel-avatar" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="chat-panel-map-wrap float-right">
+                                <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
+                                    <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
+                                </a>                                    
+                                <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
+                            </div>
+                        </div>
+                        <!-- 语音 -->
+                        <div *ngIf="i.content.msg_type === 'voice'" class="chat-panel-voice clearfix">
+                            <div class="float-right chat-panel-fromId-me" (click)="watchSelfInfo()">
+                                <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                            </div>
+                            <div class="float-right chat-panel-voice-sound">
+                                <p (click)="playVoice(num)" [ngStyle]="{'width': i.content.msg_body.duration * 20 + 'px'}">
+                                    <span class="float-right">{{i.content.msg_body.duration}}''</span>
+                                </p>
+                                <audio [id]="'audio' + num" [src]="i.content.msg_body.media_url"></audio>
+                            </div>                      
                         </div>
                     </div>
                 </div>

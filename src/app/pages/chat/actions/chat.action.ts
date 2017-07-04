@@ -31,5 +31,7 @@ export const chatAction = {
     getSingleAvatarUrl: '[chat] get single avatar url',
     changeNoDisturb: '[chat] change no disturb',
     changeNoDisturbSuccess: '[chat] change no disturb success',
-    createOtherChat: '[chat] create other chat'
+    createOtherChat: '[chat] create other chat',
+    addGroupMembersEvent: '[chat] add group members event',
+    addGroupMembersEventSuccess: '[chat] add group members event success'
 }

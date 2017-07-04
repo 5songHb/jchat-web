@@ -89,15 +89,19 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
             changeActivePerson(state);
             break;
-            // 删除本地会话列表
-        case chatAction.deleteConversationItem:
-            deleteConversationItem(state, payload);
-            break;
         case contactAction.selectContactItem:
+            
+        case mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
             state.activePerson = payload;
             selectUserResult(state, payload);
-            changeActivePerson(state);
+            changeActivePerson(state);            
+            emptyUnreadNum(state, payload);
+            state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
+            break;
+            // 删除本地会话列表
+        case chatAction.deleteConversationItem:
+            deleteConversationItem(state, payload);
             break;
         case chatAction.getResourceUrl:
             // 获取静态资源路径
@@ -107,7 +111,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.saveDraft:
             state.messageList[payload[1].activeIndex].draft = payload[0];
             for(let i=0;i<state.conversation.length;i++){
-                if(payload[1].key == state.conversation[i].key){
+                if(Number(payload[1].key) === Number(state.conversation[i].key)){
                     state.conversation[i].draft = payload[0];
                 }
             }
@@ -115,12 +119,6 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 搜索用户
         case mainAction.searchUser:
             state.searchUserResult = searchUser(state, payload);
-            break;
-        case mainAction.selectSearchUser:
-            state.defaultPanelIsShow = false;
-            state.activePerson = payload;
-            selectUserResult(state, payload);
-            changeActivePerson(state);
             break;
             // 成功查看别人的信息
         case chatAction.watchOtherInfoSuccess:
@@ -185,7 +183,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.defaultPanelIsShow = true;
             state.messageList[state.activePerson.activeIndex].groupSetting.show = false;
             for(let i=0;i<state.groupList.length;i++){
-                if(state.groupList[i].gid === payload.gid){
+                if(Number(state.groupList[i].gid) === Number(payload.gid)){
                     state.groupList.splice(i,1);
                     break;
                 }
@@ -233,22 +231,49 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.changeNoDisturbSuccess:
             for(let i=0;i<state.conversation.length;i++){
-                if(payload.key == state.conversation[i].key){
+                if(Number(payload.key) === Number(state.conversation[i].key)){
                     state.conversation[i].noDisturb = !state.conversation[i].noDisturb;                
                     break;
                 }
             }
             break;
-        
+        case chatAction.addGroupMembersEventSuccess:
+            addGroupMembersEvent(state, payload);
+            break;
         default:
     }
     return state;
 };
+// 被添加进群的事件
+function addGroupMembersEvent(state: ChatStore, payload){
+    let flag = true;
+    for(let i=0;i<payload.to_usernames.length;i++){
+        if(payload.to_usernames[i].username === global.user){
+            flag = false;
+            break;
+        }
+    }
+    if(flag === false){
+        let conversation = {
+            key: payload.gid,
+            name: payload.name,
+            type: 4,
+            unreadNum: 1
+        }
+        state.conversation.unshift(conversation);
+        state.messageList.push({
+            key: payload.gid,
+            msgs: [],
+            addGroupMembers: true
+        })
+    }
+}
 // 删除群成员
 function deleteGroupItem(state: ChatStore, payload){
-    for(let i=0;i<state.messageList[state.activePerson.activeIndex].groupSetting.memberList.length;i++){
-        if(state.messageList[state.activePerson.activeIndex].groupSetting.memberList[i].uid === payload.deleteItem.uid){
-            state.messageList[state.activePerson.activeIndex].groupSetting.memberList.splice(i, 1);
+    let memberList = state.messageList[state.activePerson.activeIndex].groupSetting.memberList;
+    for(let i=0;i<memberList.length;i++){
+        if(Number(memberList[i].uid) === Number(payload.deleteItem.uid)){
+            memberList.splice(i, 1);
             break;
         }
     }
@@ -258,7 +283,7 @@ function completionMessageList(state: ChatStore){
     for(let i=0;i<state.conversation.length;i++){
         let flag = false;
         for(let j=0;j<state.messageList.length;j++){
-            if(state.conversation[i].key == state.messageList[j].key){
+            if(Number(state.conversation[i].key) === Number(state.messageList[j].key)){
                 flag = true;
                 break;
             }
@@ -274,7 +299,7 @@ function completionMessageList(state: ChatStore){
 function addNoDisturb(state: ChatStore, noDisturb){
     for(let i=0;i<noDisturb.users.length;i++){
         for(let j=0;j<state.conversation.length;j++){
-            if(noDisturb.users[i].username == state.conversation[j].name && state.conversation[j].type == 3){
+            if(Number(noDisturb.users[i].username) === Number(state.conversation[j].name) && state.conversation[j].type === 3){
                 state.conversation[j].noDisturb = true;
                 break;
             }
@@ -282,7 +307,7 @@ function addNoDisturb(state: ChatStore, noDisturb){
     }
     for(let i=0;i<noDisturb.groups.length;i++){
         for(let j=0;j<state.conversation.length;j++){
-            if(noDisturb.groups[i].gid == state.conversation[j].key && state.conversation[j].type == 4){
+            if(Number(noDisturb.groups[i].gid) === Number(state.conversation[j].key) && state.conversation[j].type === 4){
                 state.conversation[j].noDisturb = true;
                 break;
             }
@@ -307,11 +332,11 @@ function filterImageViewer(state: ChatStore){
     return imgResult;
 }
 function changeActivePerson(state: ChatStore){
-    if(state.activePerson.group === true && state.activePerson.gid){
+    if(state.activePerson.type === 4 && state.activePerson.gid){
         state.activePerson.key = state.activePerson.gid;         
     }
     for(let i=0;i<state.messageList.length;i++){
-        if(state.messageList[i].key == state.activePerson.key){
+        if(Number(state.messageList[i].key) === Number(state.activePerson.key)){
             state.activePerson.activeIndex = i;
             break;
         }
@@ -321,7 +346,7 @@ function changeActivePerson(state: ChatStore){
 function filterRecentMsg(state: ChatStore){
     for(let i=0;i<state.conversation.length;i++){
         for(let j=0;j<state.messageList.length;j++){
-            if(state.conversation[i].key == state.messageList[j].key){
+            if(Number(state.conversation[i].key) === Number(state.messageList[j].key)){
                 let msgs = state.messageList[j].msgs;
                 if(msgs.length > 0){
                     msgs[msgs.length - 1].conversation_time_show = util.reducerDate(msgs[msgs.length - 1].ctime_ms);
@@ -337,7 +362,7 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
         let msgId = [];
         for(let i=0;i<state.conversation.length;i++){
             for(let j=0;j<state.messageList.length;j++){
-                if(state.conversation[i].key == state.messageList[j].key){
+                if(Number(state.conversation[i].key) === Number(state.messageList[j].key)){
                     let msgs = state.messageList[j].msgs;
                     if(!state.conversation[i].unreadNum && msgs.length > 0){
                         msgId.push({
@@ -368,7 +393,7 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
                     let flag = true;
                     if(msgId){
                         for(let i=0;i<state.msgId.length;i++){
-                            if(state.msgId[i].key == payload[j].key){
+                            if(Number(state.msgId[i].key) === Number(payload[j].key)){
                                 flag = false;
                                 state.msgId[i] = {
                                     key: payload[j].key,
@@ -409,10 +434,10 @@ function unreadNum(state: ChatStore, payload){
         let flag = false;
         // 当localstorage里面存储了该会话人的msgId
         for(let i=0;i<payload.msgId.length;i++){
-            if(state.messageList[a].key == payload.msgId[i].key){
+            if(Number(state.messageList[a].key) === Number(payload.msgId[i].key)){
                 flag = true;
                 for(let j=0;j<state.messageList[a].msgs.length;j++){
-                    if(state.messageList[a].msgs[j].msg_id == payload.msgId[i].msgId){
+                    if(Number(state.messageList[a].msgs[j].msg_id) === Number(payload.msgId[i].msgId)){
                         let unreadNum = state.messageList[a].msgs.length - 1 - j;
                         for(let b=0;b<state.conversation.length;b++){
                             if(state.messageList[a].key == state.conversation[b].key){
@@ -429,7 +454,7 @@ function unreadNum(state: ChatStore, payload){
         // 当localstorage里面没有存储该会话人的msgId
         if(flag === false){
             for(let b=0;b<state.conversation.length;b++){
-                if(state.messageList[a].key == state.conversation[b].key){
+                if(Number(state.messageList[a].key) === Number(state.conversation[b].key)){
                     state.conversation[b].unreadNum = state.messageList[a].msgs.length;
                     break;
                 }
@@ -440,13 +465,14 @@ function unreadNum(state: ChatStore, payload){
 // 完成消息的发送接口的调用后返回状态
 function sendMsgComplete(state: ChatStore, payload){
     for(let i=0;i<state.messageList.length;i++){
-        if(state.messageList[i].key == payload.key){
-            for(let j=state.messageList[i].msgs.length-1;j>=0;j--){
-                if(state.messageList[i].msgs[j].msgKey && payload.msgKey == state.messageList[i].msgs[j].msgKey){
+        if(Number(state.messageList[i].key) === Number(payload.key)){
+            let msgs = state.messageList[i].msgs;
+            for(let j=msgs.length-1;j>=0;j--){
+                if(msgs[j].msgKey && Number(payload.msgKey) === Number(msgs[j].msgKey)){
                     if(payload.msgId){
-                        state.messageList[i].msgs[j].msg_id = payload.msgId;                    
+                        msgs[j].msg_id = payload.msgId;                    
                     }
-                    state.messageList[i].msgs[j].success = payload.success;
+                    msgs[j].success = payload.success;
                     return;
                 }
             }
@@ -455,14 +481,13 @@ function sendMsgComplete(state: ChatStore, payload){
 }
 // 删除本地的会话列表
 function deleteConversationItem(state: ChatStore, payload){
-    console.log(333, payload)
     for(let i=0;i<state.conversation.length;i++){
-        if(state.conversation[i].key == payload.item.key || state.conversation[i].key == payload.item.uid){
+        if(Number(state.conversation[i].key) === Number(payload.item.key) || Number(state.conversation[i].key) === Number(payload.item.uid)){
             state.conversation.splice(i,1);
             break;
         }
     }
-    if(payload.item.key == state.activePerson.key){
+    if(Number(payload.item.key) === Number(state.activePerson.key)){
         state.defaultPanelIsShow = true;
     }
 }
@@ -533,9 +558,10 @@ function addMessage(state: ChatStore, payload){
 
             let flag = false;    
             // 如果发送人在会话列表里
+            console.log(55555, payload)
             for(let i=0;i<state.messageList.length;i++){
-                let groupMsg = payload.messages[j].msg_type === 4 && state.messageList[i].key == payload.messages[j].from_gid,
-                    singleMsg = payload.messages[j].msg_type === 3 && state.messageList[i].key == payload.messages[j].from_uid;
+                let groupMsg = payload.messages[j].msg_type === 4 && Number(state.messageList[i].key) === Number(payload.messages[j].from_gid),
+                    singleMsg = payload.messages[j].msg_type === 3 && Number(state.messageList[i].key) === Number(payload.messages[j].from_uid);
                 if(groupMsg || singleMsg){
                     let msgs = state.messageList[i].msgs;
                     if(msgs.length === 0 || (payload.messages[j].ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
@@ -552,8 +578,8 @@ function addMessage(state: ChatStore, payload){
                 let groupMsg = payload.messages[j].msg_type === 4 && state.conversation[a].key == payload.messages[j].from_gid,
                     singleMsg = payload.messages[j].msg_type === 3 && state.conversation[a].key == payload.messages[j].from_uid;
                 if(groupMsg || singleMsg){
-                    let groupNoActive = payload.messages[j].msg_type === 4 && state.activePerson.key != payload.messages[j].from_gid,
-                    singleNoActive = payload.messages[j].msg_type === 3 && state.activePerson.key != payload.messages[j].from_uid;
+                    let groupNoActive = payload.messages[j].msg_type === 4 && Number(state.activePerson.key) !== Number(payload.messages[j].from_gid),
+                    singleNoActive = payload.messages[j].msg_type === 3 && Number(state.activePerson.key) !== Number(payload.messages[j].from_uid);
                     if(groupNoActive || singleNoActive){
                         if(!state.conversation[a].unreadNum){
                             state.conversation[a].unreadNum = 1;
@@ -568,29 +594,49 @@ function addMessage(state: ChatStore, payload){
                     return ;                    
                 }
             }
+            console.log(flag);
             // 如果发送人不在会话列表里            
             if(flag === false){
-                payload.messages[j].time_show = 'today';
-                let msg = {
-                    key: payload.messages[j].from_uid,
-                    msgs: [
-                        payload.messages[j]
-                    ],
-                    draft: '',
-                    content: payload.messages[j].content
+                let msg,conversationItem;
+                if(payload.messages[j].msg_type === 3){
+                    msg = {
+                        key: payload.messages[j].from_uid,
+                        msgs: [
+                            payload.messages[j]
+                        ],
+                        draft: '',
+                        content: payload.messages[j].content
+                    }
+                    conversationItem = {
+                        avatar: "",
+                        key: payload.messages[j].from_uid,
+                        mtime: payload.messages[j].ctime_ms,
+                        name: payload.messages[j].content.from_id,
+                        nickName: payload.messages[j].content.from_name,
+                        type: 3
+                    }
+                }else{
+                    msg = {
+                        key: payload.messages[j].from_gid,
+                        msgs: [
+                            payload.messages[j]
+                        ],
+                        draft: '',
+                        content: payload.messages[j].content
+                    }
+                    conversationItem = {
+                        avatar: "",
+                        key: payload.messages[j].from_gid,
+                        mtime: payload.messages[j].ctime_ms,
+                        name: payload.messages[j].content.target_name,
+                        type: 4,
+                        unreadNum: 1
+                    }
                 }
+                payload.messages[j].time_show = 'today';                
                 state.newMessage = msg;
                 state.messageList.push(msg);
-                let conversationItem = {
-                    avatar: "",
-                    key: payload.messages[j].from_uid,
-                    mtime: payload.messages[j].ctime_ms,
-                    name: payload.messages[j].content.from_id,
-                    nickName: payload.messages[j].content.from_name,
-                    type: payload.messages[j].msg_type
-                }
                 state.conversation.unshift(conversationItem);
-                payload.messages[j].time_show = util.reducerDate(payload.messages[j].ctime_ms);
                 state.conversation[0].recentMsg = payload.messages[j];
             }
         }
@@ -601,7 +647,7 @@ function addMessage(state: ChatStore, payload){
 function messageListUrl(state: ChatStore, payload){
     for(let i=0;i<payload.length;i++){
         for(let j=0;j<state.messageList.length;j++){
-            if(payload[i].key == state.messageList[j].key){
+            if(Number(payload[i].key) === Number(state.messageList[j].key)){
                 for(let a=0;a<state.messageList[j].msgs.length;a++){
                     if(payload[i].media_id == state.messageList[j].msgs[a].content.msg_body.media_id){
                         state.messageList[j].msgs[a].content.msg_body.media_url = payload[i].url;
@@ -658,7 +704,7 @@ function selectUserResult(state, payload){
     let conversation = state.conversation,
         flag = false;
     for(let i=0;i<conversation.length;i++){
-        if((conversation[i].key == payload.key && payload.key)){
+        if((Number(conversation[i].key) === Number(payload.key) && payload.key)){
             let item = conversation.splice(i,1);
             conversation.unshift(item[0]);
             flag = true;
@@ -676,7 +722,7 @@ function selectUserResult(state, payload){
 // 切换当前会话时,清空未读消息数目
 function emptyUnreadNum(state: ChatStore, payload){
     for(let i=0;i<state.conversation.length;i++){
-        if(state.conversation[i].key == payload.key){
+        if(Number(state.conversation[i].key) === Number(payload.key)){
             if(state.conversation[i].unreadNum){
                 state.conversation[i].unreadNum = 0;
                 break;

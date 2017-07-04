@@ -78,6 +78,14 @@ export class ChatComponent implements OnInit {
         });
         global.JIM.onEventNotification(function(data) {
             console.log('event',data);
+            switch(data.event_type){
+                case 10:
+                    that.store$.dispatch({
+                        type: chatAction.addGroupMembersEvent,
+                        payload: data
+                    });
+                    break;
+            }
         });
         //离线消息同步监听
         global.JIM.onSyncConversation(function(data) { 
@@ -123,6 +131,7 @@ export class ChatComponent implements OnInit {
                     this.storageService.set(this.storageKey, JSON.stringify(chatState.msgId));
                 }
                 this.messageList = chatState.messageList;
+                this.storageMsgId(chatState.msgId);
                 break;
             case chatAction.sendSingleMessage:
 
@@ -149,9 +158,11 @@ export class ChatComponent implements OnInit {
                 this.storageMsgId(chatState.msgId);
                 break;
             case contactAction.selectContactItem:
+            
+            case mainAction.selectSearchUser:
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
-                this.active.change = !this.active.change;                
+                this.storageMsgId(chatState.msgId);
                 break;
             case chatAction.getResourceUrl:
                 this.messageList = chatState.messageList;
@@ -166,10 +177,6 @@ export class ChatComponent implements OnInit {
                     payload: chatState.searchUserResult
                 });
                 break;
-            case mainAction.selectSearchUser:
-                this.changeActivePerson(chatState);
-                this.defaultPanelIsShow = chatState.defaultPanelIsShow;
-                break;
             case chatAction.deleteConversationItem:
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 break;
@@ -181,10 +188,6 @@ export class ChatComponent implements OnInit {
                 break;
             case  mainAction.createSingleChatSuccess:
                 this.otherInfo = chatState.otherInfo;
-                console.log(5555555, this.otherInfo)                
-                // this.conversationList = chatState.conversation;
-                // this.changeActivePerson(chatState);
-                // this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 break;
             case chatAction.groupSetting:
                 this.groupSetting = Object.assign({}, this.groupSetting, chatState.messageList[chatState.activePerson.activeIndex].groupSetting);

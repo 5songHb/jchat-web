@@ -159,9 +159,11 @@ export class ChatEffect {
                     if(j+1 < data[i].msgs.length || data[i].msgs.length === 1){
                         if(j === 0)
                             data[i].msgs[j].time_show = this.util.reducerDate(data[i].msgs[j].ctime_ms);
-                        let timeGap = (data[i].msgs[j + 1].ctime_ms - data[i].msgs[j].ctime_ms) / 1000 / 60;
-                        if(timeGap > 5)
-                            data[i].msgs[j + 1].time_show = this.util.reducerDate(data[i].msgs[j + 1].ctime_ms);
+                        if(j + 1 !== data[i].msgs.length){
+                            let timeGap = (data[i].msgs[j + 1].ctime_ms - data[i].msgs[j].ctime_ms) / 1000 / 60;
+                            if(timeGap > 5)
+                                data[i].msgs[j + 1].time_show = this.util.reducerDate(data[i].msgs[j + 1].ctime_ms);
+                        }
                     }
                     // if(data[i].msgs[j].content.msg_body.media_id){
                     //     count ++;
@@ -601,6 +603,29 @@ export class ChatEffect {
             return Observable.of('changeNoDisturbObj')
                     .map(() => {
                         return {type: '[chat] change no disturb useless'};
+                    })
+    });
+    // 被添加进群时获取群信息
+    @Effect()
+    private addGroupMembersEvent$: Observable<Action> = this.actions$
+        .ofType(chatAction.addGroupMembersEvent)
+        .map(toPayload)
+        .switchMap((eventData) => {
+            let that = this,
+            groupInfoObj = global.JIM.getGroupInfo({'gid': eventData.gid})
+            .onSuccess(function(data) {
+                eventData.name = data.group_info.name;
+                that.store$.dispatch({
+                    type: chatAction.addGroupMembersEventSuccess,
+                    payload: eventData
+                })
+                console.log('success:' + JSON.stringify(data));
+            }).onFail(function(data) {
+                console.log('error:' + JSON.stringify(data));
+            });
+            return Observable.of('addGroupMembersEventObj')
+                    .map(() => {
+                        return {type: '[chat] add group members event useless'};
                     })
     });
 }
