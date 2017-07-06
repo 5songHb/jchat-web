@@ -33,5 +33,6 @@ export const chatInit = {
             avatarUrl: ''
         }
     },
-    imageViewer: []
+    imageViewer: [],
+    voiceState: []
 }

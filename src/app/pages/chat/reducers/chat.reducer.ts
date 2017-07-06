@@ -14,8 +14,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 初始化会话
             if(!payload.storage && payload.conversation){
                 state.conversation = payload.conversation;
-            }else if(!payload.storage && payload.noDisturb){
-                addNoDisturb(state, payload.noDisturb);
+            }else if(!payload.storage && payload.shield){
+                addGroupShield(state, payload.shield);
             }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
                 unreadNum(state, payload);
                 console.log('00000000000', state.conversation, state.messageList);
@@ -83,6 +83,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.changeActivePerson:
             // 更换当前会话用户
+            console.log(2222222222)
             state.activePerson = payload.item;
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
             emptyUnreadNum(state, payload.item);
@@ -229,16 +230,20 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case mainAction.addGroupMemberSuccess:
             state.messageList[state.activePerson.activeIndex].groupSetting.memberList = state.messageList[state.activePerson.activeIndex].groupSetting.memberList.concat(payload);
             break;
-        case chatAction.changeNoDisturbSuccess:
+        case chatAction.changeGroupShieldSuccess:
             for(let i=0;i<state.conversation.length;i++){
                 if(Number(payload.key) === Number(state.conversation[i].key)){
-                    state.conversation[i].noDisturb = !state.conversation[i].noDisturb;                
+                    state.conversation[i].shield = !state.conversation[i].shield;                
                     break;
                 }
             }
             break;
         case chatAction.addGroupMembersEventSuccess:
             addGroupMembersEvent(state, payload);
+            break;
+        // 获取voice是否已经播放的状态
+        case chatAction.getVoiceStateSuccess:
+            state.voiceState = payload;
             break;
         default:
     }
@@ -296,19 +301,11 @@ function completionMessageList(state: ChatStore){
         }
     }
 }
-function addNoDisturb(state: ChatStore, noDisturb){
-    for(let i=0;i<noDisturb.users.length;i++){
+function addGroupShield(state: ChatStore, shield){
+    for(let i=0;i<shield.length;i++){
         for(let j=0;j<state.conversation.length;j++){
-            if(Number(noDisturb.users[i].username) === Number(state.conversation[j].name) && state.conversation[j].type === 3){
-                state.conversation[j].noDisturb = true;
-                break;
-            }
-        }
-    }
-    for(let i=0;i<noDisturb.groups.length;i++){
-        for(let j=0;j<state.conversation.length;j++){
-            if(Number(noDisturb.groups[i].gid) === Number(state.conversation[j].key) && state.conversation[j].type === 4){
-                state.conversation[j].noDisturb = true;
+            if(Number(shield[i].gid) === Number(state.conversation[j].key)){
+                state.conversation[j].shield = true;
                 break;
             }
         }
@@ -321,7 +318,7 @@ function filterImageViewer(state: ChatStore){
     let imgResult = [];
     for(let j=0;j<state.messageList[state.activePerson.activeIndex].msgs.length;j++){
         let content = state.messageList[state.activePerson.activeIndex].msgs[j].content;
-        if(content.msg_type === 'image'){
+        if(content.msg_type === 'image' && (!content.msg_body.extras || !content.msg_body.extras.kLargeEmoticon ||   content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon')){
             imgResult.push({
                 src: content.msg_body.media_url,
                 width: content.msg_body.width,
@@ -339,6 +336,38 @@ function changeActivePerson(state: ChatStore){
         if(Number(state.messageList[i].key) === Number(state.activePerson.key)){
             state.activePerson.activeIndex = i;
             break;
+        }
+    }
+    let list = state.messageList[state.activePerson.activeIndex];
+    for(let i=0;i<list.msgs.length;i++){
+        if(list.msgs[i].content.msg_type === 'file' && list.msgs[i].content.msg_body.extras && list.msgs[i].content.msg_body.extras.video === 'mp4'){
+            //audio 0 正在加载  1 加载完成  2 正在播放
+            list.msgs[i].content.load = 0;
+            // 加载进度 0%
+            list.msgs[i].content.range = 0;
+        }else if(list.msgs[i].content.msg_type === 'voice'){
+            // voice 播放时的动画
+            list.msgs[i].content.playing = {
+                single: true,
+                double: true,
+                max: true
+            };
+        }
+    }
+    // 初始化已读语音消息的状态
+    for(let i=0;i<state.voiceState.length;i++){
+        if(Number(state.voiceState[i].key) === Number(list.key)){
+            let flag = true;
+            for(let j=0;j<list.msgs.length;j++){
+                if(Number(state.voiceState[i].msgId) === Number(list.msgs[j].msg_id)){
+                    list.msgs[j].content.havePlay = true;
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag){
+                state.voiceState.splice(i, 1);
+            }
         }
     }
     state.imageViewer = filterImageViewer(state);
@@ -515,7 +544,6 @@ function addMessage(state: ChatStore, payload){
                 if((payload.msgs.ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
                     payload.msgs.time_show = 'today';
                 }
-                // payload.msgs.content.msg_body.text = payload.msgs.content.msg_body.text.replace('[a]','haha');
                 msgs.push(payload.msgs);
                 state.newMessage = payload.msgs;                 
             }
@@ -555,19 +583,28 @@ function addMessage(state: ChatStore, payload){
                     height: payload.messages[j].content.msg_body.height
                 })
             }
-
+            if(payload.messages[j].content.msg_type === 'voice'){
+                payload.messages[j].content.playing = {
+                    single: true,
+                    double: true,
+                    max: true
+                };
+                payload.messages[j].content.havePlay = false;
+            }
             let flag = false;    
             // 如果发送人在会话列表里
-            console.log(55555, payload)
             for(let i=0;i<state.messageList.length;i++){
                 let groupMsg = payload.messages[j].msg_type === 4 && Number(state.messageList[i].key) === Number(payload.messages[j].from_gid),
                     singleMsg = payload.messages[j].msg_type === 3 && Number(state.messageList[i].key) === Number(payload.messages[j].from_uid);
+                // 给单聊会话人的消息添加头像
+                if(singleMsg){
+                    payload.messages[j].content.avatarUrl = state.activePerson.avatarUrl;                    
+                }
                 if(groupMsg || singleMsg){
                     let msgs = state.messageList[i].msgs;
                     if(msgs.length === 0 || (payload.messages[j].ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
                         payload.messages[j].time_show = 'today';
                     }
-                    payload.messages[j].content.avatarUrl = state.selfInfo.info.avatarUrl;
                     msgs.push(payload.messages[j]);
                     state.newMessage = payload.messages[j];
                     flag = true;
@@ -594,9 +631,8 @@ function addMessage(state: ChatStore, payload){
                     return ;                    
                 }
             }
-            console.log(flag);
             // 如果发送人不在会话列表里            
-            if(flag === false){
+            if(!flag){
                 let msg,conversationItem;
                 if(payload.messages[j].msg_type === 3){
                     msg = {

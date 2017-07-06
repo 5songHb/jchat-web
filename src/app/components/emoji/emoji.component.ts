@@ -22,31 +22,22 @@ export class EmojiComponent implements OnInit {
 
     }
     ngOnInit() {
-        // let that = this,
-        //     html = document.getElementsByTagName('html')[0];
-        // html.addEventListener('click',function(){
-        //     if(that.emojiInfo.show == true){
-        //         that.emojiInfo.show = false;
-        //     }
-        // },false);
+        
     }
     @HostListener('window:click') onClick(){
-        if(this.emojiInfo.show == true){
+        if(this.emojiInfo.show === true){
             this.emojiInfo.show = false;
         }
     }
     private stopPagation(event){
         event.stopPropagation();
     }
-    private emojiSelectAction(item){
+    private emojiSelectAction(idName){
         let contentId = document.getElementById(this.emojiInfo.contentId),
-            insertHtml = `<img src="${imgRouter}assets/images/spacer.gif" class="emoji-face-normal emoji-face-input${item.imgNum - 1}" />`;
-        this.util.insertAtCursor(contentId,insertHtml,false);
+            insertHtml = document.getElementById(idName).innerHTML;
+        this.util.insertAtCursor(contentId, insertHtml, false);
     }
-    private jpushEmojiSelectAction(item){
-        this.jpushEmojiSelect.emit(item);
-    }
-    private changeTab(event, index){
-        this.tab = index;
-    }
+    // private changeTab(event, index){
+    //     this.tab = index;
+    // }
 }

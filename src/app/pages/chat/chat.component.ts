@@ -17,7 +17,13 @@ export class ChatComponent implements OnInit {
     private util: Util = new Util();
     private chatStream$;
     private conversationList;
-    private messageList;
+    private messageList = [
+        {
+            key: 0,
+            msgs: [],
+            groupSetting: {}
+        }
+    ];
     private global = global;
     private active = {
         // 当前active的用户
@@ -27,7 +33,7 @@ export class ChatComponent implements OnInit {
         activeIndex: 0,
         type: 0,
         change: false,
-        noDisturb: false
+        shield: false
     }
     private defaultPanelIsShow = true;
     private otherInfo = {
@@ -63,10 +69,15 @@ export class ChatComponent implements OnInit {
     ){}
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
+        console.log(444444, this.storageKey)
         this.subscribeStore();
         this.store$.dispatch({
             type: chatAction.getConversation, 
             payload: null
+        });
+        this.store$.dispatch({
+            type: chatAction.getVoiceState, 
+            payload: 'voiceState' + global.user
         });
         let that = this;        
         global.JIM.onMsgReceive(function(data) {
@@ -113,7 +124,7 @@ export class ChatComponent implements OnInit {
             case chatAction.getConversationSuccess:
                 this.conversationList = chatState.conversation;
                 if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){                
-                    this.storageService.set(this.storageKey, JSON.stringify(chatState.msgId));
+                    this.storageMsgId(chatState.msgId);
                 }
                 this.store$.dispatch({
                     type: chatAction.dispatchConversationList,
@@ -123,12 +134,12 @@ export class ChatComponent implements OnInit {
             case chatAction.getAllMessageSuccess:
                 this.messageList = chatState.messageList;
                 if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){
-                    this.storageService.set(this.storageKey, JSON.stringify(chatState.msgId));
+                    this.storageMsgId(chatState.msgId);
                 }
                 break;
             case chatAction.receiveMessage:
                 if(chatState.msgId.length > 0 && (this.active.key == chatState.newMessage.from_uid || this.active.key == chatState.newMessage.from_gid)){
-                    this.storageService.set(this.storageKey, JSON.stringify(chatState.msgId));
+                    this.storageMsgId(chatState.msgId);
                 }
                 this.messageList = chatState.messageList;
                 this.storageMsgId(chatState.msgId);
@@ -149,10 +160,11 @@ export class ChatComponent implements OnInit {
                 break;
             case chatAction.sendMsgComplete:
                 if(chatState.msgId.length > 0){
-                    this.storageService.set(this.storageKey, JSON.stringify(chatState.msgId));
+                    this.storageMsgId(chatState.msgId);
                 }
                 break;
             case chatAction.changeActivePerson:
+                console.log(33333333)
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 this.storageMsgId(chatState.msgId);
@@ -231,9 +243,9 @@ export class ChatComponent implements OnInit {
                 break;
             case mainAction.addGroupMemberSuccess:
                 this.groupSetting.memberList = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.memberList;
-            case chatAction.changeNoDisturbSuccess:
+            case chatAction.changeGroupShieldSuccess:
                 this.conversationList = chatState.conversation;
-                this.active.noDisturb = chatState.activePerson.noDisturb;
+                this.active.shield = chatState.activePerson.shield;
                 break;
             default:
 
@@ -332,6 +344,7 @@ export class ChatComponent implements OnInit {
                 }
             }
             msgs.singleMsg = singleMsg;
+            msgs.msg_type = 3;
             this.store$.dispatch({
                 type: chatAction.sendSingleMessage, 
                 payload: {
@@ -352,6 +365,7 @@ export class ChatComponent implements OnInit {
                 }
             }
             msgs.groupMsg = groupMsg;
+            msgs.msg_type = 4;
             this.store$.dispatch({
                 type: chatAction.sendGroupMessage,
                 payload: {
@@ -435,6 +449,7 @@ export class ChatComponent implements OnInit {
                     }
                 }
                 msgs.singlePicFormData = singlePicFormData;
+                msgs.msg_type = 3;
                 that.store$.dispatch({
                     type: chatAction.sendSinglePic, 
                     payload: {
@@ -454,6 +469,7 @@ export class ChatComponent implements OnInit {
                     }
                 }
                 msgs.groupPicFormData = groupPicFormData;
+                msgs.msg_type = 4;
                 that.store$.dispatch({
                     type: chatAction.sendGroupPic,
                     payload: {
@@ -496,6 +512,7 @@ export class ChatComponent implements OnInit {
                 }
             }
             msgs.singleFile = singleFile;
+            msgs.msg_type = 3;
             this.store$.dispatch({
                 type: chatAction.sendSingleFile,
                 payload: {
@@ -515,6 +532,7 @@ export class ChatComponent implements OnInit {
                 }
             }
             msgs.groupFile = groupFile;
+            msgs.msg_type = 4;
             this.store$.dispatch({
                 type: chatAction.sendGroupFile,
                 payload: {

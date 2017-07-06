@@ -15,7 +15,7 @@
             </div>
             <div class="clearfix group-setting-text">
                 <span class="float-left">屏蔽群消息&nbsp;:&nbsp;</span>
-                <switch-component [state]="groupSetting.active.noDisturb" (changeSwitch)="changeNoDisturbEmit()" class="float-right group-setting-switch"></switch-component>
+                <switch-component [state]="groupSetting.active.shield" (changeSwitch)="changeGroupShieldEmit()" class="float-right group-setting-switch"></switch-component>
             </div>
             <div class="group-setting-search">
                 <search-member-component [searchResult]="searchResult" (searchKeyup)="seachKeyupEmit($event)" (searchItem)="searchItemEmit($event)" (clearInput)="clearInputEmit()"></search-member-component>

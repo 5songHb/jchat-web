@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { global } from '../../services/common/global';
-import '../../../assets/static/js/jmessage-sdk-web.2.2.1.min.js';
+import '../../../assets/static/js/jmessage-sdk-web.2.3.0.1.min.js';
 declare function JMessage(): void;
 
 @Component({

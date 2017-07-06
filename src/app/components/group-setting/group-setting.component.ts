@@ -119,9 +119,9 @@ export class GroupSettingComponent implements OnInit {
         this.modifyGroupName.emit(event.target.value);
         this.modifyGroupNameShow = false;
     }
-    private changeNoDisturbEmit(){
+    private changeGroupShieldEmit(){
         this.store$.dispatch({
-            type: chatAction.changeNoDisturb,
+            type: chatAction.changeGroupShield,
             payload: this.groupSetting.active
         })
     }

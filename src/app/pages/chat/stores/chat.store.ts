@@ -38,4 +38,5 @@ export interface ChatStore{
         };
     };
     imageViewer: Array<any>;
+    voiceState: Array<any>;
 }

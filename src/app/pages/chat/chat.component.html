@@ -4,7 +4,7 @@
     </div>
     <div class="chat-conversation flex-1">
         <default-panel-component *ngIf="defaultPanelIsShow"></default-panel-component>        
-        <chat-panel-component *ngIf="!defaultPanelIsShow" [selfInfo]="selfInfo" [messageList]="messageList" [active]="active" (sendMsg)="sendMsgEmit($event)" (sendPic)="sendPicEmit($event)" (sendFile)="sendFileEmit($event)" (saveDraft) ="saveDraftEmit($event)" (otherInfo)="watchOtherInfoEmit($event)" (selfInfoEmit)="watchSelfInfoEmit()" (groupSetting)="groupSettingEmit()" (addGroup)="addGroupEmit()"></chat-panel-component>        
+        <chat-panel-component [hidden]="defaultPanelIsShow" [selfInfo]="selfInfo" [messageList]="messageList" [active]="active" (sendMsg)="sendMsgEmit($event)" (sendPic)="sendPicEmit($event)" (sendFile)="sendFileEmit($event)" (saveDraft) ="saveDraftEmit($event)" (otherInfo)="watchOtherInfoEmit($event)" (selfInfoEmit)="watchSelfInfoEmit()" (groupSetting)="groupSettingEmit()" (addGroup)="addGroupEmit()"></chat-panel-component>        
         <group-setting-component *ngIf="groupSetting.show" [groupSetting]="groupSetting" (closeGroupSetting)="closeGroupSettingEmit()" (exitGroup)="exitGroupEmit($event)" (modifyGroupDescription)="modifyGroupDescriptionEmit()" (addMember)="addMemberEmit()" (watchOtherInfo)="watchOtherInfoEmit($event)" (watchSelfInfo)="watchSelfInfoEmit()" (deleteMember)="deleteMemberEmit($event)" (modifyGroupName)="modifyGroupNameEmit($event)"></group-setting-component>        
     </div>
 </div>

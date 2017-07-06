@@ -22,6 +22,25 @@ export class ChatEffect {
         private router: Router,
         private storageService: StorageService
     ){}
+    // 获取storage里的voice状态
+    @Effect()
+    private getVoiceState$: Observable<Action> = this.actions$
+        .ofType(chatAction.getVoiceState)
+        .map(toPayload)
+        .switchMap((key) => {
+            console.log(555, key)
+            let voiceState = this.storageService.get(key);
+            if(voiceState){
+                this.store$.dispatch({
+                    type: chatAction.getVoiceStateSuccess,
+                    payload: eval(voiceState)
+                })
+            }
+            return Observable.of('getVoiceState')
+                    .map(() => {
+                        return {type: '[chat] get voice state useless'};
+                    })
+        })
     // 获取会话列表
     @Effect()
     private getConversation$: Observable<Action> = this.actions$
@@ -64,14 +83,12 @@ export class ChatEffect {
                         });
                     }
                 }
-                // 获取免打扰列表
-                global.JIM.getNoDisturb()
-                .onSuccess(function(data) {
-                    console.log('noDisturbObj:',data);
+                // 获取屏蔽列表
+                global.JIM.groupShieldList().onSuccess(function(data) {
                     that.store$.dispatch({
                         type: chatAction.getConversationSuccess, 
                         payload: {
-                            noDisturb: data.no_disturb
+                            shield: data.groups
                         }
                     });
                 }).onFail(function(data) {
@@ -202,6 +219,7 @@ export class ChatEffect {
                 }
             }
             let msgId = JSON.parse(this.storageService.get('msgId' + global.user));
+            console.log(555555, 'msgId' + global.user)
             this.store$.dispatch({
                 type: chatAction.getConversationSuccess,
                 payload: {
@@ -570,30 +588,28 @@ export class ChatEffect {
                         return {type: '[chat] update group info useless'};
                     })
     });
-    // 切换群组免打扰
+    // 切换群屏蔽
     @Effect()
-    private changeNoDisturb$: Observable<Action> = this.actions$
-        .ofType(chatAction.changeNoDisturb)
+    private changeGroupShield$: Observable<Action> = this.actions$
+        .ofType(chatAction.changeGroupShield)
         .map(toPayload)
         .switchMap((active) => {
             let that = this;
-            if(active.noDisturb){
-                global.JIM.delGroupNoDisturb({'gid': active.key})
-                .onSuccess(function(data) {
-                    console.log('delete:',data);
+            if(active.shield){
+                global.JIM.delGroupShield({'gid': active.key}).onSuccess(function(data) {
+                    console.log('success:' + JSON.stringify(data));
                     that.store$.dispatch({
-                        type: chatAction.changeNoDisturbSuccess,
+                        type: chatAction.changeGroupShieldSuccess,
                         payload: active
                     })
                 }).onFail(function(data) {
                     console.log('error:' + JSON.stringify(data));
                 });
             }else{
-                let changeNoDisturbObj = global.JIM.addGroupNoDisturb({'gid': active.key})
-                .onSuccess(function(data) {
-                    console.log('add:', data);
+                global.JIM.addGroupShield({'gid': active.key}).onSuccess(function(data) {
+                    console.log('success:' + JSON.stringify(data));
                     that.store$.dispatch({
-                        type: chatAction.changeNoDisturbSuccess,
+                        type: chatAction.changeGroupShieldSuccess,
                         payload: active
                     })
                 }).onFail(function(data) {

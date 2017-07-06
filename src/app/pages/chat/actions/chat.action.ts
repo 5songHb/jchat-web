@@ -29,9 +29,11 @@ export const chatAction = {
     updateGroupInfo: '[chat] update group info',
     getMemberAvatarUrl: '[chat] get member avatar url',
     getSingleAvatarUrl: '[chat] get single avatar url',
-    changeNoDisturb: '[chat] change no disturb',
-    changeNoDisturbSuccess: '[chat] change no disturb success',
+    changeGroupShield: '[chat] change no disturb',
+    changeGroupShieldSuccess: '[chat] change no disturb success',
     createOtherChat: '[chat] create other chat',
     addGroupMembersEvent: '[chat] add group members event',
-    addGroupMembersEventSuccess: '[chat] add group members event success'
+    addGroupMembersEventSuccess: '[chat] add group members event success',
+    getVoiceState: '[chat] get voice state',
+    getVoiceStateSuccess: '[chat] get voice state success'
 }

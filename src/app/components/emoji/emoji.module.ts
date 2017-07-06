@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { EmojiComponent } from './emoji.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
+import { EmojiPipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
   imports: [
     CommonModule,
     FormsModule,
-    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG)
+    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG),
+    EmojiPipeModule
   ],
   exports: [
       EmojiComponent

@@ -5,11 +5,12 @@ import { AppStore } from '../../app.store';
 import { chatAction } from '../../pages/chat/actions';
 import { contactAction } from '../../pages/contact/actions';
 import { mainAction } from '../../pages/main/actions';
-
+import '../../../assets/static/js/emoji.js';
 import { global, emojiConfig, jpushConfig } from '../../services/common';
 import { Util } from '../../services/util';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
-import { imgRouter } from '../../services/common';
+import{ StorageService } from '../../services/common';
+declare let Emoji;
 
 @Component({
     selector: 'chat-panel-component',
@@ -84,8 +85,10 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         active: {},
         show: false
     }
+    private voiceState = [];
     constructor(
-        private store$: Store<AppStore>
+        private store$: Store<AppStore>,
+        private storageService: StorageService
     ) {
 
     }
@@ -133,6 +136,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
                 }
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
+                this.voiceState = chatState.voiceState;
+                console.log(33333, this.voiceState)
                 break;
             case chatAction.sendGroupFile:
 
@@ -220,7 +225,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         }
     }
     private pointerToMap(chatState){
-        if(chatState.newMessage.content.msg_type == 'location' && this.active.name === chatState.newMessage.content.from_id){
+        if(chatState.newMessage.content.msg_type === 'location' && this.active.name === chatState.newMessage.content.from_id){
             setTimeout(function(){
                 this.util.theLocation({
                     id: 'allmap' + (this.msg.length - 1).toString(),
@@ -253,13 +258,18 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private sendMsgAction(){
         let draft = this.messageList[this.active.activeIndex].draft;
         if(draft){
-            // draft = draft.replace(new RegExp('\n','g'),'<br>');
-            draft = draft.replace(new RegExp('<','g'),'&lt;');
-            draft = draft.replace(new RegExp('>','g'),'&gt;');
-            // if(draft.match(new RegExp('<br>$'))){
-            //     draft = draft.substring(0,draft.length-4);
-            // }
             draft = draft.replace(/^(<br>){1,}$/g,'');
+            let imgReg = new RegExp('<img.{1,}?\.\.\/\.\.\/\.\.\/assets\/images\/emoji\/.{1,}?\.png">', 'g');
+            if(draft.match(imgReg)){
+                let arr = draft.match(imgReg);
+                for(let i=0;i<arr.length;i++){
+                    let str = arr[i].split('src="../../../assets/images/emoji/')[1],
+                        str2 = str.split('.png"')[0];
+                    draft = draft.replace(arr[i], Emoji.convert(str2));
+                }
+            }
+            draft = draft.replace(new RegExp('&lt;','g'),'<');
+            draft = draft.replace(new RegExp('&gt;','g'),'>');
             this.sendMsg.emit({
                 content: draft
             });
@@ -267,12 +277,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             this.flag = true;
             this.contentDiv.innerHTML = '';
         }   
-    }
-    private jpushEmojiSelectEmit(item){
-        this.sendMsg.emit({
-            content: `&lt;img src="${imgRouter}assets/images/jpush/${item.imgNum}.png" class="jpush-emoji" /&gt;`
-        });
-        this.emojiInfo.show = false;
     }
     private sendPicAction(event){
         let img = this.util.getFileFormData('sendPic');
@@ -331,7 +335,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             this.util.focusLast(this.contentDiv);
         }
         this.emojiInfo.content = this.messageList[this.active.activeIndex];
-        if(this.emojiInfo.show == true){
+        if(this.emojiInfo.show === true){
             this.emojiInfo.show = false;
         }else{
             this.emojiInfo.show = true;
@@ -343,7 +347,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     // ctrl + enter换行，enter发送消息
     private preKeydown(event){
-        if(event.keyCode == 13 && event.ctrlKey){
+        if(event.keyCode === 13 && event.ctrlKey){
             let contentId = document.getElementById(this.emojiInfo.contentId),
             insertHtml = '<br>';
             if(window.getSelection){
@@ -353,15 +357,15 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
                     break;
                 }while(next = next.nextSibling);
                 next || (insertHtml += insertHtml);
-                if(next && next.nodeName == '#text' && insertHtml != '<br><br>' && event.target.innerHTML && !event.target.innerHTML.match(/<br>$/ig)){
+                if(next && next.nodeName === '#text' && insertHtml !== '<br><br>' && event.target.innerHTML && !event.target.innerHTML.match(/<br>$/ig)){
                     insertHtml += insertHtml;
                 }
                 if(!event.target.innerHTML){
                     insertHtml += insertHtml;
                 }
             }
-            this.util.insertAtCursor(contentId,insertHtml,false);
-        }else if(event.keyCode == 13){
+            this.util.insertAtCursor(contentId, insertHtml, false);
+        }else if(event.keyCode === 13){
             this.sendMsgAction();
             event.preventDefault();
         }
@@ -439,9 +443,80 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private playVoice(index){
         let audio = (document.getElementById('audio' + index) as HTMLAudioElement);
         if (audio.paused) {
+            audio.load();
             audio.play();
+            this.msg[index].content.playing = {
+                single: false,
+                double: false,
+                max: true
+            }
+            this.msg[index].content.timer1 = setInterval(function(){
+                this.msg[index].content.playing.double = true;
+            }.bind(this), 300);
+            this.msg[index].content.timer2 = setInterval(function(){
+                this.msg[index].content.playing.single = true;
+            }.bind(this), 600);
+            this.msg[index].content.timer3 = setInterval(function(){
+                this.msg[index].content.playing = {
+                    single: false,
+                    double: false,
+                    max: true
+                }
+            }.bind(this), 900);
+            // 如果是未读
+            if(!this.msg[index].content.havePlay){
+                let voiceState = {
+                    key: this.active.key,
+                    msgId: this.msg[index].msg_id
+                }
+                this.voiceState.push(voiceState);
+                this.msg[index].content.havePlay = true;
+                this.storageService.set('voiceState' + global.user, JSON.stringify(this.voiceState));
+            }
         }else{
+            audio.load();
             audio.pause();
+            clearInterval(this.msg[index].content.timer1);
+            clearInterval(this.msg[index].content.timer2);
+            clearInterval(this.msg[index].content.timer3);
+            this.msg[index].content.playing = {
+                single: true,
+                double: true,
+                max: true
+            }
         }
+    }
+    private voiceEnded(index){
+        clearInterval(this.msg[index].content.timer1);
+        clearInterval(this.msg[index].content.timer2);
+        clearInterval(this.msg[index].content.timer3);
+        this.msg[index].content.playing = {
+            single: true,
+            double: true,
+            max: true
+        }
+    }
+    private videoLoadStart(index){
+        this.msg[index].content.timer4 = setInterval(function(){
+            this.msg[index].content.range ++;
+        }.bind(this), 100);
+    }
+    private videoLoad(index){
+        this.msg[index].content.load = 1;
+        clearInterval(this.msg[index].content.timer4);
+        this.msg[index].content.range = 0;
+    }
+    private playVideo(index){
+        let video = (document.getElementById('video' + index) as HTMLVideoElement);
+        if (video.paused) {
+            video.play();
+            this.msg[index].content.load = 2;
+        }else{
+            video.pause();
+            this.msg[index].content.load = 1;
+        }
+    }
+    private videoEnded(index){
+        this.msg[index].content.load = 1;
     }
 }

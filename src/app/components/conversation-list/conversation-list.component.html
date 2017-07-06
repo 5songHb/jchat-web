@@ -22,15 +22,15 @@
                         <time *ngSwitchCase="'today'">{{item.recentMsg.ctime_ms | date:"HH:mm"}}</time>
                     </p>
                 </div>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'text' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span><span [innerHTML]="item.recentMsg.content.msg_body.text | tag"></span></p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'image' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>图片</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'file' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>文件</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'voice' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>语音</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'location' && !item.draft"><span *ngIf="item.recentMsg.msg_type == 4">{{item.recentMsg.content.from_id == global.user ? '我' : item.recentMsg.content.from_id}} : </span>地图</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'text' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : item.recentMsg.content.from_id}} : </span><span [innerHTML]="item.recentMsg.content.msg_body.text | emoji"></span></p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'image' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : item.recentMsg.content.from_id}} : </span>图片</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'file' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : item.recentMsg.content.from_id}} : </span>文件</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'voice' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : item.recentMsg.content.from_id}} : </span>语音</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'location' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : item.recentMsg.content.from_id}} : </span>地图</p>
                 <p class="conversation-draft" *ngIf="item.draft">[草稿] <span [innerHTML]="item.draft"></span></p>
             </div>
             <span class="conversation-delete" (click)="deleteThis($event,item)">×</span>
-            <span *ngIf="item.noDisturb" class="conversation-no-disturb"></span>
+            <span *ngIf="item.shield" class="conversation-no-disturb"></span>
         </li>
     </ul>
 </perfect-scrollbar>
