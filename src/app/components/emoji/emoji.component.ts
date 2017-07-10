@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 
 import { Util } from '../../services/util';
 import { imgRouter } from '../../services/common';
@@ -18,7 +18,9 @@ export class EmojiComponent implements OnInit {
     private imgRouter = imgRouter;
     private tab = 0;
 
-    constructor() {
+    constructor(
+        private elementRef: ElementRef
+    ) {
 
     }
     ngOnInit() {
@@ -34,7 +36,7 @@ export class EmojiComponent implements OnInit {
     }
     private emojiSelectAction(idName){
         let contentId = document.getElementById(this.emojiInfo.contentId),
-            insertHtml = document.getElementById(idName).innerHTML;
+            insertHtml = this.elementRef.nativeElement.querySelector('#' + idName).innerHTML;
         this.util.insertAtCursor(contentId, insertHtml, false);
     }
     // private changeTab(event, index){

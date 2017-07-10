@@ -3,7 +3,7 @@
         <contact-list-component (changeTab)="changeTabEmit($event)"></contact-list-component>        
     </div>
     <div class="contact-conversation flex-1">
-        <linkman-list-component *ngIf="tab === 1" [conversation]="conversation" (selectLinkmanItemEmit)="selectContactItemEmit($event)"></linkman-list-component>           
-        <group-list-component *ngIf="tab === 2" [groupList]="groupList" (selectGroupItemEmit)="selectContactItemEmit($event)"></group-list-component>
+        <linkman-list-component [hidden]="tab === 2" [conversation]="conversation" (selectLinkmanItemEmit)="selectContactItemEmit($event)"></linkman-list-component>           
+        <group-list-component [hidden]="tab === 1" [groupList]="groupList" (selectGroupItemEmit)="selectContactItemEmit($event)"></group-list-component>
     </div>
 </div>

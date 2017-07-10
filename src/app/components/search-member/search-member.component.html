@@ -10,7 +10,10 @@
                     <img [src]="item.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                 </div>
                 <p class="flex-1">{{item.nickName.indexOf(searchKeyword) !== -1 ? item.nickName : (item.username ? item.username : item.name)}}</p>
-                <input spellcheck="false" *ngIf="searchResult.checkbox" (click)="changeCheckedAction(item)"[checked]="item.checked" [disabled]="item.disabled" class="search-member-checkbox" type="checkbox">
+                <label class="search-member-label">
+                    <input spellcheck="false" #input *ngIf="searchResult.checkbox" (click)="changeCheckedAction(input, item)" [ngModel]="item.checked" [disabled]="item.disabled" type="checkbox">
+                    <b></b>
+                </label>
             </li>
         </ul>
     </perfect-scrollbar>

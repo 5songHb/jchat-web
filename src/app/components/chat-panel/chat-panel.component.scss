@@ -163,7 +163,8 @@
                         margin: -21px 0 0 -5px;
                         border-radius: 3px 3px 0 0;
                         border-top: 1px solid #2ECFCF;
-                        animation: loadVideo 1s infinite forwards;
+                        -webkit-animation: loadVideo 1s infinite forwards;
+                                animation: loadVideo 1s infinite forwards;
                         z-index: 1;
                     }
                 }
@@ -652,10 +653,12 @@
 }
 @-webkit-keyframes loadVideo{
     0%{
-        transform: rotate(0);
+        -webkit-transform: rotate(0);
+                transform: rotate(0);
     }
     100%{
-        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
     }
 }
 @media (max-width: 900px){

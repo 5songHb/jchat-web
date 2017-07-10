@@ -11,7 +11,8 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
     padding-bottom: 32px;
     h1{
         height: 143px;
@@ -60,50 +61,47 @@
             font-size: 12px;
             color: #808080;
             margin-bottom: 22px;
-            input{
-                width: 12px;
-                height: 12px;
-                border-radius: 2px;   
-                position: relative;
-                background: #fff;
-                margin-top: 2px;
-                &:before{
-                    content: '';
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    display: block;
-                    background: #fff;
-                    border: 1px solid #D9DEE4;    
-                    border-radius: 2px;                
-                }                       
-            }
-            input:checked{
-                &:before{
-                    content: '';
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    display: block;
-                    background: #2DD0CF;
-                    border: 1px solid #2DD0CF;   
-                    border-radius: 2px;                 
-                }
-                &:after{
-                    content: '';
-                    position: absolute;
-                    width: 8px;
-                    height: 4px;
-                    border-left: 1px solid #fff;
-                    border-bottom: 1px solid #fff;
-                    transform: rotateZ(-45deg);
-                    display: block;
-                    top: 3px;
-                    left: 3px;
-                }
-            }
             label{
-                padding-left: 11px;
+                cursor: pointer;
+                input{   
+                    display: none;               
+                }
+                input + b{
+                    border: 1px solid #D9DEE4;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 2px;   
+                    position: relative;
+                    z-index: 1;
+                    background: #fff;
+                    margin-top: 2px;
+                    float: left;
+                    margin-right: 11px;
+                }
+                input:checked + b{
+                    border-color: #2DD0CF;
+                    &:before{
+                        content: '';
+                        position: absolute;
+                        width: 12px;
+                        height: 12px;
+                        display: block;
+                        background: #2DD0CF;  
+                    }
+                    &:after{
+                        content: '';
+                        position: absolute;
+                        width: 8px;
+                        height: 4px;
+                        border-left: 1px solid #fff;
+                        border-bottom: 1px solid #fff;
+                        -webkit-transform: rotateZ(-45deg);
+                                transform: rotateZ(-45deg);
+                        display: block;
+                        top: 3px;
+                        left: 2px;
+                    }
+                }
             }
         }
         .login-btn{

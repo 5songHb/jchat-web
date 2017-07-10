@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 declare let Emoji;
 
 /**
- * 将毫秒数转化成星期几
+ * 将原始表情转化成unicode编码
  */
 @Pipe({
     name: 'emoji'

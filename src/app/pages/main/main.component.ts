@@ -19,6 +19,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 })
 export class MainComponent implements OnInit, OnDestroy {
     private util: Util = new Util();
+    private mainLoading = false;
     private mainStream$;
     private global = global;
     private listTab = 0;
@@ -43,7 +44,10 @@ export class MainComponent implements OnInit, OnDestroy {
     };
     private tipModal = {
         show: false,
-        info: {}
+        info: {
+            title: '',
+            tip: ''
+        }
     };
     private createSingleChat = {
         show: false,
@@ -143,9 +147,9 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     // 关闭窗口时存cookie，五分钟之内进入页面还可以免登陆
     @HostListener('window:beforeunload') onBeforeunloadWindow(){
-        let now = 5 * 60 * 1000;
-        this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, now);
-        this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, now);
+        let time = 5 * 60 * 1000;
+        this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, time);
+        this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, time);
     }
     private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
@@ -162,6 +166,11 @@ export class MainComponent implements OnInit, OnDestroy {
     private stateChanged(mainState, contactState){
         console.log('main',mainState.actionType);
         switch(mainState.actionType){
+            case chatAction.getConversationSuccess:
+                if(mainState.mainLoading){
+                    this.mainLoading = mainState.mainLoading;
+                }
+                break;
             case contactAction.selectContactItem:
                 this.listTab = mainState.listTab;
                 break;
@@ -183,7 +192,21 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.createGroup = mainState.createGroup;
                 break;
             case mainAction.modifyPasswordShow:
-                this.isModifyPasswordShow = mainState.modifyPasswordShow;
+                this.isModifyPasswordShow = mainState.modifyPasswordShow.show;
+                if(mainState.modifyPasswordShow.repeatLogin !== ''){
+                    global.password = mainState.modifyPasswordShow.repeatLogin;
+                    let time = 5 * 60 * 1000;
+                    this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, time);
+                    this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, time);
+                    this.store$.dispatch({
+                        type: mainAction.login,
+                        payload: {
+                            username: global.user,
+                            password: global.password,
+                            md5: true
+                        }
+                    })
+                }
                 break;
             case chatAction.searchUserSuccess:
                 this.searchUserResult =  mainState.searchUserResult;
@@ -299,7 +322,10 @@ export class MainComponent implements OnInit, OnDestroy {
         }else{
             this.store$.dispatch({
                 type: mainAction.modifyPasswordShow, 
-                payload: false
+                payload: {
+                    repeatLogin: '',
+                    show: false
+                }
             });
         }
     }
@@ -458,7 +484,10 @@ export class MainComponent implements OnInit, OnDestroy {
             case 0 :
                 this.store$.dispatch({
                     type: mainAction.modifyPasswordShow, 
-                    payload: true
+                    payload: {
+                        repeatLogin: '',
+                        show: true
+                    }
                 });
                 break;
             case 1:

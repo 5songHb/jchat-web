@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { global, authPayload, StorageService } from '../../services/common';
@@ -63,9 +63,14 @@ export class ChatComponent implements OnInit {
     };
     private isCacheArr = [];
     private storageKey;
+    private playVideoShow = {
+        show: false,
+        url: ''
+    }
     constructor(
         private store$: Store<AppStore>,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private elementRef: ElementRef
     ){}
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
@@ -216,22 +221,38 @@ export class ChatComponent implements OnInit {
             case chatAction.createOtherChat:
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
+                this.store$.dispatch({
+                    type: chatAction.groupSetting,
+                    payload: {
+                        show: false
+                    }
+                });
                 break;
             case mainAction.exitGroupSuccess:
                 this.conversationList = chatState.conversation;
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
-                this.groupSetting.show = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.show;
+                this.store$.dispatch({
+                    type: chatAction.groupSetting,
+                    payload: {
+                        show: false
+                    }
+                })
                 break;
             case mainAction.addBlackListSuccess:
                 this.conversationList = chatState.conversation;
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 if(chatState.messageList[chatState.activePerson.activeIndex].groupSetting){
-                    this.groupSetting.show = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.show;
+                    this.store$.dispatch({
+                        type: chatAction.groupSetting,
+                        payload: {
+                            show: false
+                        }
+                    })
                 }
                 break;
             case chatAction.groupDescription:
                 this.groupDescription.show = chatState.groupDeacriptionShow;
-                this.groupDescription.description = this.util.deepCopy(chatState.messageList[chatState.activePerson.activeIndex].groupSetting.groupInfo);
+                this.groupDescription.description = Object.assign({}, chatState.messageList[chatState.activePerson.activeIndex].groupSetting.groupInfo, {});
                 break;
             case chatAction.groupName:
                 this.groupSetting.groupInfo.name = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.groupInfo.name;
@@ -246,6 +267,9 @@ export class ChatComponent implements OnInit {
             case chatAction.changeGroupShieldSuccess:
                 this.conversationList = chatState.conversation;
                 this.active.shield = chatState.activePerson.shield;
+                break;
+            case chatAction.playVideoShow:
+                this.playVideoShow = chatState.playVideoShow;
                 break;
             default:
 
@@ -397,7 +421,7 @@ export class ChatComponent implements OnInit {
     private sendPicEmit(data){
         let msgs,
             that = this,
-            file = document.getElementById('sendPic');
+            file = this.elementRef.nativeElement.querySelector('#sendPic');
         // 重发消息
         if(data.repeatSend && this.active.type === 3){
             that.store$.dispatch({
@@ -585,16 +609,7 @@ export class ChatComponent implements OnInit {
         });
     }
     private OtherInfoEmit(item){
-        // if(item && item.key != this.active.key){
-        //     this.store$.dispatch({
-        //         type: chatAction.changeActivePerson, 
-        //         payload: {
-        //             item,
-        //             defaultPanelIsShow: false
-        //         }
-        //     })
-        // }
-        if(item && item.uid != this.active.key){
+        if(item && Number(item.key) !== Number(this.active.key)){
             this.store$.dispatch({
                 type: chatAction.createOtherChat, 
                 payload: item
@@ -724,6 +739,24 @@ export class ChatComponent implements OnInit {
         this.store$.dispatch({
             type: chatAction.updateGroupInfo,
             payload: groupSetting
+        })
+    }
+    private playVideoEmit(url){
+        this.store$.dispatch({
+            type: chatAction.playVideoShow,
+            payload: {
+                url: url,
+                show: true
+            }
+        })
+    }
+    private colseVideoEmit(){
+        this.store$.dispatch({
+            type: chatAction.playVideoShow,
+            payload: {
+                url: '',
+                show: false
+            }
         })
     }
 }

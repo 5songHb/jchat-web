@@ -1,4 +1,5 @@
 export interface MainStore{
+    mainLoading: boolean;
     selfInfo: {
         info: {
             avatar: string;
@@ -29,5 +30,6 @@ export interface MainStore{
     };
     createGroupSearch: {
         info: object;
-    }
+    };
+    errorApiTip: object;
 }

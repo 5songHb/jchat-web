@@ -58,9 +58,17 @@ export class MainEffect {
                             show: false
                         }
                     });
-                }); 
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                });
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(usrInfoObj)
                     .map(() => {
@@ -95,8 +103,12 @@ export class MainEffect {
                             info
                         }
                     })
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
                 });
             return Observable.of(updateSelfInfo)
                     .map(() => {
@@ -118,8 +130,12 @@ export class MainEffect {
                             avatar
                         }
                     })
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
                 });
             return Observable.of(updateSelfAvatar)
                     .map(() => {
@@ -159,8 +175,12 @@ export class MainEffect {
                             payload: groupObj
                         });
                         console.log('success:' + JSON.stringify(data));
-                    }).onFail(function(data) {
-                        console.log('error:' + JSON.stringify(data))
+                    }).onFail(function(error) {
+                        that.store$.dispatch({
+                            type: '[index] error api tip',
+                            payload: error
+                        });
+                        console.log('error:' + JSON.stringify(error))
                     });
                 }else{
                     that.store$.dispatch({
@@ -169,8 +189,12 @@ export class MainEffect {
                     });
                 }
                 
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(createGroupObj)
                     .map(() => {
@@ -192,9 +216,12 @@ export class MainEffect {
                     type: mainAction.addGroupMemberSuccess, 
                     payload: info.detailMember
                 });
-                console.log(111111,data);
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data))
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error))
             });
             return Observable.of(addGroupMemberObj)
                     .map(() => {
@@ -217,7 +244,10 @@ export class MainEffect {
                 global.JIM.loginOut();
                 that.store$.dispatch({
                     type: mainAction.modifyPasswordShow, 
-                    payload: false
+                    payload: {
+                        repeatLogin: md5(passwordInfo.new_pwd),
+                        show: false
+                    }
                 });
                 that.store$.dispatch({
                     type: mainAction.showModalTip,
@@ -232,8 +262,12 @@ export class MainEffect {
                     }
                 })
                 console.log(data);
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(passwordInfoObj)
                     .map(() => {
@@ -276,15 +310,18 @@ export class MainEffect {
                             payload: item
                         });
                     }).onFail(function(error){
-
+                        that.store$.dispatch({
+                            type: '[index] error api tip',
+                            payload: error
+                        });
                     });
                 }
                 that.store$.dispatch({
                     type: mainAction.createSingleChatSuccess,
                     payload: item
                 });
-            }).onFail(function(data) {
-                if(data.code == 882002){
+            }).onFail(function(error) {
+                if(error.code == 882002){
                     that.store$.dispatch({
                         type: mainAction.createSingleChatError,
                         payload: {
@@ -292,8 +329,13 @@ export class MainEffect {
                             info: '查无此人'
                         }
                     })
+                }else{
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
                 }
-                console.log('error:' + JSON.stringify(data));
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(createSingleChatObj)
                     .map(() => {
@@ -332,7 +374,11 @@ export class MainEffect {
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
                             payload: item
-                        })
+                        });
+                        that.store$.dispatch({
+                            type: '[index] error api tip',
+                            payload: error
+                        });
                     });
                 }else{
                     that.store$.dispatch({
@@ -340,12 +386,17 @@ export class MainEffect {
                         payload: item
                     })
                 }
-            }).onFail(function(data) {
-                if(data.code == 882002){
+            }).onFail(function(error) {
+                if(error.code == 882002){
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: null
                     })
+                }else{
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
                 }
             });
             return Observable.of(createGroupSearchObj)
@@ -370,8 +421,12 @@ export class MainEffect {
                     }
                 });
                 console.log('success:' + JSON.stringify(data.black_list));
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(blackMenuObj)
                     .map(() => {
@@ -395,8 +450,12 @@ export class MainEffect {
                     type: mainAction.delSingleBlackSuccess,
                     payload: user
                 })
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(delSingleBlackObj)
                     .map(() => {
@@ -420,15 +479,22 @@ export class MainEffect {
                     type: mainAction.addBlackListSuccess,
                     payload: {
                         show: false,
-                        info: {},
+                        info: {
+                            title: '',
+                            tip: ''
+                        },
                         deleteItem: {
                             item: active
                         }
                     }
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(addBlackListObj)
                     .map(() => {
@@ -456,15 +522,22 @@ export class MainEffect {
                         payload: {
                             tipModal: {
                                 show: false,
-                                info: {}
+                                info: {
+                                    title: '',
+                                    tip: ''
+                                }
                             },
                             item: {
                                 key: gid
                             }
                         }
                     });
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data))
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error))
                 });
             return Observable.of(exitGroupObj)
                     .map(() => {
@@ -489,18 +562,66 @@ export class MainEffect {
                       payload: {
                             tipModal: {
                                 show: false,
-                                info: {}
+                                info: {
+                                    title: '',
+                                    tip: ''
+                                }
                             },
                             deleteItem: info.deleteItem,
                             group: info.group
                         }
                   })
-               }).onFail(function(data) {
-                  // 同上
+               }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
                });
             return Observable.of(deleteMember)
                     .map(() => {
                         return {type: '[main] delete group member useless'};
+                    })
+    })
+    // 获取黑名单列表
+    @Effect()
+    private login$: Observable<Action> = this.actions$
+        .ofType(mainAction.login)
+        .map(toPayload)
+        .switchMap((val) => {
+            let that = this,
+                loginObj = global.JIM.init({
+                    "appkey": authPayload.appKey,
+                    "random_str": authPayload.randomStr,
+                    "signature": authPayload.signature,
+                    "timestamp": authPayload.timestamp,
+                    "flag": authPayload.flag
+                }).onSuccess(function(data) {
+                    global.JIM.login({
+                        'username': val.username,
+                        'password': val.password,
+                        'is_md5': val.md5
+                    })
+                    .onSuccess(function(data) {
+                        
+                    }).onFail(function(error) {
+                        that.store$.dispatch({
+                            type: '[index] error api tip',
+                            payload: error
+                        });
+                    }).onTimeout(function(data) {
+                        console.log('timeout:' + JSON.stringify(data));
+                    });
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                }).onTimeout(function(data) {
+                    console.log(data)
+                })
+            return Observable.of(loginObj)
+                    .map(() => {
+                        return {type: '[main] login useless'};
                     })
     })
 }

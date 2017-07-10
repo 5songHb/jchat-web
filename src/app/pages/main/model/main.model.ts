@@ -1,4 +1,5 @@
 export const mainInit = {
+    mainLoading: false,
     selfInfo: {
         info: {
             avatar: '',
@@ -35,5 +36,6 @@ export const mainInit = {
     },
     createGroupSearch: {
         info: null
-    }
+    },
+    errorApiTip: {}
 }

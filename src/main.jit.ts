@@ -6,6 +6,5 @@ import { global } from './app/services/common/global';
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .then((componentRef: any) => {
-    console.log('setting global');
     global.injector = componentRef.injector;
   })

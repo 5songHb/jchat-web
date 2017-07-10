@@ -49,8 +49,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
                         this.storageService.remove(md5('jchat-remember-username'));
                         this.storageService.remove(md5('jchat-remember-password'));
                     }
-                    window.sessionStorage.setItem(md5('login-persistence-username'), loginState.userInfo.username);
-                    window.sessionStorage.setItem(md5('login-persistence-password'), loginState.userInfo.password);
+                    // window.sessionStorage.setItem(md5('login-persistence-username'), loginState.userInfo.username);
+                    // window.sessionStorage.setItem(md5('login-persistence-password'), loginState.userInfo.password);
                     global.password = loginState.userInfo.password;
                     this.router.navigate(['main']);
                     break;

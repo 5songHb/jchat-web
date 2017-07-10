@@ -12,9 +12,11 @@
                 <input spellcheck="false" id="loginPassword" class="input-focus" [(ngModel)]="password" type="password" placeholder="请输入密码" (keyup.enter)="login()" (keyup)="isButtonAvailableAction()" (change)="isButtonAvailableAction()">
             </div>
             <p class="login-remember clearfix">
-                <input spellcheck="false" [(ngModel)]="loginRemember" id="remember" class="float-left" type="checkbox">
-                <label for="remember" class="float-left">记住用户名和密码</label>
-                <b></b>
+                <label for="remember" class="float-left">
+                    <input spellcheck="false" [(ngModel)]="loginRemember" id="remember" class="float-left" type="checkbox">                    
+                    <b></b>                    
+                    记住用户名和密码
+                </label>
             </p>
             <p class="login-btn">
                 <button [ngClass]="{'disabled': !isButtonAvailable && !rememberPassword}" class="btn-active" type="button" (click)="login()">登录</button>

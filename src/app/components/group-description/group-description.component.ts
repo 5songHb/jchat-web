@@ -16,6 +16,9 @@ export class GroupDescriptionComponent implements OnInit {
     }
     ngOnInit() {
     }
+    private stopPropagation(event){
+        event.stopPropagation();
+    }
     private groupAction(desc){
         if(desc){
             this.updateGroupInfo.emit(desc);

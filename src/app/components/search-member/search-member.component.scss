@@ -72,27 +72,29 @@
                         width: 100%;
                     }
                 }
-                .search-member-checkbox{
+                .search-member-label{
                     position: relative;
-                    margin: 19px 20px 0 0;
                     cursor: pointer;
-                    &:after{
-                        content: '';
+                    width: 24px;
+                    height: 24px;
+                    margin: 13px 20px 0 0;
+                    input{
+                        display: none;
+                    }
+                    input + b{
+                        width: 100%;
+                        height: 100%;
                         display: block;
-                        width: 24px;
-                        height: 24px;
                         background: #fff url(../../../assets/images/select-member-normal.png) center center no-repeat;
                         background-size: 24px;
-                        position: absolute;
-                        top: -6px;
-                        left: -6px;
                         border-radius: 12px;
                     }
-                    // &:hover:after{
-                    //     background: #fff url(../../../assets/images/select-member-active.png) center center no-repeat;
-                    // }
-                    &:checked:after{
-                        background: #fff url(../../../assets/images/select-member-active.png) center center no-repeat;
+                    input:checked + b{
+                        background-image: url(../../../assets/images/select-member-active.png);
+                    }
+                    input:disabled + b{
+                        background-image: url(../../../assets/images/has-select.png);
+                        cursor: default;
                     }
                 }
             }

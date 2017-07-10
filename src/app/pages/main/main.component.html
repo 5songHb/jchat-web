@@ -7,23 +7,23 @@
             <div class="main-tab">
                 <div (click)="changeListTab(0)" class="main-chat">
                     <div class="main-conversation-icon" [ngClass]="{active: listTab === 0}" [hoverEvent]="conversationHover"></div>
-                    <hover-tip-component *ngIf="conversationHover.show" [hoverInfo]="conversationHover"></hover-tip-component>
+                    <hover-tip-component [hidden]="!conversationHover.show" [hoverInfo]="conversationHover"></hover-tip-component>
                 </div>
                 <div (click)="changeListTab(1)" class="main-chat">
                     <div class="main-contact-icon" [ngClass]="{active: listTab === 1}" [hoverEvent]="contactHover"></div>
-                    <hover-tip-component *ngIf="contactHover.show" [hoverInfo]="contactHover"></hover-tip-component>
+                    <hover-tip-component [hidden]="!contactHover.show" [hoverInfo]="contactHover"></hover-tip-component>
                 </div>
             </div>
             <div class="main-add-container">
                 <div class="main-add-single">
                     <div [hoverEvent]="createHover" class="main-add-single-icon" (click)="chatMenuShow($event)" [ngClass]="{'active': chatMenu.show}"></div>
                     <menu-component [hidden]="!chatMenu.show" [menu]="chatMenu" (selectMenuItem)="selectChatMenuItemEmit($event)"></menu-component>
-                    <hover-tip-component *ngIf="createHover.show" [hoverInfo]="createHover"></hover-tip-component>
+                    <hover-tip-component [hidden]="!createHover.show" [hoverInfo]="createHover"></hover-tip-component>
                 </div>
                 <div class="main-setting">
                     <div [hoverEvent]="moreHover" class="main-setting-icon" (click)="settingMenuShow($event)" [ngClass]="{'active': settingMenu.show}"></div>
                     <menu-component [hidden]="!settingMenu.show" [menu]="settingMenu" (selectMenuItem)="selectSettingItemEmit($event)"></menu-component>
-                    <hover-tip-component *ngIf="moreHover.show" [hoverInfo]="moreHover"></hover-tip-component>
+                    <hover-tip-component [hidden]="!moreHover.show" [hoverInfo]="moreHover"></hover-tip-component>
                 </div>
             </div>
         </div>
@@ -35,12 +35,12 @@
             </div>
         </div>
     </div>
-    <self-info-component *ngIf="self.show" [selfInfo]="self.info" (isShow)="selfInfoEmit($event)"></self-info-component>    
+    <self-info-component [hidden]="!self.show" [selfInfo]="self.info" (isShow)="selfInfoEmit($event)"></self-info-component>    
     <create-group-component *ngIf="createGroup.show" [createGroup]="createGroup" (isCreateGroup)="createGroupEmit($event)"></create-group-component>
-    <modify-password-component *ngIf="isModifyPasswordShow" (modifyPassword)="modifyPasswordEmit($event)"></modify-password-component>
+    <modify-password-component [hidden]="!isModifyPasswordShow" (modifyPassword)="modifyPasswordEmit($event)"></modify-password-component>
     <tip-modal-component *ngIf="tipModal.show" [info]="tipModal.info" (modalTipEmit)="modalTipEmit($event)"></tip-modal-component>
     <create-single-chat-component *ngIf="createSingleChat.show" [info]="createSingleChat.info" (createSingleChat)="createSingleChatEmit($event)"></create-single-chat-component>
-    <black-menu-component *ngIf="blackMenu.show" [menuInfo]="blackMenu.menu" (blockMenuConfirm)="blackMenuConfirmEmit()" (delSingleBlack)="delSingleBlackEmit($event)"></black-menu-component>
+    <black-menu-component [hidden]="!blackMenu.show" [menuInfo]="blackMenu.menu" (blockMenuConfirm)="blackMenuConfirmEmit()" (delSingleBlack)="delSingleBlackEmit($event)"></black-menu-component>
 </div>
 
 <div class="copyright-container">
@@ -48,4 +48,7 @@
     <p>
         深圳市和讯华谷信息技术有限公司 版权所有 @2011-2017  粤ICP备12056275号-13
     </p>
+</div>
+<div *ngIf="!mainLoading" class="modal-shadow main-loading">
+    <img src="../../../assets/images/app-loading.gif" alt="">
 </div>

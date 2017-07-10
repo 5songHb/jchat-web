@@ -42,6 +42,9 @@ export class OtherInfoComponent implements OnInit {
     public ngOnInit() {
         
     }
+    private stopPropagation(event){
+        event.stopPropagation();
+    }
     private avatarErrorIcon(event){
         event.target.src = avatarErrorIcon;
     }

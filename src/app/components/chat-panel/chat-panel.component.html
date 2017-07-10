@@ -4,10 +4,10 @@
             <span *ngIf="active.type === 3" (click)="watchOtherInfo(active.name)" class="chat-panel-username">{{active.nickName ? active.nickName : active.name}}</span>
             <span *ngIf="active.type === 4">{{active.nickName ? active.nickName : active.name}}</span>
             <button class="chat-panel-setting-btn" [hoverEvent]="groupConversationHover" *ngIf="active.type === 3" (click)="addGroupAction()">
-                <hover-tip-component *ngIf="groupConversationHover.show" [hoverInfo]="groupConversationHover"></hover-tip-component>
+                <hover-tip-component [hidden]="!groupConversationHover.show" [hoverInfo]="groupConversationHover"></hover-tip-component>
             </button>
-            <button class="chat-panel-group-setting" [hoverEvent]="groupSettingHover" *ngIf="active.type === 4" (click)="groupSettingAction()">
-                <hover-tip-component *ngIf="groupSettingHover.show" [hoverInfo]="groupSettingHover"></hover-tip-component>
+            <button class="chat-panel-group-setting" [hoverEvent]="groupSettingHover" *ngIf="active.type === 4" (click)="groupSettingAction($event)">
+                <hover-tip-component [hidden]="!groupSettingHover.show" [hoverInfo]="groupSettingHover"></hover-tip-component>
             </button>
         </div>
         <div class="chat-panel-message-borad flex-1" id="imgViewer">
@@ -73,15 +73,15 @@
                             <a class="float-left chat-panel-download-file" [href]="i.content.msg_body.media_url" download=""></a>                            
                         </div>
                         <!-- 视频消息 -->
-                        <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video === 'mp4'" class="clearfix">
+                        <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video === 'video'" class="clearfix">
                             <div class="chat-panel-fromId-you float-left" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img class="chat-panel-avatar" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left chat-panel-video">
-                                <video (click)="playVideo(num)" (ended)="videoEnded(num)" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
-                                    <source [src]="i.content.msg_body.media_url">
+                                <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
+                                    <!--<source [src]="i.content.msg_body.media_url">-->
                                 </video>
-                                <div class="chat-panel-video-paly" (click)="playVideo(num)" *ngIf="i.content.load === 1"></div>
+                                <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
                                 <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
                             </div>
                         </div>
@@ -124,7 +124,7 @@
                                     </div>
                                     <b *ngIf="!i.content.havePlay"></b>
                                 </div>
-                                <audio [id]="'audio' + num" (ended)="voiceEnded(num)">
+                                <audio [id]="'audio' + num" (ended)="voiceEnded(num)" [src]="i.content.msg_body.media_url">
                                     <source [src]="i.content.msg_body.media_url">
                                 </audio>
                             </div>                      
@@ -186,15 +186,15 @@
                             </div>
                         </div>
                         <!-- 视频消息 -->
-                        <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video === 'mp4'" class="clearfix">
+                        <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video === 'video'" class="clearfix">
                             <div class="chat-panel-fromId-me float-right" (click)="watchSelfInfo()">
                                 <img class="chat-panel-avatar" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-right chat-panel-video">
-                                <video (click)="playVideo(num)" (ended)="videoEnded(num)" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
-                                    <source [src]="i.content.msg_body.media_url">
+                                <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
+                                    <!--<source [src]="i.content.msg_body.media_url">-->
                                 </video>
-                                <div class="chat-panel-video-paly" (click)="playVideo(num)" *ngIf="i.content.load === 1"></div>
+                                <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
                                 <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
                             </div>
                         </div>
@@ -237,7 +237,7 @@
                                     </div>
                                     <b *ngIf="!i.content.havePlay"></b>
                                 </div>
-                                <audio [id]="'audio' + num" (ended)="voiceEnded(num)">
+                                <audio [id]="'audio' + num" (ended)="voiceEnded(num)" [src]="i.content.msg_body.media_url">
                                     <source [src]="i.content.msg_body.media_url">
                                 </audio>
                             </div>                      
@@ -249,7 +249,7 @@
     </div>
     <div class="chat-panel-message-input">
         <div class="chat-panel-send-file">
-            <emoji-component *ngIf="emojiInfo.show" [emojiInfo]="emojiInfo" (jpushEmojiSelect)="jpushEmojiSelectEmit($event)"></emoji-component>            
+            <emoji-component [hidden]="!emojiInfo.show" [emojiInfo]="emojiInfo" (jpushEmojiSelect)="jpushEmojiSelectEmit($event)"></emoji-component>            
             <button title="表情" class="chat-panel-emoji-btn" [ngClass]="{'active': emojiInfo.show }" type="button" (click)="showEmojiPanel($event)"></button>
             <input type="file" id="sendFile" class="chat-panel-singleFile" (click)="inputNoBlurAction()" (change) = "sendFileAction($event)" value="发送图片">
             <label title="文件" for="sendFile" class="chat-panel-singleFile-label" [ngClass]="{'active': filePanelShow}"></label>

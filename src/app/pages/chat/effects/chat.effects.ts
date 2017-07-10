@@ -28,7 +28,6 @@ export class ChatEffect {
         .ofType(chatAction.getVoiceState)
         .map(toPayload)
         .switchMap((key) => {
-            console.log(555, key)
             let voiceState = this.storageService.get(key);
             if(voiceState){
                 this.store$.dispatch({
@@ -79,7 +78,7 @@ export class ChatEffect {
                                 }
                             });
                         }).onFail(function(error){
-
+                            
                         });
                     }
                 }
@@ -91,11 +90,19 @@ export class ChatEffect {
                             shield: data.groups
                         }
                     });
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
                 });
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(conversationObj)
                     .map(() => {
@@ -115,19 +122,19 @@ export class ChatEffect {
                 let msgBody = msg[i].content.msg_body;
                 if(msgBody.media_id && !msgBody.media_url){
                     global.JIM.getResource({'media_id' : msgBody.media_id})
-                        .onSuccess(function(urlInfo){
-                            msg[i].content.msg_body.media_url = urlInfo.url;
-                            that.store$.dispatch({
-                                type: chatAction.getAllMessageSuccess,
-                                payload: info.messageList
-                            });
-                        }).onFail(function(error){
-                            msg[i].content.msg_body.media_url = '';
-                            that.store$.dispatch({
-                                type: chatAction.getAllMessageSuccess,
-                                payload: info.messageList
-                            });
+                    .onSuccess(function(urlInfo){
+                        msg[i].content.msg_body.media_url = urlInfo.url;
+                        that.store$.dispatch({
+                            type: chatAction.getAllMessageSuccess,
+                            payload: info.messageList
                         });
+                    }).onFail(function(error){
+                        msg[i].content.msg_body.media_url = '';
+                        that.store$.dispatch({
+                            type: chatAction.getAllMessageSuccess,
+                            payload: info.messageList
+                        });
+                    });
                 }
             }
             return Observable.of('getSourceUrl')
@@ -254,7 +261,7 @@ export class ChatEffect {
                         msgId: msgs.msg_id
                     }
                 })
-            }).onFail(function(data) {
+            }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -262,8 +269,12 @@ export class ChatEffect {
                         key: text.key,
                         success: 3
                     }
-                })
-                console.log('error:' + JSON.stringify(data));
+                });
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(msgObj)
                     .map(() => {
@@ -295,7 +306,7 @@ export class ChatEffect {
                     }
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
+            }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -304,7 +315,11 @@ export class ChatEffect {
                         success: 3
                     }
                 })
-                console.log('error:' + JSON.stringify(data));
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(groupMessageObj)
                     .map(() => {
@@ -329,7 +344,7 @@ export class ChatEffect {
                         msgId: msgs.msg_id
                     }
                 })
-            }).onFail(function(data) {
+            }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -337,7 +352,11 @@ export class ChatEffect {
                         key: img.key,
                         success: 3
                     }
-                })
+                });
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
             });
             return Observable.of(singlePicObj)
                     .map(() => {
@@ -362,7 +381,7 @@ export class ChatEffect {
                         msgId: msgs.msg_id
                     }
                 })
-            }).onFail(function(data, msgs) {
+            }).onFail(function(error, msgs) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -371,7 +390,11 @@ export class ChatEffect {
                         success: 3
                     }
                 })
-                console.log('error:' + JSON.stringify(data));
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(sendGroupPicObj)
                     .map(() => {
@@ -397,7 +420,7 @@ export class ChatEffect {
                     }
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
+            }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -405,8 +428,12 @@ export class ChatEffect {
                         key: file.key,
                         success: 3
                     }
-                })
-                console.log('error:' + JSON.stringify(data));
+                });
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(sendSingleFileObj)
                     .map(() => {
@@ -432,7 +459,7 @@ export class ChatEffect {
                     }
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
+            }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -440,8 +467,12 @@ export class ChatEffect {
                         key: file.key,
                         success: 3
                     }
-                })
-                console.log('error:' + JSON.stringify(data));
+                });
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(sendgroupFileObj)
                     .map(() => {
@@ -488,8 +519,12 @@ export class ChatEffect {
                         }
                     })
                 });
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(OtherInfoObj)
                     .map(() => {
@@ -518,8 +553,12 @@ export class ChatEffect {
                     }
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             let groupMemberObj = global.JIM.getGroupMembers({'gid': info.active.key})
             .onSuccess(function(data) {
@@ -546,8 +585,12 @@ export class ChatEffect {
                     }
                 }
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(groupInfoObj)
                     .map(() => {
@@ -580,8 +623,12 @@ export class ChatEffect {
                         }
                     })
                 }
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(groupInfoObj)
                     .map(() => {
@@ -602,8 +649,12 @@ export class ChatEffect {
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
                     })
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
                 });
             }else{
                 global.JIM.addGroupShield({'gid': active.key}).onSuccess(function(data) {
@@ -612,8 +663,12 @@ export class ChatEffect {
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
                     })
-                }).onFail(function(data) {
-                    console.log('error:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
                 });
             }
             return Observable.of('changeNoDisturbObj')
@@ -636,8 +691,12 @@ export class ChatEffect {
                     payload: eventData
                 })
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(data) {
-                console.log('error:' + JSON.stringify(data));
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of('addGroupMembersEventObj')
                     .map(() => {

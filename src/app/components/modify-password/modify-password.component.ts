@@ -40,6 +40,11 @@ export class ModifyPasswordComponent implements OnInit {
         })
     }
     private cancelModify(){
+        this.oldPassword = '';
+        this.newPassword = '';
+        this.newPasswordRepeat = '';
+        this.oldPwdTip = false;
+        this.repeatPwdTip = 0;
         this.modifyPassword.emit();
     }
 }

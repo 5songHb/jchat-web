@@ -1,4 +1,5 @@
-let pinyin = require('pinyin');
+import { pinyin } from '../tools';
+
 declare let BMap;
 
 export class Util {
@@ -8,13 +9,12 @@ export class Util {
      * params id: string , input file的id
      * return FormData对象
      */
-    getFileFormData(id: string){
+    getFileFormData(file){
         let fd = new FormData();
-        let file = document.getElementById(id);
-        if(!(file as HTMLInputElement).files[0]) {
+        if(!file.files[0]) {
             throw new Error('获取文件失败');
         }
-        fd.append((file as HTMLInputElement).files[0].name, (file as HTMLInputElement).files[0]);
+        fd.append(file.files[0].name, file.files[0]);
         return fd;
     }
     /**
@@ -23,15 +23,15 @@ export class Util {
      * return null
      */
     imgReader(file, callback?: Function){
-        let files = (file as HTMLInputElement).files[0];
+        let files = file.files[0];
         if(!/image\/\w+/.test(files.type)){ 
             alert("文件必须为图片！"); 
             return false; 
         }
         let reader = new FileReader();
         reader.readAsDataURL(files);
-        let img = new Image();
-        let promise = new Promise(function(resolve,reject){
+        let img = new Image(),
+            promise = new Promise(function(resolve,reject){
             reader.onload = function(e){
                 img.src = this.result;
                 let that = this;
@@ -57,12 +57,10 @@ export class Util {
      * params file: input file 对象
      */
     fileReader(file){
-        let files = (file as HTMLInputElement).files[0];
+        let files = file.files[0];
         if(!/image\/\w+/.test(files.type)){ 
             alert("文件必须为图片！"); 
-            return new Promise((resolve,reject) => {
-                reject();
-            }); 
+            return false;
         }
         let reader = new FileReader();
         reader.readAsDataURL(files);
@@ -77,32 +75,33 @@ export class Util {
      * params oldObj: Object   需要拷贝的对象
      * return Object 新对象
      */
-    deepCopy(oldObj) {
-        let newObject = {};
-        if(oldObj){
-            if (oldObj.constructor === Object) {
-                newObject = new oldObj.constructor();
-            } else {
-                newObject = new oldObj.constructor(oldObj.valueOf());
-            }
-            for (const key in oldObj) {
-                if (newObject[key] !== oldObj[key]) {
-                    if (typeof(oldObj[key]) === 'object') {
-                        newObject[key] = this.deepCopy(oldObj[key]);
-                    } else {
-                        newObject[key] = oldObj[key];
-                    }
-                }
-            }
-            newObject.toString = oldObj.toString;
-            newObject.valueOf = oldObj.valueOf;
-            return newObject;
-        }
-    }
+    // deepCopy(oldObj) {
+    //     let newObject = {};
+    //     if(oldObj){
+    //         if (oldObj.constructor === Object) {
+    //             newObject = new oldObj.constructor();
+    //         } else {
+    //             newObject = new oldObj.constructor(oldObj.valueOf());
+    //         }
+    //         for (const key in oldObj) {
+    //             if (newObject[key] !== oldObj[key]) {
+    //                 if (typeof(oldObj[key]) === 'object') {
+    //                     newObject[key] = this.deepCopy(oldObj[key]);
+    //                 } else {
+    //                     newObject[key] = oldObj[key];
+    //                 }
+    //             }
+    //         }
+    //         newObject.toString = oldObj.toString;
+    //         newObject.valueOf = oldObj.valueOf;
+    //         return newObject;
+    //     }
+    // }
     /**
      * contenteditable输入框插入表情
      * params field: object  输入框dom对象， value: string 需要插入的内容
      */
+    
     insertAtCursor (field, value, selectPastedContent) {
         var sel, range;
         // if (field.nodeName == 'PRE') {
@@ -203,7 +202,6 @@ export class Util {
      * return 排好序的数组array
      */
     sortByLetter(payload){
-        console.log(555555, payload)
         let letter = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
             result = [],
             defaultResult = {

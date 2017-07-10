@@ -2,6 +2,10 @@ import { Routes, RouterModule,PreloadAllModules } from '@angular/router';
 import RouterGuard from './services/common/router-guard.service';
 
 export const ROUTES: Routes = [{
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full'
+},{
     path: 'login',
     loadChildren: './pages/login#LoginModule'
 },{
@@ -11,9 +15,6 @@ export const ROUTES: Routes = [{
     path: 'main',
     canActivate: [RouterGuard],
     loadChildren: './pages/main#MainModule'
-}, {
-    path: 'list',
-    loadChildren: './pages/list#ListModule'
 },{
     path: 'map/:pointer',
     loadChildren: './pages/map#MapModule'

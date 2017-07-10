@@ -34,5 +34,9 @@ export const chatInit = {
         }
     },
     imageViewer: [],
-    voiceState: []
+    voiceState: [],
+    playVideoShow: {
+        url: '',
+        show: false
+    }
 }

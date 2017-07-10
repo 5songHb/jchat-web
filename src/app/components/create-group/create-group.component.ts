@@ -64,6 +64,9 @@ export class CreateGroupComponent implements OnInit {
                 break;
         }
     }
+    private stopPropagation(event){
+        event.stopPropagation();
+    }
     private initData(){
         // 多人会话
         for(let i=0;i<this.createGroup.list.length;i++){
@@ -71,7 +74,8 @@ export class CreateGroupComponent implements OnInit {
                 this.createGroup.list[i].data[j].checked = false;
                 this.createGroup.list[i].data[j].disabled = false;
                 this.createGroup.list[i].data[j].show = true;
-                if(Number(this.createGroup.info.activeSingle && this.createGroup.info.activeSingle.key) === Number(this.createGroup.list[i].data[j].key)){
+                let keyFlag = this.createGroup.info.activeSingle && Number(this.createGroup.info.activeSingle.key) === Number(this.createGroup.list[i].data[j].key);
+                if(keyFlag){
                     this.createGroup.list[i].data[j].checked = true;
                     this.createGroup.list[i].data[j].disabled = true;
                     this.selectList.push(this.createGroup.info.activeSingle);
@@ -83,7 +87,9 @@ export class CreateGroupComponent implements OnInit {
             for(let i=0;i<this.createGroup.list.length;i++){
                 for(let j=0;j<this.createGroup.list[i].data.length;j++){
                     for(let a=0;a<this.createGroup.info.filter.length;a++){
-                        if(Number(this.createGroup.info.filter[a].uid) === Number(this.createGroup.list[i].data[j].key) || Number(this.createGroup.info.filter[a].key) === Number(this.createGroup.list[i].data[j].key)){
+                        let keyFlag = Number(this.createGroup.info.filter[a].uid) === Number(this.createGroup.list[i].data[j].key) || Number(this.createGroup.info.filter[a].key) === Number(this.createGroup.list[i].data[j].key);
+                        let nameFlag = this.createGroup.info.filter[a].username === this.createGroup.list[i].data[j].name && this.createGroup.list[i].data[j].type === 3;
+                        if(keyFlag || nameFlag){
                             this.createGroup.list[i].data[j].show = false;
                             break;
                         }
@@ -119,10 +125,8 @@ export class CreateGroupComponent implements OnInit {
     }
     private changeCheckedEmit(item){
         if(!item.checked){
-            item.checked = true;
             this.selectList.push(item);
         }else{
-            item.checked = false;
             for(let i=0;i<this.selectList.length;i++){
                 if(Number(item.key) === Number(this.selectList[i].key)){
                     this.selectList.splice(i, 1);
@@ -195,7 +199,8 @@ export class CreateGroupComponent implements OnInit {
         }
         this.isCreateGroup.emit(groupInfo);
     }
-    private cancelCreateGroup(){
+    private cancelCreateGroup(event){
+        event.stopPropagation();
         this.isCreateGroup.emit();
     }
     private selectItem(event, user){

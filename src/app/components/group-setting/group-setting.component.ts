@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, ViewChild, OnChanges, HostListener, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
@@ -22,7 +22,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     ]
 })
 
-export class GroupSettingComponent implements OnInit {
+export class GroupSettingComponent implements OnInit, OnChanges {
     @ViewChild(PerfectScrollbarComponent) componentScroll;
     @ViewChild(PerfectScrollbarDirective) directiveScroll;
 
@@ -64,11 +64,26 @@ export class GroupSettingComponent implements OnInit {
     private modifyGroupNameShow = false;
     private dec = '';
     constructor(
-        private store$: Store<AppStore>
+        private store$: Store<AppStore>,
+        private elementRef: ElementRef
     ) {
 
     }
     public ngOnInit() {
+    }
+    private stopPropagation(event){
+        event.stopPropagation();
+    }
+    @HostListener('window:click') onWindowClick(){
+        this.groupSetting.show = false;
+        this.settingAnimate = 'void';
+    }
+    public ngOnChanges(){
+        if(this.groupSetting.show){
+            this.settingAnimate = 'in';
+        }else{
+            this.settingAnimate = 'void';
+        }
     }
     private clearInputEmit(){
         this.searchResult.result = [];
@@ -112,8 +127,8 @@ export class GroupSettingComponent implements OnInit {
     private modifyGroupNameAction(){
         this.modifyGroupNameShow = true;
         setTimeout(function(){
-            document.getElementById('groupSettingNameInput').focus();
-        }, 0)
+            this.elementRef.nativeElement.querySelector('#groupSettingNameInput').focus();
+        }.bind(this), 0)
     }
     private modifyGroupNameBlur(event){
         this.modifyGroupName.emit(event.target.value);

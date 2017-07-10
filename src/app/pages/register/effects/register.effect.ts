@@ -73,7 +73,7 @@ export class RegisterEffect {
                 if(data.code === 882002){
                     usernameTip = '用户名已存在';                
                 }else {
-                    usernameTip = '注册失败'
+                    usernameTip = '注册失败';
                 }
                 that.store$.dispatch({
                     type: registerAction.registerFailed, 

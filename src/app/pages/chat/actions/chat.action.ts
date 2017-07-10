@@ -35,5 +35,6 @@ export const chatAction = {
     addGroupMembersEvent: '[chat] add group members event',
     addGroupMembersEventSuccess: '[chat] add group members event success',
     getVoiceState: '[chat] get voice state',
-    getVoiceStateSuccess: '[chat] get voice state success'
+    getVoiceStateSuccess: '[chat] get voice state success',
+    playVideoShow: '[chat] play video show'
 }

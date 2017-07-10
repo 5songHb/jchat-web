@@ -7,6 +7,11 @@ import { chatAction } from '../../chat/actions';
 export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+        case chatAction.getConversationSuccess:
+            if(payload.conversation){
+                state.mainLoading = true;
+            }
+            break;
             // 成功获取个人信息
         case mainAction.showSelfInfo:
             if (payload.show !== 'undefined') {
@@ -29,7 +34,6 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             break;
         case mainAction.createGroupShow:
             // 是否显示创建群组模块
-            console.log(33333,payload)
             state.createGroup = payload;
             break;
         case mainAction.createGroupSuccess:
@@ -38,7 +42,6 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             state.listTab = 0;
             break;
         case mainAction.addGroupMemberSuccess:
-            console.log(44444,payload);
             state.createGroup.show = false;
             state.listTab = 0;
             break;

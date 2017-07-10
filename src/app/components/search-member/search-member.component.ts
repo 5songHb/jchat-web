@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -23,15 +23,18 @@ export class SearchMemberComponent implements OnInit {
         private changeChecked: EventEmitter<any> = new EventEmitter();
         
     private searchKeyword = '';
-    constructor() {
+    private fileDom;
+    constructor(
+        private elementRef: ElementRef
+    ) {
 
      }
     public ngOnInit() {
         
     }
     public ngAfterViewInit(){
-        const file = document.getElementById(this.searchResult.id);
-        Observable.fromEvent(file, "keyup")
+        this.fileDom = this.elementRef.nativeElement.querySelector('#' + this.searchResult.id);
+        Observable.fromEvent(this.fileDom, "keyup")
             .debounceTime(200)
             .subscribe((event:any) => {
                 this.searchKeyup.emit(event.target.value);
@@ -44,14 +47,15 @@ export class SearchMemberComponent implements OnInit {
         this.searchItem.emit(item);
     }
     private clearInputAction(){
-        document.getElementById(this.searchResult.id).focus();
+        this.fileDom.focus();
         this.searchKeyword = '';
         this.clearInput.emit();
     }
     private searchBtnAction(){
         this.searchBtn.emit(this.searchKeyword);
     }
-    private changeCheckedAction(item){
+    private changeCheckedAction(input, item){
+        console.log(666, input.checked, item.checked)
         this.changeChecked.emit(item);
     }
 }

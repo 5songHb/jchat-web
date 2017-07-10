@@ -32,6 +32,10 @@ export class ContactEffect {
                     payload: data.group_list
                 });
             }).onFail(function(data) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: data
+                });
                 console.log('error:' + JSON.stringify(data));
             });
             return Observable.of(groupListObj)

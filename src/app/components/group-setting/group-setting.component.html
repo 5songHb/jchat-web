@@ -1,4 +1,4 @@
-<div class="group-setting-container" [@flyInOut] = "settingAnimate">
+<div class="group-setting-container" [@flyInOut] = "settingAnimate" (click)="stopPropagation($event)">
     <div class="group-setting-wrap">
         <span class="group-setting-close" (click)="closeGroupSettingAction()"></span>
         <div class="group-setting-header">
@@ -36,7 +36,7 @@
                         <span class="flex-1" *ngIf="item.nickName">{{item.nickName}}</span>
                         <span class="flex-1" *ngIf="item.username && !item.nickName">{{item.username}}</span>
                         <div class="group-setting-host" *ngIf="item.flag === 1" [hoverEvent]="hostHover">
-                            <hover-tip-component *ngIf="hostHover.show" [hoverInfo]="hostHover"></hover-tip-component>
+                            <hover-tip-component [hidden]="!hostHover.show" [hoverInfo]="hostHover"></hover-tip-component>
                         </div>
                         <span (click)="deleteMemberAction(item)" class="group-setting-delete" *ngIf="item.flag === 0 && groupSetting.memberList[0].username === global.user">×</span>
                     </li>

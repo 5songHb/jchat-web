@@ -9,6 +9,7 @@ import { DefaultPanelModule } from '../../components/default-panel';
 import { OtherInfoModule } from '../../components/other-info';
 import { GroupSettingModule } from '../../components/group-setting';
 import { GroupDescriptionModule } from '../../components/group-description';
+import { VideoModule } from '../../components/video';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { GroupDescriptionModule } from '../../components/group-description';
     DefaultPanelModule,
     OtherInfoModule,
     GroupSettingModule,
-    GroupDescriptionModule
+    GroupDescriptionModule,
+    VideoModule
   ],
   exports: [
       ChatComponent

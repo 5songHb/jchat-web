@@ -83,7 +83,6 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.changeActivePerson:
             // 更换当前会话用户
-            console.log(2222222222)
             state.activePerson = payload.item;
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
             emptyUnreadNum(state, payload.item);
@@ -245,6 +244,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.getVoiceStateSuccess:
             state.voiceState = payload;
             break;
+        case chatAction.playVideoShow:
+            state.playVideoShow = payload;
+            break;
         default:
     }
     return state;
@@ -277,7 +279,7 @@ function addGroupMembersEvent(state: ChatStore, payload){
 function deleteGroupItem(state: ChatStore, payload){
     let memberList = state.messageList[state.activePerson.activeIndex].groupSetting.memberList;
     for(let i=0;i<memberList.length;i++){
-        if(Number(memberList[i].uid) === Number(payload.deleteItem.uid)){
+        if(memberList[i].username === payload.deleteItem.username){
             memberList.splice(i, 1);
             break;
         }
@@ -340,7 +342,7 @@ function changeActivePerson(state: ChatStore){
     }
     let list = state.messageList[state.activePerson.activeIndex];
     for(let i=0;i<list.msgs.length;i++){
-        if(list.msgs[i].content.msg_type === 'file' && list.msgs[i].content.msg_body.extras && list.msgs[i].content.msg_body.extras.video === 'mp4'){
+        if(list.msgs[i].content.msg_type === 'file' && list.msgs[i].content.msg_body.extras && list.msgs[i].content.msg_body.extras.video === 'video'){
             //audio 0 正在加载  1 加载完成  2 正在播放
             list.msgs[i].content.load = 0;
             // 加载进度 0%
@@ -590,6 +592,10 @@ function addMessage(state: ChatStore, payload){
                     max: true
                 };
                 payload.messages[j].content.havePlay = false;
+            }
+            if(payload.messages[j].content.msg_type === 'file' && payload.messages[j].content.msg_body.extras && payload.messages[j].content.msg_body.extras.video === 'video'){
+                payload.messages[j].content.load = 0;
+                payload.messages[j].content.range = 0;
             }
             let flag = false;    
             // 如果发送人在会话列表里

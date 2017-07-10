@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, HostListener } from '@angular/core';
-import { global } from '../../services/common/global';
+import { Component, OnInit, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 
 @Component({
     selector: 'image-viewer-component',
@@ -30,6 +29,11 @@ export class ImageViewerComponent implements OnInit {
         y: 0
     }
     private imgHidden = false;
+    constructor(
+        private elementRef: ElementRef
+    ){
+
+    }
     public ngOnInit() {
         if(!this.imageViewer){
             this.imageViewer = {
@@ -45,19 +49,19 @@ export class ImageViewerComponent implements OnInit {
         this.initImviewer();
     }
     private initImviewer(){
-        let body = (document.getElementsByTagName('body')[0] as HTMLBodyElement);
-        if(this.imageViewer.active.width / body.offsetWidth > this.imageViewer.active.height / body.offsetHeight && this.imageViewer.active.width > body.offsetWidth * 0.6){
-            this.position.width = this.initPosition.width = body.offsetWidth * 0.6;
-            this.position.height = this.initPosition.height = body.offsetWidth / this.imageViewer.active.width * 0.6 * this.imageViewer.active.height;
-        }else if(this.imageViewer.active.width / body.offsetWidth < this.imageViewer.active.height / body.offsetHeight && this.imageViewer.active.height > body.offsetHeight * 0.6){
-            this.position.height = this.initPosition.height = body.offsetHeight * 0.6;
-            this.position.width = this.initPosition.width = body.offsetHeight / this.imageViewer.active.height * 0.6 * this.imageViewer.active.width;
+        let viewerWrap = this.elementRef.nativeElement.querySelector('#viewerWrap');
+        if(this.imageViewer.active.width / viewerWrap.offsetWidth > this.imageViewer.active.height / viewerWrap.offsetHeight && this.imageViewer.active.width > viewerWrap.offsetWidth * 0.6){
+            this.position.width = this.initPosition.width = viewerWrap.offsetWidth * 0.6;
+            this.position.height = this.initPosition.height = viewerWrap.offsetWidth / this.imageViewer.active.width * 0.6 * this.imageViewer.active.height;
+        }else if(this.imageViewer.active.width / viewerWrap.offsetWidth < this.imageViewer.active.height / viewerWrap.offsetHeight && this.imageViewer.active.height > viewerWrap.offsetHeight * 0.6){
+            this.position.height = this.initPosition.height = viewerWrap.offsetHeight * 0.6;
+            this.position.width = this.initPosition.width = viewerWrap.offsetHeight / this.imageViewer.active.height * 0.6 * this.imageViewer.active.width;
         }else{
             this.position.height = this.initPosition.height = this.imageViewer.active.height;
             this.position.width = this.initPosition.width = this.imageViewer.active.width;
         }
-        this.position.left = (body.offsetWidth - this.position.width) / 2;
-        this.position.top = (body.offsetHeight - this.position.height) / 2;
+        this.position.left = (viewerWrap.offsetWidth - this.position.width) / 2;
+        this.position.top = (viewerWrap.offsetHeight - this.position.height) / 2;
     }
     @HostListener("window:resize", ['$event']) onResize(event) {
         this.initImviewer();
@@ -95,7 +99,6 @@ export class ImageViewerComponent implements OnInit {
         }else if(ratio < 0.2){
             this.showTip('无法再缩小了');
         }else{
-            let body = (document.getElementsByTagName('body')[0] as HTMLBodyElement);
             this.ratio = ratio = Number(ratio.toFixed(1));
             this.position.left = this.position.left + (this.position.width - this.initPosition.width * ratio) / 2;
             this.position.top = this.position.top + (this.position.height - this.initPosition.height * ratio) / 2;

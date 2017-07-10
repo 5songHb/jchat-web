@@ -21,8 +21,7 @@ export default class RouterGuard implements CanActivate {
             }
             let that = this;
             // 判断是否登陆，前者是刷新时登录，后者是关闭窗口五分钟内打开窗口登录
-            let refrashLogin = window.sessionStorage.getItem(md5('login-persistence-username')) && window.sessionStorage.getItem(md5('login-persistence-password')),
-                leaveLogin = this.storageService.get(md5('afterFiveMinutes-username'), true) && this.storageService.get(md5('afterFiveMinutes-password'));
+            let leaveLogin = this.storageService.get(md5('afterFiveMinutes-username'), true) && this.storageService.get(md5('afterFiveMinutes-password'));
             // 测试一下兼容性
             // if(refrashLogin){
             //     this.username = window.sessionStorage.getItem(md5('login-persistence-username'));
@@ -32,7 +31,7 @@ export default class RouterGuard implements CanActivate {
                 this.username = this.storageService.get(md5('afterFiveMinutes-username'), true);
                 this.password = this.storageService.get(md5('afterFiveMinutes-password'), true);
             }
-            if(refrashLogin || leaveLogin){
+            if(leaveLogin){
                 return new Promise<Boolean>((resolve, reject) => {
                     that.JIMInit(resolve);
                 });

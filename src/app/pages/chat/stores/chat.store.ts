@@ -39,4 +39,8 @@ export interface ChatStore{
     };
     imageViewer: Array<any>;
     voiceState: Array<any>;
+    playVideoShow: {
+        url: string,
+        show: boolean
+    }
 }

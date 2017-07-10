@@ -1,4 +1,4 @@
-<div class="modal-shadow">
+<div class="modal-shadow" (click)="stopPropagation($event)">
     <div class="other-info-container modal-content">
         <span class="modal-close" (click)="otherClose()"></span>
         <div class="other-info-avatar">
@@ -8,7 +8,7 @@
             <div class="other-info-avatar-username">
                 {{otherInfo.nickname ? otherInfo.nickname : otherInfo.username}}
                 <div class="self-info-blacklist-icon" [hoverEvent]="addBlackHover" (click)="addBlack()">
-                    <hover-tip-component *ngIf="addBlackHover.show" [hoverInfo]="addBlackHover"></hover-tip-component>
+                    <hover-tip-component [hidden]="!addBlackHover.show" [hoverInfo]="addBlackHover"></hover-tip-component>
                 </div>
             </div>
             <p class="other-info-signature">

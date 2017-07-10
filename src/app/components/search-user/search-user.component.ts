@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, HostListener, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -24,18 +24,21 @@ export class SearchUserComponent implements OnInit {
     private groupShowText = '显示全部';
     private singleHeight = '200px';
     private groupHeight = '200px';
+    private fileDom;
     @Input()
         searchUserResult;
     @Output()
         private searchUser: EventEmitter<any> = new EventEmitter();
     @Output()
         private selectUserResult: EventEmitter<any> = new EventEmitter();
-    constructor() {
+    constructor(
+        private elementRef: ElementRef
+    ) {
 
     }
     public ngOnInit() {
-        const file = document.getElementById("searchInput");
-        Observable.fromEvent(file, "keyup")
+        this.fileDom = this.elementRef.nativeElement.querySelector("#searchInput");
+        Observable.fromEvent(this.fileDom, "keyup")
             .debounceTime(300)
             .subscribe((event:any) => {
                 this.searchUser.emit(event.target.value);
@@ -76,7 +79,7 @@ export class SearchUserComponent implements OnInit {
     private clearInput(){
         this.searchKeyword = '';
         this.searchUser.emit(this.searchKeyword);
-        document.getElementById('searchInput').focus();
+        this.fileDom.focus();
     }
     private selectSearchItem(item){
         this.selectUserResult.emit(item);
@@ -85,8 +88,8 @@ export class SearchUserComponent implements OnInit {
         this.searchInputIsShow = false;
         this.inputAnimate = 'in';
         setTimeout(function(){
-            document.getElementById('searchInput').focus();
-        },200);
+            this.fileDom.focus();
+        }.bind(this),200);
     }
     private stopPropagation(event){
         event.stopPropagation();
