@@ -1,6 +1,7 @@
 import { registerAction } from '../actions';
 import { RegisterStore } from '../stores';
 const registerInit = {
+    actionType: '',
     isRegisterSuccess: false,
     usernameTip: '',
     passwordTip: '',
@@ -12,6 +13,7 @@ const registerInit = {
     }
 }
 export const registerReducer = (state: RegisterStore = registerInit, {type, payload}) => {
+    state.actionType = type;
     switch (type) {
         case registerAction.register:
             break;
@@ -35,6 +37,33 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
             break;
         case registerAction.repeatPasswordTip:
             state.repeatPasswordTip = payload;
+            break;
+        case registerAction.initState:
+            state = {
+                actionType: '',
+                isRegisterSuccess: false,
+                usernameTip: '',
+                passwordTip: '',
+                repeatPasswordTip: '',
+                isButtonAvailable: false,
+                tipModal: {
+                    show: false,
+                    info: {}
+                }
+            };
+            break;
+        case registerAction.emptyTip:
+            switch(payload){
+                case 'username':
+                    state.usernameTip = '';
+                    break;
+                case 'password':
+                    state.passwordTip = '';
+                    break;
+                case 'repeatPassword':
+                    state.repeatPasswordTip = '';
+                    break;
+            }
             break;
         default:
     }

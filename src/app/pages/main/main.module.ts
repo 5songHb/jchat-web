@@ -25,6 +25,7 @@ import { HoverTipModule } from '../../components/hover-tip';
 import { ChatModule } from '../chat';
 import { ContactModule } from '../contact';
 import { HoverEventModule } from '../../directives';
+import { LogoutKickModule } from '../../components//logout-kick';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { HoverEventModule } from '../../directives';
     ContactModule,
     MenuModule,
     HoverTipModule,
-    HoverEventModule
+    HoverEventModule,
+    LogoutKickModule
   ],
   providers: [
   ]

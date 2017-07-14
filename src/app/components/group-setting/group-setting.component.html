@@ -1,7 +1,7 @@
-<div class="group-setting-container" [@flyInOut] = "settingAnimate" (click)="stopPropagation($event)">
+<div class="group-setting-container" id="groupSettingContainer" [@flyInOut] = "settingAnimate" (click)="stopPropagation($event)">
     <div class="group-setting-wrap">
         <span class="group-setting-close" (click)="closeGroupSettingAction()"></span>
-        <div class="group-setting-header">
+        <div class="group-setting-header" id="groupSettingHeader">
             <div class="group-setting-title">群设置</div>
             <p class="clearfix group-setting-text">
                 <span class="float-left">群名称&nbsp;:&nbsp;</span>
@@ -10,7 +10,7 @@
             </p>
             <div class="clearfix group-setting-text">
                 <span class="float-left">群描述&nbsp;:&nbsp;</span>
-                <span class="float-left group-setting-dec" id="groupSettingDec" [title]="groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : ''" (click)="modifyGroupDescriptionAction()">{{groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : '未填写'}}</span>
+                <span class="float-left group-setting-dec" id="groupSettingDec" [title]="groupSetting.groupInfo.desc ? groupSetting.groupInfo.desc : ''" (click)="modifyGroupDescriptionAction()">{{groupSetting.groupInfo.desc ? (groupSetting.groupInfo.desc | ellipsis: 26) : '未填写'}}</span>
                 <!--<button type="button" (click)="modifyGroupDescriptionAction()">修改</button>-->
             </div>
             <div class="clearfix group-setting-text">
@@ -21,7 +21,7 @@
                 <search-member-component [searchResult]="searchResult" (searchKeyup)="seachKeyupEmit($event)" (searchItem)="searchItemEmit($event)" (clearInput)="clearInputEmit()"></search-member-component>
             </div>
         </div>
-        <div class="group-setting-list">
+        <div class="group-setting-list" [ngStyle]="{'top': listTop + 'px'}">
             <p class="clearfix group-setting-add">
                 <span class="float-left">群成员&nbsp;:&nbsp;</span>
                 <span class="float-left">{{groupSetting.memberList.length}}人</span>
@@ -31,7 +31,8 @@
                 <ul>
                     <li class="clearfix display-flex" *ngFor="let item of groupSetting.memberList">
                         <div class="group-setting-avatar" (click)="watchInfoAction(item.username)">
-                            <img [src]="item.avatarUrl" (error)="avatarErrorIcon($event)" alt="">                        
+                            <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" [src]="item.avatarUrl" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
+                            <img *ngIf="!item.avatarUrl || item.avatarUrl === ''" src="../../../assets/images/single-avatar.png" style="width: 100%;" alt="">                      
                         </div>
                         <span class="flex-1" *ngIf="item.nickName">{{item.nickName}}</span>
                         <span class="flex-1" *ngIf="item.username && !item.nickName">{{item.username}}</span>

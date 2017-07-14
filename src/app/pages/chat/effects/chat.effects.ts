@@ -4,7 +4,7 @@ import { Actions, Effect, toPayload } from '@ngrx/effects';
 import { Store, Action } from '@ngrx/store';
 import { Http } from '@angular/Http';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { indexAction } from '../../index/actions';
 import { global, authPayload, StorageService } from '../../../services/common';
 import { AppStore } from '../../../app.store';
 import { chatAction } from '../actions';
@@ -22,6 +22,64 @@ export class ChatEffect {
         private router: Router,
         private storageService: StorageService
     ){}
+    // 接收到新消息
+    @Effect()
+    private receiveMessage$: Observable<Action> = this.actions$
+        .ofType(chatAction.receiveMessage)
+        .map(toPayload)
+        .switchMap((data) => {
+            let that = this,
+                count = 0,
+                messages = data.messages;
+            for(let i=0;i<messages.length;i++){
+                global.JIM.getUserInfo({
+                    'username' : messages[i].content.from_id
+                }).onSuccess(function(user) {
+                    if(!user.user_info.avatar || user.user_info.avatar === ''){
+                        count ++;
+                        if(count === messages.length){
+                            that.store$.dispatch({
+                                type: chatAction.receiveMessageSuccess,
+                                payload: data
+                            });
+                        }
+                        return;
+                    }
+                    global.JIM.getResource({'media_id' : user.user_info.avatar})
+                    .onSuccess(function(urlInfo){
+                        messages[i].content.avatarUrl = urlInfo.url;
+                        count ++;
+                        if(count === messages.length){
+                            that.store$.dispatch({
+                                type: chatAction.receiveMessageSuccess,
+                                payload: data
+                            });
+                        }
+                    }).onFail(function(error){
+                        count ++;
+                        if(count === messages.length){
+                            that.store$.dispatch({
+                                type: chatAction.receiveMessageSuccess,
+                                payload: data
+                            });
+                        }
+                    });
+                }).onFail(function(error) {
+                    count ++;
+                    if(count === messages.length){
+                        that.store$.dispatch({
+                            type: chatAction.receiveMessageSuccess,
+                            payload: data
+                        });
+                    }
+                    console.log('error:' + JSON.stringify(error));
+                });
+            }
+            return Observable.of('receiveMessage')
+                    .map(() => {
+                        return {type: '[chat] receive message useless'};
+                    })
+        })
     // 获取storage里的voice状态
     @Effect()
     private getVoiceState$: Observable<Action> = this.actions$
@@ -92,14 +150,14 @@ export class ChatEffect {
                     });
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                     console.log('error:' + JSON.stringify(error));
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -177,7 +235,7 @@ export class ChatEffect {
         .map((data) => {
             let that = this;
             // let count = 0,
-            //     resourceArray = [];
+            //     resourceArray = [];groupInfo.groupName
             for(let i=0;i<data.length;i++){
                 for(let j=0;j<data[i].msgs.length;j++){
                     if(j+1 < data[i].msgs.length || data[i].msgs.length === 1){
@@ -271,7 +329,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -316,7 +374,7 @@ export class ChatEffect {
                     }
                 })
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -354,7 +412,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
             });
@@ -391,7 +449,7 @@ export class ChatEffect {
                     }
                 })
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -430,7 +488,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -469,7 +527,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -521,7 +579,7 @@ export class ChatEffect {
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -555,7 +613,7 @@ export class ChatEffect {
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -587,7 +645,7 @@ export class ChatEffect {
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -625,7 +683,7 @@ export class ChatEffect {
                 }
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -651,7 +709,7 @@ export class ChatEffect {
                     })
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                     console.log('error:' + JSON.stringify(error));
@@ -665,7 +723,7 @@ export class ChatEffect {
                     })
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                     console.log('error:' + JSON.stringify(error));
@@ -693,7 +751,7 @@ export class ChatEffect {
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));

@@ -11,7 +11,7 @@ export class MapComponent implements OnInit {
     private util = new Util();
     private errorTipShow = false;
     constructor(
-        private activatedRoute: ActivatedRoute,
+        private activatedRoute: ActivatedRoute
     ){}
     public ngOnInit() {
         let pointer = this.activatedRoute.snapshot.params.pointer;

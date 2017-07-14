@@ -18,12 +18,6 @@ export class LoginEffect {
     private login$: Observable<Action> = this.actions$
         .ofType(loginAction.login)
         .map(toPayload)
-        .filter((val) => {                                          
-            if(!val.isButtonAvailable){
-                return false;
-            }
-            return val;
-        })
         .switchMap((val) => {
             let that = this;
             let loginObj = global.JIM.login({

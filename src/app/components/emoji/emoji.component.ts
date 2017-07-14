@@ -38,8 +38,9 @@ export class EmojiComponent implements OnInit {
         let contentId = document.getElementById(this.emojiInfo.contentId),
             insertHtml = this.elementRef.nativeElement.querySelector('#' + idName).innerHTML;
         this.util.insertAtCursor(contentId, insertHtml, false);
+        this.emojiInfo.show = false;
     }
-    // private changeTab(event, index){
-    //     this.tab = index;
-    // }
+    private changeTab(event, index){
+        this.tab = index;
+    }
 }

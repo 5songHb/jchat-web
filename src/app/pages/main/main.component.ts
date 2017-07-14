@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { global, authPayload, StorageService } from '../../services/common';
 import { AppStore } from '../../app.store';
@@ -119,9 +120,17 @@ export class MainComponent implements OnInit, OnDestroy {
         },
         show: false
     };
+    private logoutKick = {
+        show: false,
+        info: {
+            title: '',
+            tip: ''
+        }
+    }
     constructor(
         private store$: Store<AppStore>,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private router: Router
     ){}
     public ngOnInit() {
         let that = this;
@@ -228,13 +237,16 @@ export class MainComponent implements OnInit, OnDestroy {
                 break;
             case mainAction.createSingleChatShow:
                 this.createSingleChat = mainState.createSingleChat;
-            case  mainAction.createSingleChatSuccess:
+            case mainAction.createSingleChatSuccess:
                 this.createSingleChat = mainState.createSingleChat;
                 this.listTab = mainState.listTab;
                 break;
-            case mainAction.createSingleChatError:
-                this.createSingleChat = mainState.createSingleChat;
+            case mainAction.emptySingleChatTip:
+                this.createSingleChat.info = mainState.createSingleChat.info;;
                 break;
+            // case mainAction.createSingleChatError:
+            //     this.createSingleChat.info = mainState.createSingleChat.info;
+            //     break;
             case mainAction.blackMenuSuccess:
                 this.blackMenu = mainState.blackMenu;
                 break;
@@ -246,6 +258,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 break;
             case mainAction.delSingleBlackSuccess:
                 this.blackMenu = mainState.blackMenu;
+                break;
+            case mainAction.logoutKickShow:
+                this.logoutKick = mainState.logoutKick;
                 break;
             default:
 
@@ -356,7 +371,7 @@ export class MainComponent implements OnInit, OnDestroy {
         };
         if(singleName === ''){
             this.store$.dispatch({
-                type: mainAction.createSingleChatError,
+                type: mainAction.createSingleChatShow,
                 payload: {
                     show: true,
                     info: '请输入要单聊的用户名'
@@ -373,13 +388,21 @@ export class MainComponent implements OnInit, OnDestroy {
         // 点击取消
         }else{
             this.store$.dispatch({
-                type: mainAction.createSingleChatError,
+                type: mainAction.createSingleChatShow,
                 payload: {
                     show: false,
                     info: ''
                 }
             })
         }
+    }
+    private emptySingleChatTipEmit(){
+        this.store$.dispatch({
+            type: mainAction.emptySingleChatTip,
+            payload: {
+                info: ''
+            }
+        })
     }
     // 点击黑名单模态框确定按钮
     private blackMenuConfirmEmit(){
@@ -513,5 +536,32 @@ export class MainComponent implements OnInit, OnDestroy {
                 break;
         }
         this.settingMenu.show = false;
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight > event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
+    }
+    // 被其他设备登录踢
+    private logoutKickEmit(info){
+        // 重新登录
+        if(info){
+            this.store$.dispatch({
+                type: mainAction.login,
+                payload: {
+                    username: global.user,
+                    password: global.password,
+                    md5: true,
+                    reload: true
+                }
+            })
+        // 去登录页面
+        }else{
+            this.router.navigate(['/login']);
+        }
     }
 }

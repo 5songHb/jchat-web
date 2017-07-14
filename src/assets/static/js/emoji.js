@@ -25,7 +25,7 @@ window.Emoji = {
 
 		//如果浏览器支持原生的emoji，无需转换，把转换方法置空
 		if (isSupportEmoji) {
-			Emoji.emoji = function() {};
+			// Emoji.emoji = function() {};
 
 			//置空$().emoji()方法
 			// if (typeof $ !== 'undefined') {
@@ -36,10 +36,10 @@ window.Emoji = {
 		} else {
 
 			//判断屏幕分辨率，如果是高清屏的话使用稍大尺寸的表情图片
-			var pixelRatio = parseFloat(window.devicePixelRatio) || 1;
-			if (pixelRatio > 1.2) {
-				Emoji.emojiPath += '2x/';
-			}
+			// var pixelRatio = parseFloat(window.devicePixelRatio) || 1;
+			// if (pixelRatio > 1.2) {
+			// 	Emoji.emojiPath = pixelRatio + '2x/';
+			// }
 
 			// Emoji.emoji = function(text) {
 			// 	setTimeout(function() {

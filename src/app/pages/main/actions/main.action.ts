@@ -21,7 +21,8 @@ export const mainAction = {
     createSingleChatShow: '[main] create single chat show',
     createSingleChatAction: '[main] create single chat action',
     createSingleChatSuccess: '[main] create single chat success',
-    createSingleChatError: '[main] create single chat error',
+    emptySingleChatTip: '[main] empty single chat tip',
+    // createSingleChatError: '[main] create single chat error',
     blackMenu: '[main] black menu',
     blackMenuSuccess: '[main] black menu success',
     delSingleBlack: '[main] delete single black',
@@ -34,5 +35,6 @@ export const mainAction = {
     deleteMemberSuccess: '[main] delete member success',
     createGroupSearchAction: '[main] create group search action',
     createGroupSearchComplete: '[main] create group search complete',
-    login: '[main] login'
+    login: '[main] login',
+    logoutKickShow: '[main] logout kick show'
 }

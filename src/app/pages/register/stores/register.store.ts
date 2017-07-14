@@ -1,4 +1,5 @@
 export interface RegisterStore {
+    actionType: string;
     isRegisterSuccess: boolean; //是否注册成功
     usernameTip: string; //用户名提示文本
     passwordTip: string; //密码提示文本

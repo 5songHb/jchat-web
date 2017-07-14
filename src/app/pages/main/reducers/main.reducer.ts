@@ -86,10 +86,16 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             };
             state.listTab = 0;
             break;
-        // 创建单聊失败或关闭单聊
-        case mainAction.createSingleChatError:
-            state.createSingleChat = payload;
+        case mainAction.emptySingleChatTip:
+            state.createSingleChat.info = payload.info;
             break;
+        // 创建单聊失败或关闭单聊
+        // case mainAction.createSingleChatError:
+        //     if(payload.show){
+        //         state.createSingleChat.show = payload.show;
+        //     }
+        //     state.createSingleChat.info = payload.info;
+        //     break;
             // 创建群聊搜索联系人
         case mainAction.createGroupSearchComplete:
             state.createGroupSearch.info = payload;
@@ -107,6 +113,9 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             break;
         case mainAction.delSingleBlackSuccess:
             delSingleBlackLoading(state, payload, false);
+            break;
+        case mainAction.logoutKickShow:
+            state.logoutKick = payload;
             break;
         default:
     }

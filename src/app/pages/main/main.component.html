@@ -2,7 +2,7 @@
     <div class="main-container display-flex">
         <div class="main-menu">
             <div class="main-self-avatar">
-                <img [src]="self.info.avatarUrl" (click)="getSelfInfo($event)" (error)="avatarErrorIcon($event)" alt="">
+                <img (load)="avatarLoad($event)" [src]="self.info.avatarUrl + '?v=4'" (click)="getSelfInfo($event)" (error)="avatarErrorIcon($event)" alt="">
             </div>
             <div class="main-tab">
                 <div (click)="changeListTab(0)" class="main-chat">
@@ -30,8 +30,8 @@
         <div class="main-right-container flex-1 display-flex flex-direction-vertical">
             <search-user-component [searchUserResult]="searchUserResult" (searchUser)="searchUserEmit($event)" (selectUserResult)="selectUserResultEmit($event)"></search-user-component>
             <div class="display-flex main-center-container flex-1">
-                <chat-component [hidden]="listTab == 1" class="flex-1"></chat-component>
-                <contact-component [hidden]="listTab == 0" class="flex-1"></contact-component>
+                <chat-component [hidden]="listTab === 1" class="flex-1" style="position: relative;"></chat-component>
+                <contact-component [hidden]="listTab === 0" class="flex-1"></contact-component>
             </div>
         </div>
     </div>
@@ -39,8 +39,9 @@
     <create-group-component *ngIf="createGroup.show" [createGroup]="createGroup" (isCreateGroup)="createGroupEmit($event)"></create-group-component>
     <modify-password-component [hidden]="!isModifyPasswordShow" (modifyPassword)="modifyPasswordEmit($event)"></modify-password-component>
     <tip-modal-component *ngIf="tipModal.show" [info]="tipModal.info" (modalTipEmit)="modalTipEmit($event)"></tip-modal-component>
-    <create-single-chat-component *ngIf="createSingleChat.show" [info]="createSingleChat.info" (createSingleChat)="createSingleChatEmit($event)"></create-single-chat-component>
+    <create-single-chat-component *ngIf="createSingleChat.show" [info]="createSingleChat.info" (emptySingleChatTip)="emptySingleChatTipEmit()" (createSingleChat)="createSingleChatEmit($event)"></create-single-chat-component>
     <black-menu-component [hidden]="!blackMenu.show" [menuInfo]="blackMenu.menu" (blockMenuConfirm)="blackMenuConfirmEmit()" (delSingleBlack)="delSingleBlackEmit($event)"></black-menu-component>
+    <logout-kick-component *ngIf="logoutKick.show" [info]="logoutKick.info" (modalTipEmit)="logoutKickEmit($event)"></logout-kick-component>
 </div>
 
 <div class="copyright-container">

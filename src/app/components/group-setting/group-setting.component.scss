@@ -30,7 +30,6 @@
             margin-bottom: 10px;
         }
         .group-setting-text{
-            height: 34px;
             line-height: 34px;
             font-size: 12px;
             color: #2C2C2C;
@@ -108,8 +107,8 @@
                     width: 30px;
                     height: 30px;
                     margin: 10px 10px 0 0;
+                    overflow: hidden;
                     img{
-                        width: 100%;
                         cursor: pointer;
                     }
                 }

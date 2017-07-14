@@ -10,14 +10,23 @@ body {
     height: 100%;
     width: 100%;
     font-family: PingFangSC-Regular;
-    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 button{
     border: none;
 }
 input::-ms-clear{display:none;}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    border: 1px solid #CCC!important;
+}
 input{
     border: none;
+    font-size: 12px;
+    color: #2c2c2c;
+}
+textarea{
     font-size: 12px;
     color: #2c2c2c;
 }
@@ -321,6 +330,9 @@ ul,li,ol{
     vertical-align: middle;
     position: relative;
     top: 3px;
+}
+.chat-panel-content-text .emoji, .conversation-draft .emoji{
+    top: -1px;
 }
 
 

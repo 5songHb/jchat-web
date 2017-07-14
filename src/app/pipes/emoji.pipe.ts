@@ -9,6 +9,9 @@ declare let Emoji;
 })
 export class EmojiPipe implements PipeTransform {
   transform(text) {
-    return Emoji.emoji(text);
+    let newText = text.replace(/\n/g, '<br>');    
+    newText = newText.replace(/\s/g, '&nbsp;');
+    newText = Emoji.emoji(newText);
+    return newText;
   }
 }

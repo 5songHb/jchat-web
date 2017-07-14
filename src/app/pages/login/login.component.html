@@ -4,12 +4,12 @@
             <img src="../../../assets/images/logo.png" alt="">
         </h1>
         <div class="login-info">
-            <div class="login-username" [ngClass]="{'login-tip-wrap': loginTip}">
-                <input spellcheck="false" id="loginUsername" class="input-focus" [ngClass]="{'input-error': loginTip}" [(ngModel)]="username" type="text" placeholder="请输入用户名" (keyup)="isButtonAvailableAction()" (change)="isButtonAvailableAction()">
+            <div class="login-username" (click)="inputFocus('loginUsername')" [ngClass]="{'login-tip-wrap': loginTip}">
+                <input autocomplete="off" spellcheck="false" id="loginUsername" class="input-focus" [ngClass]="{'input-error': loginTip}" [(ngModel)]="username" type="text" placeholder="请输入用户名" (keyup)="isButtonAvailableAction('username')" (change)="isButtonAvailableAction()">
                 <p class="login-tip" *ngIf="loginTip">{{loginTip}}</p>                
             </div>
-            <div class="login-pwd">
-                <input spellcheck="false" id="loginPassword" class="input-focus" [(ngModel)]="password" type="password" placeholder="请输入密码" (keyup.enter)="login()" (keyup)="isButtonAvailableAction()" (change)="isButtonAvailableAction()">
+            <div class="login-pwd" (click)="inputFocus('loginPassword')">
+                <input autocomplete="off" spellcheck="false" id="loginPassword" class="input-focus" [(ngModel)]="password" type="password" placeholder="请输入密码" (keyup.enter)="login()" (keyup)="isButtonAvailableAction('password')" (change)="isButtonAvailableAction()">
             </div>
             <p class="login-remember clearfix">
                 <label for="remember" class="float-left">
@@ -18,7 +18,7 @@
                     记住用户名和密码
                 </label>
             </p>
-            <p class="login-btn">
+            <p class="login-btn" [ngClass]="{'loading': loginLoading}">
                 <button [ngClass]="{'disabled': !isButtonAvailable && !rememberPassword}" class="btn-active" type="button" (click)="login()">登录</button>
             </p>
             <p class="login-to-register">

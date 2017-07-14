@@ -10,6 +10,9 @@ import { mainAction } from '../actions';
 import { global,authPayload } from '../../../services/common';
 import * as moment from 'moment';
 import { md5 } from '../../../services/tools';
+import { Util } from '../../../services/util';
+
+let util = new Util();
 
 @Injectable()
 
@@ -25,11 +28,11 @@ export class MainEffect {
         .ofType(mainAction.getSelfInfo)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this,usrInfoObj;
+            let that = this,
             usrInfoObj = global.JIM.getUserInfo({
                 'username' : global.user
             }).onSuccess(function(data) {
-                if(!data.user_info.avatar){
+                if(!data.user_info.avatar || data.user_info.avatar === ''){
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo, 
                         payload: {
@@ -58,10 +61,6 @@ export class MainEffect {
                             show: false
                         }
                     });
-                    that.store$.dispatch({
-                        type: '[index] error api tip',
-                        payload: error
-                    });
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -84,7 +83,7 @@ export class MainEffect {
             let loginOutObj = global.JIM.loginOut();
             return Observable.of(loginOutObj)
                     .map(() => {
-                        this.router.navigate(['/login'])
+                        this.router.navigate(['/login']);
                         return {type: '[main] login out useless'};
                     })
         })
@@ -94,8 +93,8 @@ export class MainEffect {
         .ofType(mainAction.updateSelfInfo)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this;
-            let updateSelfInfo = global.JIM.updateSelfInfo(info)
+            let that = this,
+            updateSelfInfo = global.JIM.updateSelfInfo(info)
                 .onSuccess(function(data) {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
@@ -121,8 +120,8 @@ export class MainEffect {
         .ofType(mainAction.updateSelfAvatar)
         .map(toPayload)
         .switchMap((avatar) => {
-            let that = this;
-            let updateSelfAvatar = global.JIM.updateSelfAvatar({'avatar': avatar.formData})
+            let that = this,
+            updateSelfAvatar = global.JIM.updateSelfAvatar({'avatar': avatar.formData})
                 .onSuccess(function(data) {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
@@ -148,8 +147,8 @@ export class MainEffect {
         .ofType(mainAction.createGroup)
         .map(toPayload)
         .switchMap((groupInfo) => {
-            let that = this;
-            let createGroupObj = global.JIM.createGroup({
+            let that = this,
+            createGroupObj = global.JIM.createGroup({
                 'group_name' :  groupInfo.groupName,
                 'group_description' : groupInfo.groupDescription
             }).onSuccess(function(data) {
@@ -207,8 +206,8 @@ export class MainEffect {
         .ofType(mainAction.addGroupMember)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this;
-            let addGroupMemberObj = global.JIM.addGroupMembers({
+            let that = this,
+            addGroupMemberObj = global.JIM.addGroupMembers({
                 'gid': info.activeGroup.key,
                 'member_usernames': info.memberUsernames
             }).onSuccess(function(data) {
@@ -225,7 +224,7 @@ export class MainEffect {
             });
             return Observable.of(addGroupMemberObj)
                     .map(() => {
-                        return {type: '[main] create group useless'};
+                        return {type: '[main] add group members useless'};
                     });
     })
     // 修改密码
@@ -234,8 +233,8 @@ export class MainEffect {
         .ofType(mainAction.modifyPassword)
         .map(toPayload)
         .switchMap((passwordInfo) => {
-            let that = this;
-            let passwordInfoObj = global.JIM.updateSelfPwd({
+            let that = this,
+            passwordInfoObj = global.JIM.updateSelfPwd({
                 'old_pwd' : md5(passwordInfo.old_pwd),
                 'new_pwd': md5(passwordInfo.new_pwd),
                 'is_md5' : true
@@ -282,8 +281,8 @@ export class MainEffect {
         .ofType(mainAction.createSingleChatAction)
         .map(toPayload)
         .switchMap((singleName) => {
-            let that = this;
-            let createSingleChatObj = global.JIM.getUserInfo({
+            let that = this,
+            createSingleChatObj = global.JIM.getUserInfo({
                 'username' : singleName
             }).onSuccess(function(data) {
                 let user = data.user_info,
@@ -310,10 +309,7 @@ export class MainEffect {
                             payload: item
                         });
                     }).onFail(function(error){
-                        that.store$.dispatch({
-                            type: '[index] error api tip',
-                            payload: error
-                        });
+                        
                     });
                 }
                 that.store$.dispatch({
@@ -323,10 +319,10 @@ export class MainEffect {
             }).onFail(function(error) {
                 if(error.code == 882002){
                     that.store$.dispatch({
-                        type: mainAction.createSingleChatError,
+                        type: mainAction.createSingleChatShow,
                         payload: {
                             show: true,
-                            info: '查无此人'
+                            info: '用户不存在'
                         }
                     })
                 }else{
@@ -348,8 +344,8 @@ export class MainEffect {
         .ofType(mainAction.createGroupSearchAction)
         .map(toPayload)
         .switchMap((keywords) => {
-            let that = this;
-            let createGroupSearchObj = global.JIM.getUserInfo({
+            let that = this,
+            createGroupSearchObj = global.JIM.getUserInfo({
                 'username' : keywords
             }).onSuccess(function(data) {
                 let user = data.user_info,
@@ -374,10 +370,6 @@ export class MainEffect {
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
                             payload: item
-                        });
-                        that.store$.dispatch({
-                            type: '[index] error api tip',
-                            payload: error
                         });
                     });
                 }else{
@@ -410,17 +402,40 @@ export class MainEffect {
         .ofType(mainAction.blackMenu)
         .map(toPayload)
         .switchMap(() => {
-            let that = this;
-            let blackMenuObj = global.JIM.getBlacks()
+            let that = this,
+            blackMenuObj = global.JIM.getBlacks()
             .onSuccess(function(data) {
-                that.store$.dispatch({
-                    type: mainAction.blackMenuSuccess,
-                    payload: {
-                        show: true,
-                        menu: data.black_list
-                    }
-                });
-                console.log('success:' + JSON.stringify(data.black_list));
+                if(data.black_list.length === 0){
+                    that.store$.dispatch({
+                        type: mainAction.blackMenuSuccess,
+                        payload: {
+                            show: true,
+                            menu: data.black_list
+                        }
+                    });
+                    return ;
+                }
+                for(let i=0;i<data.black_list.length;i++){
+                    global.JIM.getResource({'media_id' : data.black_list[i].avatar})
+                    .onSuccess(function(urlInfo){
+                        data.black_list[i].avatarUrl = urlInfo.url;
+                        that.store$.dispatch({
+                            type: mainAction.blackMenuSuccess,
+                            payload: {
+                                show: true,
+                                menu: data.black_list
+                            }
+                        });
+                    }).onFail(function(error){
+                        that.store$.dispatch({
+                            type: mainAction.blackMenuSuccess,
+                            payload: {
+                                show: true,
+                                menu: data.black_list
+                            }
+                        });
+                    });
+                }
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: '[index] error api tip',
@@ -439,8 +454,8 @@ export class MainEffect {
         .ofType(mainAction.delSingleBlack)
         .map(toPayload)
         .switchMap((user) => {
-            let that = this;
-            let delSingleBlackObj = global.JIM.delSingleBlacks({
+            let that = this,
+            delSingleBlackObj = global.JIM.delSingleBlacks({
                 'member_usernames':[{
                     'username': user.username,
                     'appkey': authPayload.appKey
@@ -468,8 +483,8 @@ export class MainEffect {
         .ofType(mainAction.addBlackListAction)
         .map(toPayload)
         .switchMap((active) => {
-            let that = this;
-            let addBlackListObj = global.JIM.addSingleBlacks({
+            let that = this,
+            addBlackListObj = global.JIM.addSingleBlacks({
                 'member_usernames':[{
                     'username': active.name || active.username,
                     'appkey': authPayload.appKey
@@ -515,110 +530,114 @@ export class MainEffect {
         })
         .switchMap((gid) => {
             let that = this,
-                exitGroupObj = global.JIM.exitGroup({'gid': gid})
-                .onSuccess(function(data) {
-                    that.store$.dispatch({
-                        type: mainAction.exitGroupSuccess,
-                        payload: {
-                            tipModal: {
-                                show: false,
-                                info: {
-                                    title: '',
-                                    tip: ''
-                                }
-                            },
-                            item: {
-                                key: gid
+            exitGroupObj = global.JIM.exitGroup({'gid': gid})
+            .onSuccess(function(data) {
+                that.store$.dispatch({
+                    type: mainAction.exitGroupSuccess,
+                    payload: {
+                        tipModal: {
+                            show: false,
+                            info: {
+                                title: '',
+                                tip: ''
                             }
+                        },
+                        item: {
+                            key: gid
                         }
-                    });
-                }).onFail(function(error) {
-                    that.store$.dispatch({
-                        type: '[index] error api tip',
-                        payload: error
-                    });
-                    console.log('error:' + JSON.stringify(error))
+                    }
                 });
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error))
+            });
             return Observable.of(exitGroupObj)
                     .map(() => {
                         return {type: '[main] exit group useless'};
                     })
     })
-    // 退出群聊
+    // 删除群聊成员
     @Effect()
     private deleteMemberAction$: Observable<Action> = this.actions$
         .ofType(mainAction.deleteMemberAction)
         .map(toPayload)
         .switchMap((info) => {
             let that = this,
-                deleteMember = global.JIM.delGroupMembers({
-                    'gid': info.group.key,
-                    'member_usernames': [
-                        {'username': info.deleteItem.username}
-                    ]
-               }).onSuccess(function(data) {
-                  that.store$.dispatch({
-                      type: mainAction.deleteMemberSuccess,
-                      payload: {
-                            tipModal: {
-                                show: false,
-                                info: {
-                                    title: '',
-                                    tip: ''
-                                }
-                            },
-                            deleteItem: info.deleteItem,
-                            group: info.group
-                        }
-                  })
-               }).onFail(function(error) {
-                    that.store$.dispatch({
-                        type: '[index] error api tip',
-                        payload: error
-                    });
-               });
+            deleteMember = global.JIM.delGroupMembers({
+                'gid': info.group.key,
+                'member_usernames': [
+                    {'username': info.deleteItem.username}
+                ]
+            }).onSuccess(function(data) {
+                that.store$.dispatch({
+                    type: mainAction.deleteMemberSuccess,
+                    payload: {
+                        tipModal: {
+                            show: false,
+                            info: {
+                                title: '',
+                                tip: ''
+                            }
+                        },
+                        deleteItem: info.deleteItem,
+                        group: info.group
+                    }
+                })
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+            });
             return Observable.of(deleteMember)
                     .map(() => {
                         return {type: '[main] delete group member useless'};
                     })
     })
-    // 获取黑名单列表
+    // 退出登录后重新登录
     @Effect()
     private login$: Observable<Action> = this.actions$
         .ofType(mainAction.login)
         .map(toPayload)
         .switchMap((val) => {
             let that = this,
-                loginObj = global.JIM.init({
-                    "appkey": authPayload.appKey,
-                    "random_str": authPayload.randomStr,
-                    "signature": authPayload.signature,
-                    "timestamp": authPayload.timestamp,
-                    "flag": authPayload.flag
-                }).onSuccess(function(data) {
-                    global.JIM.login({
-                        'username': val.username,
-                        'password': val.password,
-                        'is_md5': val.md5
-                    })
-                    .onSuccess(function(data) {
-                        
-                    }).onFail(function(error) {
-                        that.store$.dispatch({
-                            type: '[index] error api tip',
-                            payload: error
-                        });
-                    }).onTimeout(function(data) {
-                        console.log('timeout:' + JSON.stringify(data));
-                    });
+            timestamp = new Date().getTime(),
+            signature = util.createSignature(timestamp),
+            loginObj = global.JIM.init({
+                "appkey": authPayload.appKey,
+                "random_str": authPayload.randomStr,
+                "signature": signature,
+                "timestamp": timestamp,
+                "flag": authPayload.flag
+            }).onSuccess(function(data) {
+                global.JIM.login({
+                    'username': val.username,
+                    'password': val.password,
+                    'is_md5': val.md5
+                })
+                .onSuccess(function(data) {
+                    if(val.reload){
+                        window.location.reload();
+                    }
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: '[index] error api tip',
                         payload: error
                     });
                 }).onTimeout(function(data) {
-                    console.log(data)
-                })
+                    console.log('timeout:' + JSON.stringify(data));
+                });
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: '[index] error api tip',
+                    payload: error
+                });
+            }).onTimeout(function(data) {
+                console.log(data)
+            })
             return Observable.of(loginObj)
                     .map(() => {
                         return {type: '[main] login useless'};

@@ -124,15 +124,16 @@ export class CreateGroupComponent implements OnInit {
         });
     }
     private changeCheckedEmit(item){
-        if(!item.checked){
-            this.selectList.push(item);
-        }else{
-            for(let i=0;i<this.selectList.length;i++){
-                if(Number(item.key) === Number(this.selectList[i].key)){
-                    this.selectList.splice(i, 1);
-                    break;
-                }
+        let flag = true;
+        for(let i=0;i<this.selectList.length;i++){
+            if(Number(item.key) === Number(this.selectList[i].key)){
+                flag = false;
+                this.selectList.splice(i, 1);
+                break;
             }
+        }
+        if(flag){
+            this.selectList.push(item);
         }
         for(let i=0;i<this.createGroup.list.length;i++){
             if(!this.createGroup.list[i].allGroup){
@@ -183,7 +184,7 @@ export class CreateGroupComponent implements OnInit {
             groupInfo.activeGroup = this.createGroup.info.activeGroup;
         }else if(this.createGroup.info.action && this.createGroup.info.action === 'many'){
             groupInfo.groupName = this.createGroup.info.selfInfo.nickname || this.createGroup.info.selfInfo.username;
-            for(let i=0;i<this.selectList.length;i++){
+            for(let i=0;i<this.selectList.length && i<5;i++){
                 let name;
                 if(this.selectList[i].nickName && this.selectList[i].nickName !== ''){
                     name = this.selectList[i].nickName;
@@ -196,6 +197,7 @@ export class CreateGroupComponent implements OnInit {
                 }
                 groupInfo.groupName += '、' + name;
             }
+            groupInfo.groupName = groupInfo.groupName.substr(0, 20);
         }
         this.isCreateGroup.emit(groupInfo);
     }
@@ -245,5 +247,17 @@ export class CreateGroupComponent implements OnInit {
                 }
             }
         }
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight > event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
+    }
+    private emptyTip(){
+        this.nameTip = false;
     }
 }

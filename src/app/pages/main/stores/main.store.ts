@@ -23,7 +23,10 @@ export interface MainStore{
     };
     actionType: string;
     tipModal: object;
-    createSingleChat: object;
+    createSingleChat: {
+        show: boolean,
+        info :string
+    };
     blackMenu: {
         menu: Array<any>;
         show: boolean;
@@ -32,4 +35,11 @@ export interface MainStore{
         info: object;
     };
     errorApiTip: object;
+    logoutKick: {
+        show: boolean,
+        info: {
+            title: string,
+            tip: string
+        }
+    }
 }

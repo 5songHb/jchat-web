@@ -1,4 +1,5 @@
-import { pinyin } from '../tools';
+import { pinyin, md5 } from '../tools';
+import { authPayload } from '../common';
 
 declare let BMap;
 
@@ -103,7 +104,7 @@ export class Util {
      */
     
     insertAtCursor (field, value, selectPastedContent) {
-        var sel, range;
+        let sel, range;
         // if (field.nodeName == 'PRE') {
             field.focus();
             if (window.getSelection) {
@@ -111,13 +112,13 @@ export class Util {
                 if (sel.getRangeAt && sel.rangeCount) {
                     range = sel.getRangeAt(0);
                     range.deleteContents();
-                    var el = document.createElement('div');
+                    let el = document.createElement('div');
                     el.innerHTML = value;
-                    var frag = document.createDocumentFragment(), node, lastNode;
+                    let frag = document.createDocumentFragment(), node, lastNode;
                     while ((node = el.firstChild)) {
                         lastNode = frag.appendChild(node);
                     }
-                    var firstNode = frag.firstChild;
+                    let firstNode = frag.firstChild;
                     range.insertNode(frag);
 
                     if (lastNode) {
@@ -134,7 +135,7 @@ export class Util {
                 }
             }
             //  else if ((sel = document.selection) && sel.type !== 'Control') {
-            //     var originalRange = sel.createRange();
+            //     let originalRange = sel.createRange();
             //     originalRange.collapse(true);
             //     sel.createRange().pasteHTML(html);
             //     if (selectPastedContent) {
@@ -151,9 +152,9 @@ export class Util {
         //         sel.select();
         //     }
         //     else if (field.selectionStart || field.selectionStart === 0) {
-        //         var startPos = field.selectionStart;
-        //         var endPos = field.selectionEnd;
-        //         var restoreTop = field.scrollTop;
+        //         let startPos = field.selectionStart;
+        //         let endPos = field.selectionEnd;
+        //         let restoreTop = field.scrollTop;
         //         field.value = field.value.substring(0, startPos) + value + field.value.substring(endPos, field.value.length);
         //         if (restoreTop > 0) {
         //             field.scrollTop = restoreTop;
@@ -172,19 +173,20 @@ export class Util {
      * params obj: object  输入框dom对象
      */
     focusLast(obj) {
-        // if (window.getSelection) {//ie11 10 9 ff safari
-            // obj.focus(); //解决ff不获取焦点无法定位问题
-            var range = window.getSelection();//创建range
-            range.selectAllChildren(obj);//range 选择obj下所有子内容
-            range.collapseToEnd();//光标移至最后
-        // }
-        // else if (document.selection) {//ie10 9 8 7 6 5
-        //     var range = document.selection.createRange();//创建选择对象
-        //     //var range = document.body.createTextRange();
+        // if (document.selection) {//ie10 9 8 7 6 5
+        //     let range = document.selection.createRange();//创建选择对象
+        //     //let range = document.body.createTextRange();
         //     range.moveToElementText(obj);//range定位到obj
         //     range.collapse(false);//光标移至最后
         //     range.select();
-        // }
+        // }else 
+        if (window.getSelection) {//ie11 10 9 ff safari
+            obj.focus(); //解决ff不获取焦点无法定位问题
+            let range = window.getSelection();//创建range
+            range.selectAllChildren(obj);//range 选择obj下所有子内容
+            // range.collapseToEnd();//光标移至最后
+            range.collapse(obj, obj.childNodes.length);
+        }
     }
     /**
      * 判断字符串首字母是否是中文
@@ -205,7 +207,7 @@ export class Util {
         let letter = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
             result = [],
             defaultResult = {
-                letter: 'unknow',
+                letter: '#',
                 data: []
             },
             flag = false;
@@ -215,7 +217,7 @@ export class Util {
                 data: []
             }
             for(let i=0;i<payload.length;i++){
-                let name = payload[i].name,
+                let name = (payload[i].nickName && payload[i].nickName !== '') ? payload[i].nickName : payload[i].name,
                     firstLetter = name.charAt(0);
                 if(name === '' && j === 0)
                     defaultResult.data.push(payload[i]);
@@ -245,8 +247,8 @@ export class Util {
      * return 插入元素之后的数组array
      */
     insertSortByLetter(arr, payload){
-        let name = payload.name,
-            firstLetter = payload.name.charAt(0);
+        let name = (payload.nickName && payload.nickName !== '') ? payload.nickName : payload.name,
+            firstLetter = name.charAt(0);
         if(name.match(/^[a-zA-Z]/)){
             firstLetter = firstLetter.toUpperCase();
         }else if(this.firstLetterIsChinese(name)){
@@ -254,6 +256,8 @@ export class Util {
                 style: pinyin.STYLE_NORMAL
             });
             firstLetter = py[0][0].charAt(0).toUpperCase();
+        }else{
+            firstLetter = '#';
         }
         for(let i=0;i<arr.length;i++){
             if(arr[i].letter === firstLetter){
@@ -270,8 +274,8 @@ export class Util {
      */
     theLocation(obj){
         // 百度地图API功能
-        let point = new BMap.Point(obj.longitude, obj.latitude);
-	    let map = new BMap.Map(obj.id);
+        let point = new BMap.Point(obj.longitude, obj.latitude),
+            map = new BMap.Map(obj.id);
         map.centerAndZoom(point,13);
         if(obj.scroll){
             map.enableScrollWheelZoom(true);
@@ -317,5 +321,13 @@ export class Util {
         }else if(gapDate <= 0){
             return 'today';
         }
+    }
+    /**
+     * 生成JIM初始化的签名
+     * params timestamp: 当前的时间毫秒数
+     * return string 签名
+     */
+    createSignature(timestamp : number){
+        return md5(`appkey=${authPayload.appKey}&timestamp=${timestamp}&random_str=${authPayload.randomStr}&key=${authPayload.masterkey}`);
     }
 }

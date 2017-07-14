@@ -92,16 +92,12 @@
             color: #2C2C2C;
             .create-group-avatar{
                 width: 30px;
-                height: 100%;
-                margin-right: 10px;
-                img{
-                    width: 100%;
-                    vertical-align: middle;
-                }
+                height: 30px;
+                margin: 10px 10px 0 0;
+                overflow: hidden;
             }
             .create-group-select-label{
                 position: relative;
-                cursor: pointer;
                 width: 24px;
                 height: 24px;
                 margin-top: 13px;
@@ -115,6 +111,7 @@
                     background: #fff url(../../../assets/images/select-member-normal.png) center center no-repeat;
                     background-size: 24px;
                     border-radius: 12px;
+                    cursor: pointer;                    
                 }
                 input:checked + b{
                     background-image: url(../../../assets/images/select-member-active.png);

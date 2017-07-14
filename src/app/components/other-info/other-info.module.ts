@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { OtherInfoComponent } from './other-info.component';
 import { HoverTipModule } from '../hover-tip';
 import { HoverEventModule } from '../../directives';
+import { EllipsisPipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { HoverEventModule } from '../../directives';
     CommonModule,
     FormsModule,
     HoverTipModule,
-    HoverEventModule
+    HoverEventModule,
+    EllipsisPipeModule
   ],
   exports: [
       OtherInfoComponent

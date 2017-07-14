@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 
 import { SelfInfoComponent } from './self-info.component';
 import { SelectModule } from '../select';
+import { EllipsisPipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { SelectModule } from '../select';
   imports: [
     CommonModule,
     FormsModule,
-    SelectModule
+    SelectModule,
+    EllipsisPipeModule
   ],
   exports: [
       SelfInfoComponent

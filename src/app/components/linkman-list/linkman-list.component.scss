@@ -16,6 +16,7 @@
         text-align: center;
         color: #808080;
         font-size: 14px;
+        opacity: 0.4;
     }
    .linkman-list-letter{
        padding-left: 25px;       
@@ -41,13 +42,16 @@
        padding-left: 18px;       
        cursor: pointer;
        line-height: 50px;
-       height: 50px;
        color: #2c2c2c;
        font-size: 14px;
        .linkman-list-avatar{
            width: 30px;
            height: 30px;
            margin: 10px 10px 0 0;
+           overflow: hidden;
+           .group-avatar{
+               width: 100%;
+           }
        }
        &:hover{
            background-color: #F3F7FB !important;

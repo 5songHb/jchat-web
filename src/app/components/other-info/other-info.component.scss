@@ -20,9 +20,7 @@
             width: 60px;
             height: 60px;
             margin: 0 auto;
-            img{
-                width: 100%;
-            }
+            overflow: hidden;
         }
         .other-info-avatar-username{
             line-height: 26px;
@@ -31,6 +29,7 @@
             color: #0B1816;
             text-align: center;
             .self-info-blacklist-icon{
+                margin-left: 6px;
                 display: inline-block;
                 width: 16px;
                 height: 18px;

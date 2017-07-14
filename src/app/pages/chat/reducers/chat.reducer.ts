@@ -42,12 +42,12 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             }
             break;
             // 接收消息
-        case chatAction.receiveMessage:
+        case chatAction.receiveMessageSuccess:
             addMessage(state, payload);
             let newMsgKey = [];
             for(let i=0;i<payload.messages.length;i++){
                 newMsgKey.push({
-                    key: payload.messages[i].from_uid || payload.messages[i].from_gid
+                    key: payload.messages[i].from_gid || payload.messages[i].from_uid
                 })
             }
             state.msgId = filterMsgId(state, 'update', newMsgKey);
@@ -83,6 +83,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.changeActivePerson:
             // 更换当前会话用户
+            clearTimer(state);
             state.activePerson = payload.item;
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
             emptyUnreadNum(state, payload.item);
@@ -93,6 +94,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             
         case mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
+            clearTimer(state);
             state.activePerson = payload;
             selectUserResult(state, payload);
             changeActivePerson(state);            
@@ -102,6 +104,11 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 删除本地会话列表
         case chatAction.deleteConversationItem:
             deleteConversationItem(state, payload);
+            if(state.activePerson.activeIndex >= 0){
+                if(state.messageList[state.activePerson.activeIndex].groupSetting){
+                    state.messageList[state.activePerson.activeIndex].groupSetting.show = false;
+                }
+            }      
             break;
         case chatAction.getResourceUrl:
             // 获取静态资源路径
@@ -109,7 +116,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 保存草稿
         case chatAction.saveDraft:
-            state.messageList[payload[1].activeIndex].draft = payload[0];
+            if(state.messageList[payload[1].activeIndex])
+                state.messageList[payload[1].activeIndex].draft = payload[0];
             for(let i=0;i<state.conversation.length;i++){
                 if(Number(payload[1].key) === Number(state.conversation[i].key)){
                     state.conversation[i].draft = payload[0];
@@ -154,6 +162,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.otherInfo.show = true;
             break;
         case mainAction.createGroupSuccess:
+            clearTimer(state);
             state.activePerson = payload;
             state.defaultPanelIsShow = false;
             selectUserResult(state, payload);
@@ -161,6 +170,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.groupList.push(payload);
             break;
         case chatAction.createOtherChat:
+            clearTimer(state);
             if(payload.username){
                 payload.name = payload.username;
             }
@@ -188,6 +198,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                     break;
                 }
             }
+            state.activePerson.activeIndex = -1;
             break;
         case mainAction.addBlackListSuccess:
             deleteConversationItem(state, payload.deleteItem);
@@ -207,8 +218,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.groupName:
             state.activePerson.name = state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo.name = payload.name;
+            updateGroupName(state, payload);
             break;
-        // 成功获取个人信息
         case mainAction.showSelfInfo:
             // 获取个人信息成功
             if (payload.info) {
@@ -251,6 +262,33 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     }
     return state;
 };
+function updateGroupName(state, payload){
+    for(let i=0;i<state.groupList.length;i++){
+        if(Number(payload.gid) === Number(state.groupList[i].gid)){
+            state.groupList[i].name = payload.name;
+            break;
+        }
+    }
+}
+// 切换用户前清除语音的定时器
+function clearTimer(state: ChatStore){
+    if(state.activePerson.activeIndex < 0){
+        return;
+    }
+    let msg = state.messageList[state.activePerson.activeIndex].msgs;
+    for(let i=0;i<msg.length;i++){
+        if(msg[i].content.msg_type === 'voice' && msg[i].content.timer1){
+            clearInterval(msg[i].content.timer1);
+            clearInterval(msg[i].content.timer2);
+            clearInterval(msg[i].content.timer3);
+            msg[i].content.playing = {
+                single: true,
+                double: true,
+                max: true
+            }
+        }
+    }
+}
 // 被添加进群的事件
 function addGroupMembersEvent(state: ChatStore, payload){
     let flag = true;
@@ -260,7 +298,7 @@ function addGroupMembersEvent(state: ChatStore, payload){
             break;
         }
     }
-    if(flag === false){
+    if(!flag){
         let conversation = {
             key: payload.gid,
             name: payload.name,
@@ -295,7 +333,7 @@ function completionMessageList(state: ChatStore){
                 break;
             }
         }
-        if(flag === false){
+        if(!flag){
             state.messageList.push({
                 key: state.conversation[i].key,
                 msgs: []
@@ -314,12 +352,14 @@ function addGroupShield(state: ChatStore, shield){
     }
 }
 function filterImageViewer(state: ChatStore){
-    if(state.activePerson.activeIndex < 0){
+    let messageList = state.messageList[state.activePerson.activeIndex];
+    if(state.activePerson.activeIndex < 0 || !messageList || !messageList.msgs){
         return [];
     }
-    let imgResult = [];
-    for(let j=0;j<state.messageList[state.activePerson.activeIndex].msgs.length;j++){
-        let content = state.messageList[state.activePerson.activeIndex].msgs[j].content;
+    let imgResult = [],
+        msgs = messageList.msgs;
+    for(let j=0;j<msgs.length;j++){
+        let content = msgs[j].content;
         if(content.msg_type === 'image' && (!content.msg_body.extras || !content.msg_body.extras.kLargeEmoticon ||   content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon')){
             imgResult.push({
                 src: content.msg_body.media_url,
@@ -467,11 +507,18 @@ function unreadNum(state: ChatStore, payload){
         for(let i=0;i<payload.msgId.length;i++){
             if(Number(state.messageList[a].key) === Number(payload.msgId[i].key)){
                 flag = true;
+                let idFlag = false;
                 for(let j=0;j<state.messageList[a].msgs.length;j++){
                     if(Number(state.messageList[a].msgs[j].msg_id) === Number(payload.msgId[i].msgId)){
-                        let unreadNum = state.messageList[a].msgs.length - 1 - j;
+                        idFlag = true;
+                        let unreadNum = 0;
+                        for(let c=j + 1;c<state.messageList[a].msgs.length;c++){
+                            if(state.messageList[a].msgs[c].content.from_id !== global.user){
+                                unreadNum ++;
+                            }
+                        }
                         for(let b=0;b<state.conversation.length;b++){
-                            if(state.messageList[a].key == state.conversation[b].key){
+                            if(Number(state.messageList[a].key) === Number(state.conversation[b].key)){
                                 state.conversation[b].unreadNum = unreadNum;
                                 break;
                             }
@@ -479,11 +526,26 @@ function unreadNum(state: ChatStore, payload){
                         break;
                     }
                 }
+                // 当localstorage里面存储该会话人，但是没有储存对应的msgId
+                if(!idFlag){
+                    let unreadNum = 0;
+                    for(let c=0;c<state.messageList[a].msgs.length;c++){
+                        if(state.messageList[a].msgs[c].content.from_id !== global.user){
+                            unreadNum ++;
+                        }
+                    }
+                    for(let b=0;b<state.conversation.length;b++){
+                        if(Number(state.messageList[a].key) === Number(state.conversation[b].key)){
+                            state.conversation[b].unreadNum = unreadNum;
+                            break;
+                        }
+                    }
+                }
                 break;
             }
         }
         // 当localstorage里面没有存储该会话人的msgId
-        if(flag === false){
+        if(!flag){
             for(let b=0;b<state.conversation.length;b++){
                 if(Number(state.messageList[a].key) === Number(state.conversation[b].key)){
                     state.conversation[b].unreadNum = state.messageList[a].msgs.length;
@@ -520,6 +582,7 @@ function deleteConversationItem(state: ChatStore, payload){
     }
     if(Number(payload.item.key) === Number(state.activePerson.key)){
         state.defaultPanelIsShow = true;
+        state.activePerson.activeIndex = -1;        
     }
 }
 // 添加消息到消息面板
@@ -613,7 +676,6 @@ function addMessage(state: ChatStore, payload){
                     }
                     msgs.push(payload.messages[j]);
                     state.newMessage = payload.messages[j];
-                    flag = true;
                     break;
                 }
             }
@@ -630,6 +692,7 @@ function addMessage(state: ChatStore, payload){
                             state.conversation[a].unreadNum ++;
                         }
                     }
+                    flag = true;                    
                     let item = state.conversation.splice(a,1);
                     state.conversation.unshift(item[0]);
                     payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].ctime_ms);
@@ -655,7 +718,8 @@ function addMessage(state: ChatStore, payload){
                         mtime: payload.messages[j].ctime_ms,
                         name: payload.messages[j].content.from_id,
                         nickName: payload.messages[j].content.from_name,
-                        type: 3
+                        type: 3,
+                        unreadNum: 1
                     }
                 }else{
                     msg = {
@@ -713,8 +777,8 @@ function searchUser(state: ChatStore, payload){
     let singleArr = [],
         groupArr = [];
     for(let i=0;i<state.conversation.length;i++){
-        let existNickName = state.conversation[i].nickName && state.conversation[i].nickName.toLowerCase().indexOf(payload.toLowerCase()) != -1;
-        let existName = state.conversation[i].name && state.conversation[i].name.toLowerCase().indexOf(payload.toLowerCase()) != -1;
+        let existNickName = state.conversation[i].nickName && state.conversation[i].nickName.toLowerCase().indexOf(payload.toLowerCase()) !== -1;
+        let existName = state.conversation[i].name && state.conversation[i].name.toLowerCase().indexOf(payload.toLowerCase()) !== -1;
         let existSingle = state.conversation[i].type === 3;
         if(existSingle && existNickName){
             state.conversation[i].existNickName = true;
@@ -725,7 +789,7 @@ function searchUser(state: ChatStore, payload){
         }
     }
     for(let i=0;i<state.groupList.length;i++){
-        let existGroup = (state.groupList[i].name.toLowerCase().indexOf(payload.toLowerCase()) != -1);
+        let existGroup = (state.groupList[i].name.toLowerCase().indexOf(payload.toLowerCase()) !== -1);
         if(existGroup){
             groupArr.push(state.groupList[i]);
         }
@@ -753,7 +817,7 @@ function selectUserResult(state, payload){
             break;
         }
     }
-    if(flag === false){
+    if(!flag){
         conversation.unshift(payload);
         state.messageList.push({
             key: payload.key,

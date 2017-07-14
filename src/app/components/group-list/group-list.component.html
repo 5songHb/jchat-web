@@ -5,7 +5,9 @@
         <div *ngFor="let item of groupList">
             <div *ngIf="item.data.length > 0" class="group-list-letter">{{item.letter}}</div>
             <div *ngFor="let data of item.data" class="group-list-name display-flex" (click)="selectGroupItem(data)">
-                <img [src]="data.avatar" (error)="avatarErrorIcon($event)" class="group-list-avatar" alt="">
+                <div class="group-list-avatar">
+                    <img [src]="data.avatar" (error)="avatarErrorIcon($event)" alt="">
+                </div>
                 <span class="flex-1">{{data.name}}</span>
             </div>
         </div>

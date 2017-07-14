@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { indexAction } from './actions';
 import { global } from '../../services/common/global';
 import '../../../assets/static/js/jmessage-sdk-web.2.3.0.1.min.js';
-declare function JMessage(): void;
+declare function JMessage(obj): void;
 
 @Component({
     selector: 'my-app',
@@ -21,15 +21,12 @@ export class AppComponent implements OnInit, OnDestroy {
     ){}
     ngOnInit(){
         // 创建JIM 对象
-        global.JIM = new JMessage();
-        //异常断线监听
-        global.JIM.onDisconnect(function(){
-            console.log("【disconnect】");
-        });
+        global.JIM = new JMessage({debug:true});
         this.indexStream$ = this.store$.select((state) => {
             let indexState = state['indexReducer'];
             switch(indexState.actionType){
                 case indexAction.errorApiTip:
+                    console.log('errorAipTip', indexState.errorApiTip);
                     this.errorApiTip(indexState.errorApiTip);
                     break;
                 case indexAction.tipModal:
@@ -222,6 +219,9 @@ export class AppComponent implements OnInit, OnDestroy {
             case 882005:
                 tip = '系统繁忙，稍后重试';
                 break;
+            case 898000:
+                tip = '服务器内部错误';
+                break;
             default:
                 tip = '操作失败';
         }
@@ -232,7 +232,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 info: {
                     title: '操作失败',
                     tip,
-                    actionType: '[main] error api tip',
+                    actionType: '[login] error api tip show',
                     success: 2
                 }
             }

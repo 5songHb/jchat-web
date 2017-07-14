@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, ViewChild, OnChanges, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, ViewChild, HostListener, ElementRef, DoCheck } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
@@ -22,7 +22,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     ]
 })
 
-export class GroupSettingComponent implements OnInit, OnChanges {
+export class GroupSettingComponent implements OnInit, DoCheck {
     @ViewChild(PerfectScrollbarComponent) componentScroll;
     @ViewChild(PerfectScrollbarDirective) directiveScroll;
 
@@ -63,6 +63,7 @@ export class GroupSettingComponent implements OnInit, OnChanges {
     };
     private modifyGroupNameShow = false;
     private dec = '';
+    private listTop = 203;
     constructor(
         private store$: Store<AppStore>,
         private elementRef: ElementRef
@@ -77,8 +78,16 @@ export class GroupSettingComponent implements OnInit, OnChanges {
     @HostListener('window:click') onWindowClick(){
         this.groupSetting.show = false;
         this.settingAnimate = 'void';
+        this.searchResult.result = [];
+        this.searchResult.show = false;
+        this.elementRef.nativeElement.querySelector('#' + this.searchResult.id).value = '';
     }
-    public ngOnChanges(){
+    ngDoCheck(){
+        // 修改群描述时，调整群成员列表的位置
+        let header = this.elementRef.nativeElement.querySelector('#groupSettingHeader');          
+        if(header){
+            this.listTop = header.offsetHeight;
+        }
         if(this.groupSetting.show){
             this.settingAnimate = 'in';
         }else{
@@ -114,9 +123,7 @@ export class GroupSettingComponent implements OnInit, OnChanges {
     }
     private closeGroupSettingAction(){
         this.settingAnimate = 'void';
-        setTimeout(function(){
-            this.closeGroupSetting.emit();
-        }.bind(this),200);
+        this.closeGroupSetting.emit();
     }
     private exitGroupAction(){
         this.exitGroup.emit(this.groupSetting.groupInfo);
@@ -161,5 +168,14 @@ export class GroupSettingComponent implements OnInit, OnChanges {
     }
     private deleteMemberAction(item){
         this.deleteMember.emit(item);
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight > event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
     }
 }

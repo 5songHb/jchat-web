@@ -4,6 +4,7 @@
     text-align: center;
     color: #808080;
     font-size: 14px;
+    opacity: 0.4;
 }
 .conversation-container{
     width: 100%;
@@ -28,10 +29,16 @@
             }
             .conversation-avatar{
                 width: 40px;
+                height: 40px;
                 position: relative;
                 margin-right: 9px;
-                img{
-                    width: 100%;                  
+                >div{
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                    .group-avatar{
+                        width: 100%;
+                    }
                 }
                 .conversation-unreadNum{
                     position: absolute;
@@ -66,9 +73,14 @@
                 text-overflow: ellipsis;
             }
             .conversation-draft{
-                line-height: 17px;
+                line-height: 18px;
                 font-size: 12px;
                 color: #EB424C;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 170px;
+                height: 18px;
                 span{
                     color: #999;
                 }
@@ -101,10 +113,12 @@
             .conversation-recentMsg{
                 font-size: 12px;
                 color: #999;
-                line-height: 17px;
+                line-height: 18px;
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                width: 170px;
+                height: 18px;
             }
         }
     }

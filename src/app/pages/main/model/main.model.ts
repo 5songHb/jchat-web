@@ -37,5 +37,12 @@ export const mainInit = {
     createGroupSearch: {
         info: null
     },
-    errorApiTip: {}
+    errorApiTip: {},
+    logoutKick: {
+        show: false,
+        info: {
+            title: '',
+            tip: ''
+        }
+    } 
 }

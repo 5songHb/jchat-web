@@ -3,7 +3,7 @@
         <span class="modal-close" (click)="otherClose()"></span>
         <div class="other-info-avatar">
             <div class="other-info-show-avatar">
-                <img [src]="otherInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                <img (load)="avatarLoad($event)" [src]="otherInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
             </div>
             <div class="other-info-avatar-username">
                 {{otherInfo.nickname ? otherInfo.nickname : otherInfo.username}}
@@ -12,7 +12,7 @@
                 </div>
             </div>
             <p class="other-info-signature">
-                <span>{{otherInfo.signature ? otherInfo.signature : '暂无签名'}}</span>
+                <span [title]="otherInfo.signature ? otherInfo.signature : '暂无签名'">{{otherInfo.signature ? (otherInfo.signature | ellipsis: 32) : '暂无签名'}}</span>
             </p>
         </div>
         <p class="other-info-p display-flex">

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, DoCheck } from '@angular/core';
 const avatarErrorIcon = require('../../../assets/images/group-avatar.png');
 
 @Component({
@@ -7,7 +7,7 @@ const avatarErrorIcon = require('../../../assets/images/group-avatar.png');
     styleUrls: ['./group-list.component.scss']
 })
 
-export class GroupListComponent implements OnInit, OnChanges {
+export class GroupListComponent implements OnInit, DoCheck {
     @Input()
         private groupList;
     @Output()
@@ -21,7 +21,7 @@ export class GroupListComponent implements OnInit, OnChanges {
             this.groupList = [];
         }
     }
-    ngOnChanges(){
+    ngDoCheck(){
         for(let i=0;i<this.groupList.length;i++){
             if(this.groupList[i].data.length > 0){
                 this.isEmpty = true;

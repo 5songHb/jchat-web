@@ -37,13 +37,16 @@ export class SearchMemberComponent implements OnInit {
         Observable.fromEvent(this.fileDom, "keyup")
             .debounceTime(200)
             .subscribe((event:any) => {
-                this.searchKeyup.emit(event.target.value);
+                if(event.keyCode !== 13)
+                    this.searchKeyup.emit(event.target.value);
             });
     }
     private avatarErrorIcon(event){
         event.target.src = avatarErrorIcon;
     }
     private searchItemAction(item){
+        if(!this.searchResult.checkbox)
+            this.searchKeyword = '';
         this.searchItem.emit(item);
     }
     private clearInputAction(){
@@ -52,10 +55,19 @@ export class SearchMemberComponent implements OnInit {
         this.clearInput.emit();
     }
     private searchBtnAction(){
-        this.searchBtn.emit(this.searchKeyword);
+        if(this.searchKeyword.length > 0 && this.searchResult.checkbox)
+            this.searchBtn.emit(this.searchKeyword);
     }
     private changeCheckedAction(input, item){
-        console.log(666, input.checked, item.checked)
         this.changeChecked.emit(item);
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight > event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
     }
 }

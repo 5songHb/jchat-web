@@ -120,4 +120,13 @@ export class SelfInfoComponent implements OnChanges {
     private toEdit(){
         this.isEdit = true;
     }
+    private avatarLoad(event){
+        if(event.target.naturalHeight >= event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
+    }
 }

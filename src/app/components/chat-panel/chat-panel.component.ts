@@ -18,7 +18,7 @@ declare let Emoji;
     styleUrls: ['./chat-panel.component.scss']
 })
 
-export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
+export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnChanges{
     private util: Util = new Util();
     @ViewChild(PerfectScrollbarComponent) componentScroll;
     @Input()
@@ -97,12 +97,23 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     ngOnInit(){
         this.subscribeStore();
-        if(!this.messageList[this.active.activeIndex].draft){
-            this.messageList[this.active.activeIndex].draft = '';
+        // if(!this.messageList[this.active.activeIndex].draft){
+        //     this.messageList[this.active.activeIndex].draft = '';
+        // }
+    }
+    ngOnChanges(){
+        if(!this.messageList || this.messageList.length === 0){
+            this.messageList = [{
+                draft: ''
+            }];
+        }
+        if(!this.active.activeIndex){
+            this.active.activeIndex = 0;
         }
     }
     @HostListener('window:click') onClickWindow(){
         this.inputToLast = true;
+        this.inputNoBlur = true;
     }
     private subscribeStore(){
         this.chatStream$ = this.store$.select((state) => {
@@ -116,13 +127,15 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private stateChanged(chatState){
         console.log('chat-panel',chatState.actionType);
         switch(chatState.actionType){
-            case chatAction.receiveMessage:
+            case chatAction.receiveMessageSuccess:
                 // this.msg.push(chatState.newMessage);
-                let msg = this.messageList[chatState.activePerson.activeIndex].msgs;
-                if(msg.length > 20){
-                    this.msg = msg.slice(msg.length - this.msg.length);
-                }else{
-                    this.msg = msg;
+                if(chatState.activePerson.activeIndex !== -1 && chatState.activePerson.activeIndex === this.active.activeIndex){
+                    let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                    if(msg.length > 20){
+                        this.msg = msg.slice(msg.length - this.msg.length);
+                    }else{
+                        this.msg = msg;
+                    }
                 }
                 // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
@@ -130,15 +143,29 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
-                let msgs = this.messageList[chatState.activePerson.activeIndex].msgs;
-                if(msgs.length > 20){
-                    this.msg = msgs.slice(msgs.length - 20);
-                }else{
-                    this.msg = msgs;
-                }
+                this.messageList = chatState.messageList;
+                // let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                // if(msgs.length > 20){
+                //     this.msg = msgs.slice(msgs.length - 20);
+                // }else{
+                //     this.msg = msgs;
+                // }
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
                 this.voiceState = chatState.voiceState;
+                let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                if(message && this.msg.length <= 20 && message.length > 20){
+                    this.msg = message.slice(message.length - 20);
+                }else if(message && this.msg.length <= 20 && message.length < 20){
+                    this.msg = message;                
+                }
+                setTimeout(function(){
+                    this.allPointerToMap(true);
+                    this.componentScroll.update();
+                    this.componentScroll.scrollToBottom();
+                    this.contentDiv.focus();
+                    this.util.focusLast(this.contentDiv);
+                }.bind(this), 200);
                 break;
             case chatAction.sendGroupFile:
 
@@ -176,11 +203,18 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             case contactAction.selectContactItem:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
+                let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                if(msg && this.msg.length <= 20 && msg.length > 20){
+                    this.msg = msg.slice(msg.length - 20);
+                }else if(msg && this.msg.length <= 20 && msg.length < 20){
+                    this.msg = msg;                
+                }
                 setTimeout(function(){
                     this.allPointerToMap(true);
                     this.componentScroll.update();
                     this.componentScroll.scrollToBottom();
                     this.contentDiv.focus();
+                    this.util.focusLast(this.contentDiv);
                 }.bind(this), 200);
                 this.imageViewer.result = chatState.imageViewer;
                 break;
@@ -241,26 +275,29 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
     }
     ngDoCheck(){
-        if(!this.change && this.active.change || this.active.change !== this.change){
-            this.componentScroll.update();
-            this.componentScroll.scrollToBottom();
-            let msgs = this.messageList[this.active.activeIndex].msgs;
-            if(this.msg.length <= 20 && msgs.length > 20){
-                this.msg = msgs.slice(msgs.length - 20);
-            }else if(this.msg.length <= 20 && msgs.length < 20){
-                this.msg = msgs;                
-            }
-            setTimeout(function(){
-                this.change = this.active.change;
-                this.contentDiv.focus();
-                this.util.focusLast(this.contentDiv);
-            }.bind(this),150);
-        }
+        console.log(777777, this.active.change, this.change);
+        // if((!this.change && this.active.change) || this.active.change !== this.change){
+        //     this.componentScroll.update();
+        //     this.componentScroll.scrollToBottom();
+        //     let msgs = this.messageList[this.active.activeIndex].msgs;
+        //     if(msgs && this.msg.length <= 20 && msgs.length > 20){
+        //         this.msg = msgs.slice(msgs.length - 20);
+        //     }else if(msgs && this.msg.length <= 20 && msgs.length < 20){
+        //         this.msg = msgs;                
+        //     }
+        //     setTimeout(function(){
+        //         this.change = this.active.change;
+        //         this.contentDiv.focus();
+        //         this.util.focusLast(this.contentDiv);
+        //     }.bind(this),150);
+        // }
     }
     private sendMsgAction(){
-        let draft = this.messageList[this.active.activeIndex].draft;
+        let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
         if(draft){
             draft = draft.replace(/^(<br>){1,}$/g,'');
+            draft = draft.replace(/&nbsp;/g,' ');
+            draft = draft.replace(/<br>/g, '\n');
             let imgReg = new RegExp(`<img.{1,}?${imgRouter}.{1,}?\.png">`, 'g');
             if(draft.match(imgReg)){
                 let arr = draft.match(imgReg);
@@ -278,19 +315,15 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             this.messageList[this.active.activeIndex].draft = '';
             this.flag = true;
             this.contentDiv.innerHTML = '';
-        }   
+        }
     }
     private sendPicAction(event){
         let pic = this.elementRef.nativeElement.querySelector('#sendPic'),
             img = this.util.getFileFormData(pic);
         this.sendPic.emit(img);
         event.target.value = '';
-        this.inputNoBlur = true;
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
-    }
-    private inputNoBlurAction(){
-        this.inputNoBlur = false;
     }
     private sendFileAction(event){
         let fileData = this.elementRef.nativeElement.querySelector('#sendFile'),
@@ -300,7 +333,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             fileData: this.elementRef.nativeElement.querySelector('#sendFile').files[0]
         });
         event.target.value = '';
-        this.inputNoBlur = true;
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
     }
@@ -308,17 +340,16 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         let active = Object.assign({}, this.active, {}),
             value = event.target.innerHTML;
         value = value.replace(/^<br>?/, '');
-        if(value !== '' && value !== '<br>'){
-            setTimeout(function(){
-                if(this.inputNoBlur){
-                    if(this.flag === true){
-                        value = '';
-                        this.flag = false;
-                    }
-                    this.saveDraft.emit([value,active]);
+        // 防止点击发送的时候或者点击emoji的时候触发保存草稿
+        setTimeout(function(){
+            if(this.inputNoBlur){
+                if(this.flag === true){
+                    value = '';
+                    this.flag = false;
                 }
-            }.bind(this),200);
-        }
+                this.saveDraft.emit([value, active]);
+            }
+        }.bind(this), 200);
     }
     private msgContentFocus(){
         this.flag = false;
@@ -345,12 +376,14 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
         this.emojiInfo.content = this.messageList[this.active.activeIndex];
         if(this.emojiInfo.show === true){
             this.emojiInfo.show = false;
+            setTimeout(function(){
+                this.inputNoBlur = true;
+            }.bind(this), 200);
         }else{
-            this.emojiInfo.show = true;
+            this.emojiInfo.show = true;   
         }
     }
-    private msgContentClick(event){
-        event.stopPropagation();
+    private msgContentClick(){
         this.inputToLast = false;
     }
     // ctrl + enter换行，enter发送消息
@@ -399,19 +432,20 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     // 加载更多消息
     private scrollTopEvent(){
-        if(!this.change && this.active.change || this.active.change !== this.change)
+        if((!this.change && this.active.change) || this.active.change !== this.change)
             return;
         /**
          * this.loadingFlag
          * value    1           2           3
          * state 更多消息   正在加载消息  没有更多了
          */
-        if(this.loadingFlag !== 1)
-            return ;
         if(this.loadingFlag === 1 && this.msg.length >= 20){
             this.loadingFlag = 2;
-            let oldContentHeight = this.componentScroll.contentHeight;
+            let oldContentHeight = this.componentScroll.contentHeight,
+                activeKey = this.active.key;
             setTimeout(function(){
+                if(activeKey !== this.active.key || !this.messageList[this.active.activeIndex])
+                    return;
                 this.componentScroll.update();
                 this.componentScroll.scrollTo(0, 10);
                 let msgs = this.messageList[this.active.activeIndex].msgs;
@@ -447,29 +481,16 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     private addGroupAction(){
         this.addGroup.emit();
     }
-    private contentFocus(){
-        this.inputNoBlur = false;
+    private contentFocus(event){
+        event.stopPropagation();
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
+        this.emojiInfo.show = false;
     }
     private playVoice(index){
         let audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         if (audio.paused) {
-            for(let i=0;i<this.msg.length;i++){
-                if(this.msg[i].content.msg_type === 'voice' && this.msg[i].content.timer1 && i !== index){
-                    clearInterval(this.msg[i].content.timer1);
-                    clearInterval(this.msg[i].content.timer2);
-                    clearInterval(this.msg[i].content.timer3);
-                    let otherAudio = this.elementRef.nativeElement.querySelector('#audio' + i);
-                    otherAudio.pause();
-                    otherAudio.currentTime = 0;
-                    this.msg[i].content.playing = {
-                        single: true,
-                        double: true,
-                        max: true
-                    }
-                }
-            }
+            this.clearTimer(index);
             audio.play();
             this.msg[index].content.playing = {
                 single: false,
@@ -511,6 +532,23 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
             }
         }
     }
+    private clearTimer(index){
+        for(let i=0;i<this.msg.length;i++){
+            if(this.msg[i].content.msg_type === 'voice' && this.msg[i].content.timer1 && i !== index){
+                clearInterval(this.msg[i].content.timer1);
+                clearInterval(this.msg[i].content.timer2);
+                clearInterval(this.msg[i].content.timer3);
+                let otherAudio = this.elementRef.nativeElement.querySelector('#audio' + i);
+                otherAudio.pause();
+                otherAudio.currentTime = 0;
+                this.msg[i].content.playing = {
+                    single: true,
+                    double: true,
+                    max: true
+                }
+            }
+        }
+    }
     private voiceEnded(index){
         let audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         clearInterval(this.msg[index].content.timer1);
@@ -538,5 +576,14 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit{
     }
     private playVideo(url){
         this.videoPlay.emit(url);
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight >= event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
     }
 }

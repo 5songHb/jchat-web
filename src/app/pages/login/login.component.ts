@@ -1,9 +1,10 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { loginAction } from './actions';
 import { AppStore } from '../../app.store';
 import { global, authPayload, StorageService } from '../../services/common';
 import { md5 } from '../../services/tools';
+import { Util } from '../../services/util';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -19,16 +20,16 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private loginTip = '';
     private loginStream;
     private isButtonAvailable = false;
+    private util: Util = new Util();
+    private emptyPassword = false;
+    private loginLoading = false;
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
-        private router: Router
+        private router: Router,
+        private elementRef: ElementRef
     ) {}
     public ngOnInit() {
-        if(this.storageService.get('register-username')){
-            this.username = this.storageService.get('register-username');
-            this.storageService.remove('register-username');
-        }
         if(this.username !== '' && this.password !== ''){
             this.isButtonAvailableAction();
         }
@@ -53,13 +54,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
                     // window.sessionStorage.setItem(md5('login-persistence-password'), loginState.userInfo.password);
                     global.password = loginState.userInfo.password;
                     this.router.navigate(['main']);
+                    setTimeout(function(){
+                        this.loginLoading = false;
+                    }.bind(this), 2000);
                     break;
                 case loginAction.isButtonAvailableAction:
                     this.isButtonAvailable = loginState.isButtonAvailable;
                     break;
                 case loginAction.loginFailed:
+
+                case loginAction.emptyTip:
                     if(!loginState.isLoginSuccess){
                         this.loginTip = loginState.loginTip;
+                        this.loginLoading = false;
                     }
                     break;
             }
@@ -77,21 +84,29 @@ export class LoginComponent implements OnInit, AfterViewInit {
         // })
     }
     private JIMInit(){
-        let that = this;
+        let that = this,
+            timestamp = new Date().getTime(),
+            signature = this.util.createSignature(timestamp);
         global.JIM.init({
             "appkey": authPayload.appKey,
             "random_str": authPayload.randomStr,
-            "signature": authPayload.signature,
-            "timestamp": authPayload.timestamp,
+            "signature": signature,
+            "timestamp": timestamp,
             "flag": authPayload.flag
         }).onSuccess(function(data) {
             let username = that.storageService.get(md5('jchat-remember-username'), true),
                 password = that.storageService.get(md5('jchat-remember-password'), true);
-            if(username && password && this.username !== ''){
+            if(username && password){
                 that.username = username;
                 that.rememberPassword = password;
                 that.password = password.substring(0, 6);
-                that.loginRemember = true;                
+                that.loginRemember = true;
+                that.emptyPassword = true;            
+            }
+            if(that.storageService.get('register-username')){
+                that.username = that.storageService.get('register-username');
+                that.storageService.remove('register-username');
+                that.password = '';
             }
             console.log('success:' + JSON.stringify(data));
         }).onFail(function(data) {
@@ -109,6 +124,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
         }else{
             password = md5(this.password);
         }
+        if(!this.isButtonAvailable){
+            return;
+        }
+        this.loginLoading = true;
         this.store$.dispatch({
             type: loginAction.login, 
             payload: {
@@ -121,7 +140,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
             }
         });
     }
-    private isButtonAvailableAction(){
+    private isButtonAvailableAction(type ?: string){
         this.rememberPassword = '';
         this.store$.dispatch({
             type: loginAction.isButtonAvailableAction,
@@ -130,6 +149,17 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 username: this.username
             }
         });
+        // 当input keyup进行修改时清空提示语
+        if(type){
+            this.store$.dispatch({
+                type: loginAction.emptyTip,
+                payload: type
+            });
+        }
+        if(type === 'username' && this.emptyPassword){
+            this.password = '';
+            this.emptyPassword = false;
+        }
     }
     public ngOnDestroy (){
         this.loginStream.unsubscribe();
@@ -140,5 +170,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
         }else{
             document.getElementById('loginUsername').focus();
         }
+    }
+    private inputFocus(id){
+        this.elementRef.nativeElement.querySelector('#' + id).focus();
     }
 }

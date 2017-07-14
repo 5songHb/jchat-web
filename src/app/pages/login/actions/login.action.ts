@@ -3,5 +3,6 @@ export const loginAction = {
     loginSuccess: '[login] login success',
     loginFailed: '[login] login failed',
     passwordBlur: '[login] password blur',
-    isButtonAvailableAction: '[login] is button available action'
+    isButtonAvailableAction: '[login] is button available action',
+    emptyTip: '[login] empty tip'
 };

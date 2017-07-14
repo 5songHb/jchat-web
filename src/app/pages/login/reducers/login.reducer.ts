@@ -32,6 +32,9 @@ export const loginReducer = (state: LoginStore = loginInit, {type, payload}) => 
         case loginAction.isButtonAvailableAction:
             isButtonAvailable(state,payload);
             break;
+        case loginAction.emptyTip:
+            state.loginTip = '';
+            break;
         default:
     }
     return state;

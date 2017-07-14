@@ -1,5 +1,5 @@
 import { Routes, RouterModule,PreloadAllModules } from '@angular/router';
-import RouterGuard from './services/common/router-guard.service';
+import { RouterGuard, LoginGuard } from './services/common/';
 
 export const ROUTES: Routes = [{
     path: '',
@@ -7,6 +7,7 @@ export const ROUTES: Routes = [{
     pathMatch: 'full'
 },{
     path: 'login',
+    canActivate: [LoginGuard],
     loadChildren: './pages/login#LoginModule'
 },{
     path: 'register',

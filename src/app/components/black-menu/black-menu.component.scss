@@ -4,10 +4,11 @@
         margin-bottom: 20px;
         height: 30px;
         line-height: 30px;
-        img{
+        .black-menu-avatar{
             width: 30px;
             height: 30px;
             margin-right: 10px;
+            overflow: hidden;
         }
         button{
             width: 80px;
@@ -48,5 +49,6 @@
     height: 51px;
     text-align: center;
     font-size: 14px;
-    color: #2C2C2C;
+    color: #808080;
+    opacity: 0.4;
 }

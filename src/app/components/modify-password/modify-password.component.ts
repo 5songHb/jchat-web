@@ -47,4 +47,11 @@ export class ModifyPasswordComponent implements OnInit {
         this.repeatPwdTip = 0;
         this.modifyPassword.emit();
     }
+    private emptyTip(type){
+        if(type === 'oldPassword'){
+            this.oldPwdTip = false;
+        }else if(type === 'newPassword'){
+            this.repeatPwdTip = 0;
+        }
+    }
 }

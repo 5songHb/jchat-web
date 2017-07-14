@@ -7,5 +7,7 @@ export const registerAction = {
     usernameTip: '[register] username tip',
     password: '[register] password',
     passwordTip: '[register] password tip',
-    repeatPasswordTip: '[register] repeat password tip'
+    repeatPasswordTip: '[register] repeat password tip',
+    initState: '[register] init state',
+    emptyTip: '[register] empty tip'
 }

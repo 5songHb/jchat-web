@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, DoCheck } from '@angular/core';
 
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -8,7 +8,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     styleUrls: ['./linkman-list.component.scss']
 })
 
-export class LinkmanListComponent implements OnInit, OnChanges {
+export class LinkmanListComponent implements OnInit, DoCheck {
     @Input()
         private conversation;
     @Output()
@@ -19,7 +19,7 @@ export class LinkmanListComponent implements OnInit, OnChanges {
     }
     public ngOnInit() {
     }
-    ngOnChanges(){
+    ngDoCheck(){
         for(let i=0;i<this.conversation.length;i++){
             if(this.conversation[i].data.length > 0){
                 this.isEmpty = true;
@@ -32,5 +32,14 @@ export class LinkmanListComponent implements OnInit, OnChanges {
     }
     private selectLinkmanItem(item){
         this.selectLinkmanItemEmit.emit(item);
+    }
+    private avatarLoad(event){
+        if(event.target.naturalHeight >= event.target.naturalWidth){
+            event.target.style.width = '100%';
+            event.target.style.height = 'auto';
+        }else{
+            event.target.style.height = '100%';
+            event.target.style.width = 'auto';
+        }
     }
 }

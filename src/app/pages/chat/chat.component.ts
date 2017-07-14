@@ -74,7 +74,6 @@ export class ChatComponent implements OnInit {
     ){}
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
-        console.log(444444, this.storageKey)
         this.subscribeStore();
         this.store$.dispatch({
             type: chatAction.getConversation, 
@@ -84,17 +83,43 @@ export class ChatComponent implements OnInit {
             type: chatAction.getVoiceState, 
             payload: 'voiceState' + global.user
         });
-        let that = this;        
+        let that = this;
         global.JIM.onMsgReceive(function(data) {
-            console.log('收到的消息',data)
+            console.log('收到的消息',data);
             that.store$.dispatch({
                 type: chatAction.receiveMessage, 
                 payload: data
             });
         });
+        //异常断线监听
+        global.JIM.onDisconnect(function(){
+            that.store$.dispatch({
+                type: mainAction.logoutKickShow,
+                payload: {
+                    show: true,
+                    info: {
+                        title: '提示',
+                        tip: '网络断线，请检查网络或重新登陆'
+                    }
+                }
+            });
+            console.log("【disconnect】");
+        });
         global.JIM.onEventNotification(function(data) {
             console.log('event',data);
             switch(data.event_type){
+                case 1:
+                    that.store$.dispatch({
+                        type: mainAction.logoutKickShow,
+                        payload: {
+                            show: true,
+                            info: {
+                                title: '提示',
+                                tip: '您的账号在其他设备登录'
+                            }
+                        }
+                    });
+                    break;
                 case 10:
                     that.store$.dispatch({
                         type: chatAction.addGroupMembersEvent,
@@ -142,12 +167,14 @@ export class ChatComponent implements OnInit {
                     this.storageMsgId(chatState.msgId);
                 }
                 break;
-            case chatAction.receiveMessage:
-                if(chatState.msgId.length > 0 && (this.active.key == chatState.newMessage.from_uid || this.active.key == chatState.newMessage.from_gid)){
+            case chatAction.receiveMessageSuccess:
+                let isActive = this.active.key == chatState.newMessage.from_uid || this.active.key == chatState.newMessage.from_gid;
+                if(chatState.msgId.length > 0 && isActive){
                     this.storageMsgId(chatState.msgId);
+                    this.active.change = !this.active.change;
                 }
                 this.messageList = chatState.messageList;
-                this.storageMsgId(chatState.msgId);
+                // this.storageMsgId(chatState.msgId);
                 break;
             case chatAction.sendSingleMessage:
 
@@ -169,7 +196,6 @@ export class ChatComponent implements OnInit {
                 }
                 break;
             case chatAction.changeActivePerson:
-                console.log(33333333)
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 this.storageMsgId(chatState.msgId);
@@ -196,6 +222,7 @@ export class ChatComponent implements OnInit {
                 break;
             case chatAction.deleteConversationItem:
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
+                this.groupSetting.show = false;
                 break;
             case chatAction.watchOtherInfoSuccess:
                 this.otherInfo = chatState.otherInfo;
@@ -256,6 +283,13 @@ export class ChatComponent implements OnInit {
                 break;
             case chatAction.groupName:
                 this.groupSetting.groupInfo.name = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.groupInfo.name;
+                this.store$.dispatch({
+                    type: chatAction.updateContactInfo,
+                    payload: {
+                        groupList: chatState.groupList,
+                        conversation: chatState.conversation
+                    }
+                })
                 break;
             case mainAction.showSelfInfo:
                 if(mainState.selfInfo.info){
@@ -264,6 +298,10 @@ export class ChatComponent implements OnInit {
                 break;
             case mainAction.addGroupMemberSuccess:
                 this.groupSetting.memberList = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.memberList;
+                // 为了解决添加新成员后IE假死的现象
+                this.elementRef.nativeElement.querySelector('#searchGroupMember').focus();
+                this.elementRef.nativeElement.querySelector('#searchGroupMember').blur();
+                break;
             case chatAction.changeGroupShieldSuccess:
                 this.conversationList = chatState.conversation;
                 this.active.shield = chatState.activePerson.shield;
@@ -383,7 +421,6 @@ export class ChatComponent implements OnInit {
                 target_gid: this.active.key,
                 target_gname: this.active.name,
                 content: data.content,
-                at_list: [],
                 extras: {
                     media_id: this.selfInfo.avatar
                 }

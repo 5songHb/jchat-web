@@ -2,6 +2,7 @@ export const chatAction = {
     changeActivePerson: '[chat] change active person',
     deleteConversationItem: '[chat] delete conversation item',
     receiveMessage: '[chat] receive message',
+    receiveMessageSuccess: '[chat] receive message success',
     sendSinglePic: '[chat] send single picture',
     sendGroupPic: '[chat] send group pic', 
     sendSingleFile: '[chat send single file',
@@ -36,5 +37,6 @@ export const chatAction = {
     addGroupMembersEventSuccess: '[chat] add group members event success',
     getVoiceState: '[chat] get voice state',
     getVoiceStateSuccess: '[chat] get voice state success',
-    playVideoShow: '[chat] play video show'
+    playVideoShow: '[chat] play video show',
+    updateContactInfo: '[chat] update contact info'
 }
