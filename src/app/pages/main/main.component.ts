@@ -133,22 +133,16 @@ export class MainComponent implements OnInit, OnDestroy {
         private router: Router
     ){}
     public ngOnInit() {
+        this.store$.dispatch({
+            type: mainAction.init,
+            payload: null
+        });
         let that = this;
         this.subscribeStore();
         this.store$.dispatch({
             type: mainAction.getSelfInfo,
             payload: null
         });
-        // document.getElementsByTagName('html')[0].addEventListener('click',function(){
-        //     this.settingMenu.show = false;
-        //     this.chatMenu.show = false;
-        // }.bind(this), false);
-        // 关闭窗口时存cookie，五分钟之内进入页面还可以免登陆
-        // window.addEventListener("beforeunload", function(event) {
-        //     let now = 5 * 60 * 1000;
-        //     that.storageService.set(md5('afterFiveMinutes-username'), global.user, true, now);
-        //     that.storageService.set(md5('afterFiveMinutes-password'), global.password, true, now);
-        // });
     }
     @HostListener('window:click') onClickWindow(){
         this.settingMenu.show = false;
@@ -452,6 +446,13 @@ export class MainComponent implements OnInit, OnDestroy {
                     })
                     break;
                 default:
+                    this.store$.dispatch({
+                        type: mainAction.hideModalTip,
+                        payload: {
+                            show: false,
+                            info: {}
+                        }
+                    })
             }
         // 模态框点击取消按钮
         }else{

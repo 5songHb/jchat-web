@@ -36,5 +36,6 @@ export const mainAction = {
     createGroupSearchAction: '[main] create group search action',
     createGroupSearchComplete: '[main] create group search complete',
     login: '[main] login',
-    logoutKickShow: '[main] logout kick show'
+    logoutKickShow: '[main] logout kick show',
+    init: '[main] init'
 }

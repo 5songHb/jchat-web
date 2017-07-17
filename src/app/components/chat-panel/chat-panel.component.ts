@@ -128,6 +128,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         console.log('chat-panel',chatState.actionType);
         switch(chatState.actionType){
             case chatAction.receiveMessageSuccess:
+                this.messageList = chatState.messageList;
                 // this.msg.push(chatState.newMessage);
                 if(chatState.activePerson.activeIndex !== -1 && chatState.activePerson.activeIndex === this.active.activeIndex){
                     let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
@@ -136,36 +137,49 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                     }else{
                         this.msg = msg;
                     }
+                    // this.change = chatState.activePerson.change;
                 }
+                setTimeout(function(){
+                    this.componentScroll.update();
+                    this.componentScroll.scrollToBottom();
+                    this.contentDiv.focus();
+                }.bind(this), 200);
                 // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
-                this.messageList = chatState.messageList;
                 // let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
                 // if(msgs.length > 20){
                 //     this.msg = msgs.slice(msgs.length - 20);
                 // }else{
                 //     this.msg = msgs;
                 // }
+                let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                if(message&& message.length > 20){
+                    this.msg = message.slice(message.length - 20);
+                }else if(message && message.length < 20){
+                    this.msg = message;                
+                }
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
                 this.voiceState = chatState.voiceState;
-                let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(message && this.msg.length <= 20 && message.length > 20){
-                    this.msg = message.slice(message.length - 20);
-                }else if(message && this.msg.length <= 20 && message.length < 20){
-                    this.msg = message;                
-                }
-                setTimeout(function(){
-                    this.allPointerToMap(true);
-                    this.componentScroll.update();
-                    this.componentScroll.scrollToBottom();
-                    this.contentDiv.focus();
-                    this.util.focusLast(this.contentDiv);
-                }.bind(this), 200);
+                
+                // let count = 0,
+                // timer = setInterval(function(){
+                //     // this.allPointerToMap(true);
+                //     this.componentScroll.update();
+                //     this.componentScroll.scrollToBottom();
+                //     this.contentDiv.focus();
+                //     this.util.focusLast(this.contentDiv);
+                //     if(count > 20){
+                //         clearInterval(timer);
+                //     }
+                //     count ++;
+                // }.bind(this), 10);
+                // this.change = chatState.activePerson.change;
+                // console.log(888, this.change, chatState.activePerson.change);
                 break;
             case chatAction.sendGroupFile:
 
@@ -185,16 +199,22 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
 
                 // 发送群组文件消息
             case chatAction.sendGroupFile:
+                let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
+                if(msgs.length > 20){
+                    this.msg = msgs.slice(msgs.length - this.msg.length);
+                }else{
+                    this.msg = msgs;
+                }
                 setTimeout(function(){
                     this.componentScroll.update();
                     this.componentScroll.scrollToBottom();
                     this.contentDiv.focus();
                 }.bind(this), 200);
                 this.imageViewer.result = chatState.imageViewer;
+                // this.change = chatState.activePerson.change;
+                this.messageList = chatState.messageList;
                 break;
             case mainAction.selectSearchUser:
-
-            case mainAction.createSingleChatSuccess:
 
             case mainAction.createGroupSuccess:
 
@@ -204,19 +224,25 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
                 let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(msg && this.msg.length <= 20 && msg.length > 20){
+                if(msg && msg.length > 20){
                     this.msg = msg.slice(msg.length - 20);
-                }else if(msg && this.msg.length <= 20 && msg.length < 20){
-                    this.msg = msg;                
+                }else if(msg && msg.length < 20){
+                    this.msg = msg;
                 }
-                setTimeout(function(){
-                    this.allPointerToMap(true);
-                    this.componentScroll.update();
-                    this.componentScroll.scrollToBottom();
-                    this.contentDiv.focus();
-                    this.util.focusLast(this.contentDiv);
-                }.bind(this), 200);
+                this.allPointerToMap(true);                
+                // let count2 = 0,
+                // timer2 = setInterval(function(){
+                //     this.componentScroll.update();
+                //     this.componentScroll.scrollToBottom();
+                //     this.contentDiv.focus();
+                //     this.util.focusLast(this.contentDiv);
+                //     if(count2 > 20){
+                //         clearInterval(timer2);
+                //     }
+                //     count2 ++;
+                // }.bind(this), 10);
                 this.imageViewer.result = chatState.imageViewer;
+                // this.change = chatState.activePerson.change;
                 break;
             case chatAction.getAllMessageSuccess:
                 if(chatState.imageViewer !== []){
@@ -239,6 +265,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         for(let i=0;i<num;i++){
             if(this.msg[i].content.msg_type === 'location'){
                 if(timeout){
+                    console.log(555555555)
                     let that = this;
                     (function(i){
                         setTimeout(function(){
@@ -260,7 +287,9 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         }
     }
     private pointerToMap(chatState){
-        if(chatState.newMessage.content.msg_type === 'location' && this.active.name === chatState.newMessage.content.from_id){
+        let single = (Number(this.active.key) === Number(chatState.newMessage.from_uid) && chatState.newMessage.msg_type === 3),
+            group = (Number(this.active.key) === Number(chatState.newMessage.from_gid) && chatState.newMessage.msg_type === 4);
+        if(chatState.newMessage.content.msg_type === 'location' && (single || group)){
             setTimeout(function(){
                 this.util.theLocation({
                     id: 'allmap' + (this.msg.length - 1).toString(),
@@ -275,22 +304,22 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
     }
     ngDoCheck(){
-        console.log(777777, this.active.change, this.change);
-        // if((!this.change && this.active.change) || this.active.change !== this.change){
-        //     this.componentScroll.update();
-        //     this.componentScroll.scrollToBottom();
-        //     let msgs = this.messageList[this.active.activeIndex].msgs;
-        //     if(msgs && this.msg.length <= 20 && msgs.length > 20){
-        //         this.msg = msgs.slice(msgs.length - 20);
-        //     }else if(msgs && this.msg.length <= 20 && msgs.length < 20){
-        //         this.msg = msgs;                
-        //     }
-        //     setTimeout(function(){
-        //         this.change = this.active.change;
-        //         this.contentDiv.focus();
-        //         this.util.focusLast(this.contentDiv);
-        //     }.bind(this),150);
-        // }
+        // console.log(777777, this.active.change, this.change);
+        if((!this.change && this.active.change) || this.active.change !== this.change){
+            this.componentScroll.update();
+            this.componentScroll.scrollToBottom();
+            // let msgs = this.messageList[this.active.activeIndex].msgs;
+            // if(msgs && this.msg.length <= 20 && msgs.length > 20){
+            //     this.msg = msgs.slice(msgs.length - 20);
+            // }else if(msgs && this.msg.length <= 20 && msgs.length < 20){
+            //     this.msg = msgs;                
+            // }
+            setTimeout(function(){
+                this.change = this.active.change;
+                this.contentDiv.focus();
+                this.util.focusLast(this.contentDiv);
+            }.bind(this),150);
+        }
     }
     private sendMsgAction(){
         let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
@@ -432,6 +461,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     // 加载更多消息
     private scrollTopEvent(){
+        // console.log(666, this.change, this.active.change);
         if((!this.change && this.active.change) || this.active.change !== this.change)
             return;
         /**

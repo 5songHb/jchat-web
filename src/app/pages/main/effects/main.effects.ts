@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Actions, Effect, toPayload } from '@ngrx/effects';
-import { Store,Action } from '@ngrx/store';
+import { Store, Action } from '@ngrx/store';
 import { Http } from '@angular/Http';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppStore } from '../../../app.store';
 import { mainAction } from '../actions';
-import { global,authPayload } from '../../../services/common';
+import { global, authPayload } from '../../../services/common';
 import * as moment from 'moment';
 import { md5 } from '../../../services/tools';
 import { Util } from '../../../services/util';
@@ -134,7 +134,6 @@ export class MainEffect {
                         type: '[index] error api tip',
                         payload: error
                     });
-                    console.log('error:' + JSON.stringify(error));
                 });
             return Observable.of(updateSelfAvatar)
                     .map(() => {
@@ -369,7 +368,7 @@ export class MainEffect {
                     }).onFail(function(error){
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
-                            payload: item
+                            payload: null
                         });
                     });
                 }else{
@@ -379,7 +378,7 @@ export class MainEffect {
                     })
                 }
             }).onFail(function(error) {
-                if(error.code == 882002){
+                if(error.code === 882002){
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: null

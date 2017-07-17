@@ -38,7 +38,7 @@
                 position: relative;
                 top: 4px;
                 cursor: pointer;
-                &:hover{
+                &:hover, &.black{
                     background-image: url(../../../assets/images/add-black-active.png);
                 }
             }

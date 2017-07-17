@@ -61,6 +61,7 @@
         max-height: 275px;
         ul{
             .search-member-search-result{
+                cursor: default;
                 &:hover{
                     background-color: #F2F6FB;
                 }

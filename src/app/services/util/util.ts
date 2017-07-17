@@ -59,6 +59,9 @@ export class Util {
      */
     fileReader(file){
         let files = file.files[0];
+        if(!files.type){
+            return;
+        }
         if(!/image\/\w+/.test(files.type)){ 
             alert("文件必须为图片！"); 
             return false;

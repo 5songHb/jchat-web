@@ -1,12 +1,15 @@
 import { mainAction } from '../actions';
 import { MainStore } from '../stores/main.store';
-import { mainInit } from '../model';
+import { mainInit, init } from '../model';
 import { contactAction } from '../../contact/actions';
 import { chatAction } from '../../chat/actions';
 
 export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+        case mainAction.init:
+            state = init;
+            break;
         case chatAction.getConversationSuccess:
             if(payload.conversation){
                 state.mainLoading = true;

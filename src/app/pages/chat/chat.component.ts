@@ -38,7 +38,8 @@ export class ChatComponent implements OnInit {
     private defaultPanelIsShow = true;
     private otherInfo = {
         show: false,
-        info: {}
+        info: {},
+        black: []
     };
     private blackMenu = {
         show: false,
@@ -258,12 +259,15 @@ export class ChatComponent implements OnInit {
             case mainAction.exitGroupSuccess:
                 this.conversationList = chatState.conversation;
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
-                this.store$.dispatch({
-                    type: chatAction.groupSetting,
-                    payload: {
-                        show: false
-                    }
-                })
+                this.groupSetting = {
+                    groupInfo: {
+                        name: '',
+                        desc: ''
+                    },
+                    memberList: [],
+                    active: {},
+                    show: false
+                }
                 break;
             case mainAction.addBlackListSuccess:
                 this.conversationList = chatState.conversation;
@@ -793,6 +797,19 @@ export class ChatComponent implements OnInit {
             payload: {
                 url: '',
                 show: false
+            }
+        })
+    }
+    private alreadyBlackEmit(){
+        this.store$.dispatch({
+            type: mainAction.showModalTip,
+            payload: {
+                show: true,
+                info: {
+                    title: '提示',
+                    tip: '该成员已经在黑名单了',
+                    actionType: '[chat] already black'
+                }
             }
         })
     }

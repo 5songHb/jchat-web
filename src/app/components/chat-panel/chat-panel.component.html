@@ -24,12 +24,12 @@
                     <div class="chat-panel-you-msg chat-panel-msg" *ngIf="global.user != i.content.from_id">
                         <!-- 时间 -->
                         <p class="chat-panel-time" [ngClass]="{'first': num === 0}" *ngIf="i.time_show" [ngSwitch]="i.time_show">
-                            <time *ngSwitchCase="'year'">{{i.ctime_ms | date:"yy-MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'month'">{{i.ctime_ms | date:"MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'today'">{{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'year'">{{i.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.ctime_ms | time:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.ctime_ms | time:"HH:mm"}}</time>
                         </p>
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_type === 'text'" class="clearfix">
@@ -37,8 +37,11 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="chat-panel-msgText-you float-left" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
-                                <p class="chat-panel-text-msg" [innerHTML]="i.content.msg_body.text | emoji" [ngClass]="{'chat-panel-jpush-emoji': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}"></p>
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="chat-panel-msgText-you" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
+                                    <p class="chat-panel-text-msg" [innerHTML]="i.content.msg_body.text | emoji" [ngClass]="{'chat-panel-jpush-emoji': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}"></p>
+                                </div>
                             </div>
                         </div>
                         <!-- 图片消息 -->
@@ -47,12 +50,18 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="float-left" *ngIf="!i.content.msg_body.extras || i.content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon'">
-                                <img title="点击查看大图" (click)="imageViewerShow(i.content.msg_body.media_url)" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div *ngIf="!i.content.msg_body.extras || i.content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon'">
+                                    <img title="点击查看大图" (click)="imageViewerShow(i.content.msg_body.media_url)" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                                </div>
                             </div>
                             <!-- 表情 -->
-                            <div class="float-left" *ngIf="i.content.msg_body.extras && i.content.msg_body.extras.kLargeEmoticon === 'kLargeEmoticon'">
-                                <img style="cursor: default" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="float-left" *ngIf="i.content.msg_body.extras && i.content.msg_body.extras.kLargeEmoticon === 'kLargeEmoticon'">
+                                    <img style="cursor: default" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
+                                </div>
                             </div>
                         </div>
                         <!-- 文件消息 -->
@@ -61,19 +70,22 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="float-left chat-panel-file-you">
-                                <div class="display-flex chat-panel-file-icon-you" [title]="i.content.msg_body.fname">
-                                    <img src="../../../assets/images/file-send.png" alt="">
-                                    <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 21}}</p>
-                                </div>
-                                <div class="chat-panel-range">
-                                    <div>
-                                        <span class="float-left">{{(i.content.msg_body.fsize/1024).toFixed(0) + 'KB'}}</span>
-                                        <span class="float-right">已接收</span>
+                            <div class="float-left clearfix">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="float-left chat-panel-file-you">
+                                    <div class="display-flex chat-panel-file-icon-you" [title]="i.content.msg_body.fname">
+                                        <img src="../../../assets/images/file-send.png" alt="">
+                                        <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 21}}</p>
+                                    </div>
+                                    <div class="chat-panel-range">
+                                        <div>
+                                            <span class="float-left">{{(i.content.msg_body.fsize/1024).toFixed(0) + 'KB'}}</span>
+                                            <span class="float-right">已接收</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <a class="float-left chat-panel-download-file" [href]="i.content.msg_body.media_url" download=""></a>                            
+                                <a class="float-left chat-panel-download-file" [href]="i.content.msg_body.media_url" download=""></a>
+                            </div>                           
                         </div>
                         <!-- 视频消息 -->
                         <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video === 'video'" class="clearfix">
@@ -81,12 +93,15 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="float-left chat-panel-video">
-                                <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
-                                    <!--<source [src]="i.content.msg_body.media_url">-->
-                                </video>
-                                <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
-                                <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="chat-panel-video">
+                                    <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
+                                        <!--<source [src]="i.content.msg_body.media_url">-->
+                                    </video>
+                                    <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
+                                    <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
+                                </div>
                             </div>
                         </div>
                         <!-- 地理定位 -->
@@ -95,11 +110,14 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="chat-panel-map-wrap float-left">
-                                <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
-                                    <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
-                                </a>                                    
-                                <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="chat-panel-map-wrap">
+                                    <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
+                                        <div [id]="'allmap' + num" class="float-left chat-panel-allmap" title="点击查看详细地图"></div>
+                                    </a>                                    
+                                    <p class="chat-panel-address" [title]="i.content.msg_body.label" *ngIf="i.content.msg_body.label">{{i.content.msg_body.label}}</p>
+                                </div>
                             </div>
                         </div>
                         <!-- 语音 -->
@@ -108,43 +126,46 @@
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
                             </div>
-                            <div class="float-left chat-panel-voice-sound chat-panel-voice-sound-you">
-                                <div (click)="playVoice(num)" [ngStyle]="{'width': i.content.msg_body.duration * 20 + 'px'}">
-                                    <span class="float-right">{{i.content.msg_body.duration.toFixed(0)}}''</span>
-                                    <div>
-                                        <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.single" class="one float-left"></span>
-                                        </p>
-                                        <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.double" class="two float-left"></span>                                            
-                                        </p>
-                                        <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.max" class="three float-left"></span>                                            
-                                        </p>
-                                        <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.double" class="four float-left"></span>                                            
-                                        </p>
-                                        <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.single" class="five float-left"></span>                                            
-                                        </p>
+                            <div class="float-left">
+                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
+                                <div class="chat-panel-voice-sound chat-panel-voice-sound-you">
+                                    <div (click)="playVoice(num)" [ngStyle]="{'width': i.content.msg_body.duration * 20 + 'px'}">
+                                        <span class="float-right">{{i.content.msg_body.duration.toFixed(0)}}''</span>
+                                        <div>
+                                            <p class="float-left">
+                                                <span [hidden]="i.content.playing && !i.content.playing.single" class="one float-left"></span>
+                                            </p>
+                                            <p class="float-left">
+                                                <span [hidden]="i.content.playing && !i.content.playing.double" class="two float-left"></span>                                            
+                                            </p>
+                                            <p class="float-left">
+                                                <span [hidden]="i.content.playing && !i.content.playing.max" class="three float-left"></span>                                            
+                                            </p>
+                                            <p class="float-left">
+                                                <span [hidden]="i.content.playing && !i.content.playing.double" class="four float-left"></span>                                            
+                                            </p>
+                                            <p class="float-left">
+                                                <span [hidden]="i.content.playing && !i.content.playing.single" class="five float-left"></span>                                            
+                                            </p>
+                                        </div>
+                                        <b *ngIf="!i.content.havePlay"></b>
                                     </div>
-                                    <b *ngIf="!i.content.havePlay"></b>
+                                    <audio [id]="'audio' + num" (ended)="voiceEnded(num)" [src]="i.content.msg_body.media_url">
+                                        <source [src]="i.content.msg_body.media_url">
+                                    </audio>
                                 </div>
-                                <audio [id]="'audio' + num" (ended)="voiceEnded(num)" [src]="i.content.msg_body.media_url">
-                                    <source [src]="i.content.msg_body.media_url">
-                                </audio>
-                            </div>                      
+                            </div>                     
                         </div>
                     </div>
                     <div class="chat-panel-me-msg chat-panel-msg" *ngIf="global.user === i.content.from_id">
                         <!-- 时间 -->
                         <p class="chat-panel-time" [ngClass]="{'first': num === 0}" *ngIf="i.time_show" [ngSwitch]="i.time_show">
-                            <time *ngSwitchCase="'year'">{{i.ctime_ms | date:"yy-MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'month'">{{i.ctime_ms | date:"MM-dd HH:mm"}}</time>
-                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | date:"HH:mm"}}</time>
-                            <time *ngSwitchCase="'today'">{{i.ctime_ms | date:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'year'">{{i.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'month'">{{i.ctime_ms | time:"MM-dd HH:mm"}}</time>
+                            <time *ngSwitchCase="'day'">{{i.ctime_ms | day}} {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'the day before'">前天 {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'yesterday'">昨天 {{i.ctime_ms | time:"HH:mm"}}</time>
+                            <time *ngSwitchCase="'today'">{{i.ctime_ms | time:"HH:mm"}}</time>
                         </p>
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_type === 'text'" class="clearfix">

@@ -15,7 +15,8 @@ export const chatInit = {
     actionType: '',
     otherInfo: {
         info: {},
-        show: false
+        show: false,
+        black: []
     },
     blackMenu: {
         menu: [],

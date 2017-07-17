@@ -43,11 +43,18 @@
             height: 100%;
             overflow: hidden;
             box-sizing: border-box;
+            .group-username{
+                line-height: 20px;
+                height: 20px;
+                font-size: 12px;
+                color: #999;
+            }
             .chat-panel-see-more{
                 text-align: center;
                 line-height: 18px;
-                color: #2c2c2c;
+                color: #808080;
                 font-size: 12px;
+                opacity: 0.4;
                 cursor: pointer;
                 &.no-more{
                     cursor: default;

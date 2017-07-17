@@ -103,12 +103,12 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 删除本地会话列表
         case chatAction.deleteConversationItem:
-            deleteConversationItem(state, payload);
             if(state.activePerson.activeIndex >= 0){
                 if(state.messageList[state.activePerson.activeIndex].groupSetting){
                     state.messageList[state.activePerson.activeIndex].groupSetting.show = false;
                 }
-            }      
+            }
+            deleteConversationItem(state, payload);            
             break;
         case chatAction.getResourceUrl:
             // 获取静态资源路径
@@ -133,7 +133,11 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             if(state.activePerson.type === 3 ){
                 payload.info.avatarUrl = state.activePerson.avatarUrl;                
             }
-            state.otherInfo = payload;
+            if(payload.black){
+                state.otherInfo.black = payload.black;
+            }
+            state.otherInfo.info = payload.info;
+            state.otherInfo.show = payload.show;
             break;
             // 隐藏别人的信息框
         case chatAction.hideOtherInfo:
@@ -189,7 +193,11 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.groupList = payload;
             break;
         case mainAction.exitGroupSuccess:
-            deleteConversationItem(state, payload);
+            let message = state.messageList[state.activePerson.activeIndex];
+            if(!message.groupSetting){
+                state.messageList[state.activePerson.activeIndex] = Object.assign({}, msg, {groupSetting: {}});
+            }
+            state.messageList[state.activePerson.activeIndex].groupSetting.show = payload.show;
             state.defaultPanelIsShow = true;
             state.messageList[state.activePerson.activeIndex].groupSetting.show = false;
             for(let i=0;i<state.groupList.length;i++){
@@ -198,14 +206,14 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                     break;
                 }
             }
-            state.activePerson.activeIndex = -1;
+            deleteConversationItem(state, payload);
             break;
         case mainAction.addBlackListSuccess:
-            deleteConversationItem(state, payload.deleteItem);
             if(state.activePerson.type === 3){
                 state.defaultPanelIsShow = true;
             }
             state.otherInfo.show = false;
+            deleteConversationItem(state, payload.deleteItem);            
             break;
         case mainAction.deleteMemberSuccess:
             deleteGroupItem(state, payload);

@@ -21,8 +21,7 @@ export class SearchMemberComponent implements OnInit {
         private searchKeyup: EventEmitter<any> = new EventEmitter();
     @Output()
         private changeChecked: EventEmitter<any> = new EventEmitter();
-        
-    private searchKeyword = '';
+    // private searchResult.keywords = '';
     private fileDom;
     constructor(
         private elementRef: ElementRef
@@ -31,6 +30,9 @@ export class SearchMemberComponent implements OnInit {
      }
     public ngOnInit() {
         
+    }
+    private stopPropagation(event){
+        event.stopPropagation();
     }
     public ngAfterViewInit(){
         this.fileDom = this.elementRef.nativeElement.querySelector('#' + this.searchResult.id);
@@ -46,17 +48,17 @@ export class SearchMemberComponent implements OnInit {
     }
     private searchItemAction(item){
         if(!this.searchResult.checkbox)
-            this.searchKeyword = '';
+            this.searchResult.keywords = '';
         this.searchItem.emit(item);
     }
     private clearInputAction(){
         this.fileDom.focus();
-        this.searchKeyword = '';
+        this.searchResult.keywords = '';
         this.clearInput.emit();
     }
     private searchBtnAction(){
-        if(this.searchKeyword.length > 0 && this.searchResult.checkbox)
-            this.searchBtn.emit(this.searchKeyword);
+        if(this.searchResult.keywords.length > 0 && this.searchResult.checkbox)
+            this.searchBtn.emit(this.searchResult.keywords);
     }
     private changeCheckedAction(input, item){
         this.changeChecked.emit(item);

@@ -28,7 +28,9 @@ export class CreateGroupComponent implements OnInit {
         checkbox: {
             show: true,
             list: []
-        }
+        },
+        keywords: '',
+        placeholder: '搜索'
     };
     private nameTip = false;
     constructor(
@@ -57,6 +59,16 @@ export class CreateGroupComponent implements OnInit {
                             result[0].disabled = this.selectList[i].disabled;
                         }
                     }
+                    // 如果搜索的是已经在群里的，disabled
+                    let filter =this.createGroup.info.filter;
+                    if(filter){
+                        for(let i=0;i<filter.length;i++){
+                            if(filter[i].username === mainState.createGroupSearch.info.name){
+                                result[0].disabled = true;
+                                break;
+                            }
+                        }
+                    }
                     this.searchResult.result = result;
                 }else{
                     this.searchResult.result = [];
@@ -66,6 +78,8 @@ export class CreateGroupComponent implements OnInit {
     }
     private stopPropagation(event){
         event.stopPropagation();
+        this.searchResult.show = false;
+        this.searchResult.keywords = '';
     }
     private initData(){
         // 多人会话
@@ -95,6 +109,21 @@ export class CreateGroupComponent implements OnInit {
                         }
                     }
                 }
+            }
+        }
+        // 如果整个letter的成员都不显示，则隐藏字母
+        for(let i=0;i<this.createGroup.list.length;i++){
+            let flag = false;            
+            for(let j=0;j<this.createGroup.list[i].data.length;j++){
+                if(this.createGroup.list[i].data[j].show){
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                this.createGroup.list[i].allFilter = true;
+            }else{
+                this.createGroup.list[i].allFilter = false;
             }
         }
     }

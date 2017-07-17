@@ -13,8 +13,8 @@
                 </div>
                 <perfect-scrollbar class="create-group-scroll">
                     <div *ngFor="let item of createGroup.list">
-                        <div class="create-group-letter" *ngIf="!item.allGroup && item.data.length > 0">{{item.letter}}</div>
-                        <div class="create-group-member" *ngIf="!item.allGroup && item.data.length > 0">
+                        <div class="create-group-letter" *ngIf="!item.allGroup && !item.allFilter && item.data.length > 0">{{item.letter}}</div>
+                        <div class="create-group-member" *ngIf="!item.allGroup && !item.allFilter && item.data.length > 0">
                             <div *ngFor="let user of item.data; let num = index" class="create-group-item">
                                 <div class="display-flex" *ngIf="user.show && user.type === 3">
                                     <div class="create-group-avatar">

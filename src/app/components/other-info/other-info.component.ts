@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, DoCheck } from '@angular/core';
 
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -8,13 +8,15 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     styleUrls: ['./other-info.component.scss']
 })
 
-export class OtherInfoComponent implements OnInit {
+export class OtherInfoComponent implements OnInit, OnChanges, DoCheck {
     @Input()
         private otherInfo;
     @Output()
         private isShow: EventEmitter<any> = new EventEmitter();
     @Output()
         private addBlackList: EventEmitter<any> = new EventEmitter();
+    @Output()
+        private alreadyBlack: EventEmitter<any> = new EventEmitter();
     private addBlackHover = {
         tip: '加入黑名单',
         position: {
@@ -27,16 +29,25 @@ export class OtherInfoComponent implements OnInit {
 
     }
     ngOnChanges(){
-        switch(this.otherInfo.gender){
+        switch(this.otherInfo.info.gender){
             case 0 :
-                this.otherInfo.gender = '保密';
+                this.otherInfo.info.gender = '保密';
                 break;
             case 1 :
-                this.otherInfo.gender = '男';
+                this.otherInfo.info.gender = '男';
                 break;
             case 2:
-                this.otherInfo.gender = '女';
-
+                this.otherInfo.info.gender = '女';
+        }
+    }
+    ngDoCheck(){
+        if(this.otherInfo.black && this.otherInfo.info){
+            for(let i=0;i<this.otherInfo.black.length;i++){
+                if(this.otherInfo.black[i].username === this.otherInfo.info.username){
+                    this.otherInfo.info.black = 1;
+                    break;
+                }
+            }
         }
     }
     public ngOnInit() {
@@ -50,21 +61,26 @@ export class OtherInfoComponent implements OnInit {
     }
     private sendMsgBtn(){
         let user = {
-            avatar: this.otherInfo.avatar,
-            avatarUrl: this.otherInfo.avatarUrl,
-            key: this.otherInfo.key || this.otherInfo.uid,
-            mtime: this.otherInfo.mtime,
-            name: this.otherInfo.username,
-            nickName: this.otherInfo.nickname,
+            avatar: this.otherInfo.info.avatar,
+            avatarUrl: this.otherInfo.info.avatarUrl,
+            key: this.otherInfo.info.key || this.otherInfo.info.uid,
+            mtime: this.otherInfo.info.mtime,
+            name: this.otherInfo.info.username,
+            nickName: this.otherInfo.info.nickname,
             type: 3
         }
         this.isShow.emit(user);
     }
-    private otherClose(){
+    private otherClose(event){
+        event.stopPropagation();
         this.isShow.emit(false);
     }
     private addBlack(){
-        this.addBlackList.emit(this.otherInfo);
+        if(this.otherInfo.info.black === 1){
+            this.alreadyBlack.emit();
+        }else{
+            this.addBlackList.emit(this.otherInfo.info);            
+        }
     }
     private avatarLoad(event){
         if(event.target.naturalHeight > event.target.naturalWidth){

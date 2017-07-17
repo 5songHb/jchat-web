@@ -34,7 +34,7 @@ export class RouterGuard implements CanActivate {
             this.password = this.storageService.get(md5('afterFiveMinutes-password'), true);
         }
         if(leaveLogin){
-            return new Promise<Boolean>((resolve, reject) => {
+            return new Promise<boolean>((resolve, reject) => {
                 that.JIMInit(resolve);
             });
         }else{

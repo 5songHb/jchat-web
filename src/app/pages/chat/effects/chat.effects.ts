@@ -1,3 +1,6 @@
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/debounceTime';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Actions, Effect, toPayload } from '@ngrx/effects';
@@ -547,7 +550,31 @@ export class ChatEffect {
             OtherInfoObj = global.JIM.getUserInfo({
                 'username' : other.username
             }).onSuccess(function(data) {
-                // 如多当前会话是要查看资料的人的话，不用请求avatarUrl, 直接使用单钱会话的avatarUrl
+                global.JIM.getBlacks()
+                .onSuccess(function(black) {
+                    that.store$.dispatch({
+                        type: chatAction.watchOtherInfoSuccess,
+                        payload: {
+                            info: data.user_info,
+                            show: true,
+                            black: black.black_list
+                        }
+                    });
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: chatAction.watchOtherInfoSuccess,
+                        payload: {
+                            info: data.user_info,
+                            show: true,
+                            black: []
+                        }
+                    });
+                    that.store$.dispatch({
+                        type: '[index] error api tip',
+                        payload: error
+                    });
+                });
+                // 如多当前会话是要查看资料的人的话，不用请求avatarUrl, 直接使用单聊会话的avatarUrl
                 if(other.active.type === 3){
                     that.store$.dispatch({
                         type: chatAction.watchOtherInfoSuccess,

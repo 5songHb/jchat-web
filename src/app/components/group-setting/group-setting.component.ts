@@ -51,7 +51,9 @@ export class GroupSettingComponent implements OnInit, DoCheck {
     private searchResult = {
         result: [],
         show: false,
-        id: 'searchGroupMember'
+        id: 'searchGroupMember',
+        keywords: '',
+        placeholder: '搜索群成员'
     };
     private hostHover = {
         tip: '群主',
@@ -74,6 +76,8 @@ export class GroupSettingComponent implements OnInit, DoCheck {
     }
     private stopPropagation(event){
         event.stopPropagation();
+        this.searchResult.show = false;
+        this.searchResult.keywords = '';
     }
     @HostListener('window:click') onWindowClick(){
         this.groupSetting.show = false;
@@ -148,14 +152,23 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         })
     }
     private searchItemEmit(item){
-        for(let i=0;i<this.groupSetting.memberList.length;i++){
-            if(item.uid === this.groupSetting.memberList[i].uid){
-                this.directiveScroll.scrollTo(0, 50 * i);
-                this.searchResult.result = [];
-                this.searchResult.show = false;
-                break;
-            }
+        // for(let i=0;i<this.groupSetting.memberList.length;i++){
+        //     if(item.uid === this.groupSetting.memberList[i].uid){
+        //         this.directiveScroll.scrollTo(0, 50 * i);
+        //         this.searchResult.result = [];
+        //         this.searchResult.show = false;
+        //         break;
+        //     }
+        // }
+        if(item.username === global.user){
+            this.watchSelfInfo.emit();
+        }else{
+            this.watchOtherInfo.emit({
+                username: item.username
+            });
         }
+        this.searchResult.result = [];
+        this.searchResult.show = false;
     }
     private watchInfoAction(username){
         if(username === global.user){

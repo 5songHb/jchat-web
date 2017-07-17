@@ -22,7 +22,7 @@ import { contactReducer } from './pages/contact/reducers';
 import { ContactEffect } from './pages/contact/effects';
 
 // import { LoginService } from './services/request/login';
-import { RouterGuard, LoginGuard } from './services/common';
+import { RouterGuard } from './services/common';
 import { TipModalModule } from './components/tip-modal';
 
 import { HMR } from '../config/hmr';
@@ -55,8 +55,7 @@ import '../assets/css/common.scss';
     providers: [
         // LoginService
         RouterGuard,
-        StorageService,
-        LoginGuard
+        StorageService
     ]
 })
 export class AppModule extends HMR {
