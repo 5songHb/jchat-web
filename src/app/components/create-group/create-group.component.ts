@@ -115,7 +115,7 @@ export class CreateGroupComponent implements OnInit {
         for(let i=0;i<this.createGroup.list.length;i++){
             let flag = false;            
             for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(this.createGroup.list[i].data[j].show){
+                if(this.createGroup.list[i].data[j].show && this.createGroup.list[i].data[j].type === 3){
                     flag = true;
                     break;
                 }

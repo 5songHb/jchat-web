@@ -249,6 +249,14 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                     this.imageViewer.result = chatState.imageViewer;
                 }
                 break;
+            case chatAction.addGroupMembersEventSuccess:
+                this.messageList = chatState.messageList;
+                setTimeout(function(){
+                    this.componentScroll.update();
+                    this.componentScroll.scrollToBottom();
+                    this.contentDiv.focus();
+                }.bind(this), 200);
+                break;
         }
     }
     private imageViewerShow(src){
@@ -265,7 +273,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         for(let i=0;i<num;i++){
             if(this.msg[i].content.msg_type === 'location'){
                 if(timeout){
-                    console.log(555555555)
                     let that = this;
                     (function(i){
                         setTimeout(function(){

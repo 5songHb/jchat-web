@@ -127,6 +127,12 @@ export class ChatComponent implements OnInit {
                         payload: data
                     });
                     break;
+                case 11:
+                    that.store$.dispatch({
+                        type: chatAction.deleteGroupMembersEvent,
+                        payload: data
+                    });
+                    break;
             }
         });
         //离线消息同步监听
@@ -188,6 +194,11 @@ export class ChatComponent implements OnInit {
             case chatAction.sendSingleFile:
                 
             case chatAction.sendGroupFile:
+
+            case chatAction.addGroupMembersEventSuccess:
+
+            case chatAction.updateGroupMembersEvent:
+
                 // 触发滚动条向下滚动            
                 this.active.change = !this.active.change;
                 break;
@@ -312,6 +323,11 @@ export class ChatComponent implements OnInit {
                 break;
             case chatAction.playVideoShow:
                 this.playVideoShow = chatState.playVideoShow;
+                break;
+            case chatAction.addGroupMembersEventSuccess:
+                if(chatState.activePerson.activeIndex > 0 && chatState.messageList[chatState.activePerson.activeIndex].groupSetting){
+                    this.groupSetting = Object.assign({}, this.groupSetting, chatState.messageList[chatState.activePerson.activeIndex].groupSetting);
+                }
                 break;
             default:
 

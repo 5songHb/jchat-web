@@ -776,6 +776,40 @@ export class ChatEffect {
                     payload: eventData
                 })
                 console.log('success:' + JSON.stringify(data));
+                global.JIM.getGroupMembers({'gid': eventData.gid})
+                .onSuccess(function(data) {
+                    that.store$.dispatch({
+                        type: chatAction.updateGroupMembersEvent,
+                        payload: {
+                            memberList: data.member_list,
+                            eventData
+                        }
+                    })
+                    for(let i=0;i<data.member_list.length;i++){
+                        if(data.member_list[i].avatar){
+                            global.JIM.getResource({'media_id' : data.member_list[i].avatar})
+                            .onSuccess(function(urlInfo){
+                                data.member_list[i].avatarUrl = urlInfo.url;
+                                that.store$.dispatch({
+                                    type: chatAction.updateGroupMembersEvent,
+                                    payload: {
+                                        memberList: data.member_list,
+                                        eventData
+                                    }
+                                })
+                            }).onFail(function(error){
+
+                            });
+                        }
+                    }
+                    console.log('success:' + JSON.stringify(data));
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: indexAction.errorApiTip,
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
+                });
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,

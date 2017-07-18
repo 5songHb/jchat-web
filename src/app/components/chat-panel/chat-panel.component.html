@@ -17,9 +17,20 @@
                     <div></div>
                 </div>
                 <div class="chat-panel-see-more no-more" *ngIf="loadingFlag === 3 && this.msg.length > 20">没有更多消息了</div>
-                <p class="chat-panel-add-members">
-                    <span *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex].addGroupMembers">您被添加进群聊了</span>
-                </p>
+                <!-- <p class="chat-panel-add-members">
+                    <span *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex]?.addGroupMyself?.bool === true">您{{messageList[active.activeIndex].addGroupMyself.tip}}</span>
+                </p> -->
+                <!-- 时间 -->
+                <div *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex].addGroupOther && messageList[active.activeIndex].addGroupOther.length > 0">
+                    <div *ngFor="let item of messageList[active.activeIndex].addGroupOther">
+                        <p *ngIf="item.time_show" class="chat-panel-time" [ngClass]="{'first': num === 0}">
+                            <time style="top: 0;">{{item.ctime_ms | time:"HH:mm"}}</time>
+                        </p>
+                        <p class="chat-panel-add-members">
+                            <span>{{item.tip}}被添加进群聊了</span>
+                        </p>
+                    </div>
+                </div>
                 <div *ngFor="let i of msg; let num = index;">
                     <div class="chat-panel-you-msg chat-panel-msg" *ngIf="global.user != i.content.from_id">
                         <!-- 时间 -->
@@ -45,7 +56,7 @@
                             </div>
                         </div>
                         <!-- 图片消息 -->
-                        <div *ngIf="i.content.msg_type === 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}" class="clearfix">
+                        <div *ngIf="i.content.msg_type === 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 20 + 'px' : 300 + 20 + 'px' ) : i.content.msg_body.height + 20 + 'px'}" class="clearfix">
                             <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
@@ -57,9 +68,9 @@
                                 </div>
                             </div>
                             <!-- 表情 -->
-                            <div class="float-left">
+                            <div *ngIf="i.content.msg_body.extras && i.content.msg_body.extras.kLargeEmoticon === 'kLargeEmoticon'" class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
-                                <div class="float-left" *ngIf="i.content.msg_body.extras && i.content.msg_body.extras.kLargeEmoticon === 'kLargeEmoticon'">
+                                <div class="float-left">
                                     <img style="cursor: default" class="chat-panel-message-img" [src]="i.content.msg_body.media_url" alt="">
                                 </div>
                             </div>
@@ -180,7 +191,7 @@
                             </div>
                         </div>
                         <!-- 图片消息 -->
-                        <div class="chat-panel-img-me clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}">
+                        <div class="chat-panel-img-me clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 20 + 'px' : 300 + 20 + 'px' ) : i.content.msg_body.height + 20 + 'px'}">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
                                 <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
@@ -277,6 +288,19 @@
                                     <source [src]="i.content.msg_body.media_url">
                                 </audio>
                             </div>                      
+                        </div>
+                    </div>
+                    <!-- <p class="chat-panel-add-members">
+                        <span *ngIf="i.addGroupMyself && i.addGroupMyself.bool">您{{i.addGroupMyself.tip}}</span>
+                    </p> -->
+                    <div *ngIf="i.addGroupOther && i.addGroupOther.length > 0">
+                        <div *ngFor="let item of i.addGroupOther">
+                            <p *ngIf="item.time_show" class="chat-panel-time">
+                                <time style="top: 0;">{{item.ctime_ms | time:"HH:mm"}}</time>
+                            </p>
+                            <p class="chat-panel-add-members">
+                                <span>{{item.tip}}{{item.operation}}</span>
+                            </p>
                         </div>
                     </div>
                 </div>

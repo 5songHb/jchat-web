@@ -72,7 +72,7 @@
             }
             .chat-panel-add-members{
                 text-align: center;
-                margin: 5px 0;
+                margin: 10px 0;
                 span{
                     font-size: 12px;
                     color: #999;
@@ -86,30 +86,30 @@
             }
             .chat-panel-msg{
                 margin: 19px 0;
-                .chat-panel-time{
-                    text-align: center;
-                    margin: 30px 0 20px 0;
-                    height: 20px;               
-                    time{
-                        font-size: 12px;
-                        color: #999;
-                        text-align: center;
-                        line-height: 17px;
-                        padding: 2px 9px;
-                        background: #F2F6FB;
-                        border-radius: 5px;
-                        position: relative;
-                        top: -10px;
-                    }
-                    &.first{
-                        margin-top: 10px;
-                    }
-                }
                 .chat-panel-message-img{
                     max-width: 219px;
                     max-height: 300px;
                     cursor: zoom-in;
                     border-radius: 5px;
+                }
+            }
+            .chat-panel-time{
+                text-align: center;
+                margin: 30px 0 20px 0;
+                height: 20px;               
+                time{
+                    font-size: 12px;
+                    color: #999;
+                    text-align: center;
+                    line-height: 17px;
+                    padding: 2px 9px;
+                    background: #F2F6FB;
+                    border-radius: 5px;
+                    position: relative;
+                    top: -10px;
+                }
+                &.first{
+                    margin-top: 10px;
                 }
             }
             .chat-panel-avatar{
@@ -424,7 +424,10 @@
             }
             .chat-panel-me-msg{
                 text-align: right;
-                line-height: 40px;                
+                line-height: 40px;
+                .chat-panel-address{
+                    text-align: left;
+                }
                 .chat-panel-msgText-me{
                     background: #71E1DB;
                     border: 1px solid #67D6D0;

@@ -326,6 +326,18 @@ export class Util {
         }
     }
     /**
+     * 判断两个时间间隔是否超过5分钟
+     * params oldTime: number, newTime: number
+     */
+    fiveMinutes(oldTime, newTime){
+        let gap = newTime - oldTime;
+        if(gap / 1000 / 60 > 5){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
      * 生成JIM初始化的签名
      * params timestamp: 当前的时间毫秒数
      * return string 签名

@@ -257,7 +257,13 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             }
             break;
         case chatAction.addGroupMembersEventSuccess:
-            addGroupMembersEvent(state, payload);
+            groupMembersEvent(state, payload, '被添加进群聊了');
+            break;
+        case chatAction.updateGroupMembersEvent:
+            updateGroupMembers(state, payload);
+            break;
+        case chatAction.deleteGroupMembersEvent:
+            groupMembersEvent(state, payload, '被移出群聊了');
             break;
         // 获取voice是否已经播放的状态
         case chatAction.getVoiceStateSuccess:
@@ -297,16 +303,64 @@ function clearTimer(state: ChatStore){
         }
     }
 }
-// 被添加进群的事件
-function addGroupMembersEvent(state: ChatStore, payload){
-    let flag = true;
-    for(let i=0;i<payload.to_usernames.length;i++){
-        if(payload.to_usernames[i].username === global.user){
-            flag = false;
+
+// 被添加进群时更新群成员
+function updateGroupMembers(state: ChatStore, payload){
+    for(let i=0;i<state.messageList.length;i++){
+        if(Number(state.messageList[i].key) === Number(payload.eventData.gid)){
+            if(state.messageList[i].groupSetting){
+                state.messageList[i].groupSetting.memberList = payload.memberList;
+            }
             break;
         }
     }
-    if(!flag){
+}
+// 被添加进群的事件
+function groupMembersEvent(state: ChatStore, payload, operation){
+    let flag = true,
+        usernames = payload.to_usernames,
+        addGroupOther = '';
+    for(let i=0;i<usernames.length;i++){
+        if(usernames[i].username === global.user){
+            addGroupOther = '您' + '、';
+        }else{
+            let name = '';
+            if(usernames[i].nickname && usernames[i].nickname !== ''){
+                name = usernames[i].nickname;
+            }else{
+                name = usernames[i].username;
+            }
+            addGroupOther += name + '、';
+        }
+    }
+    if(addGroupOther.length > 0){
+        addGroupOther = addGroupOther.slice(0, addGroupOther.length - 1);
+    }
+    let flag1 = true;
+    for(let i=0;i<state.conversation.length;i++){
+        if(Number(payload.gid) === Number(state.conversation[i].key)){
+            flag1 = false;
+            let item = state.conversation.splice(i, 1);
+            state.conversation.unshift(item[0]);
+            if(Number(state.activePerson.key) !== Number(state.conversation[0].key)){
+                state.conversation[0].unreadNum ++;
+            }
+            break;
+        }
+    }
+    if(flag1){
+        for(let i=0;i<state.groupList.length;i++){
+            if(Number(state.groupList[i].gid) === Number(payload.gid)){
+                state.groupList[i].type = 4;
+                state.groupList[i].key = state.groupList[i].gid;
+                state.groupList[i].unreadNum ++;
+                state.conversation.unshift(state.groupList[i]);
+                flag1 = false;            
+                break;
+            }
+        }
+    }
+    if(flag1){
         let conversation = {
             key: payload.gid,
             name: payload.name,
@@ -314,11 +368,56 @@ function addGroupMembersEvent(state: ChatStore, payload){
             unreadNum: 1
         }
         state.conversation.unshift(conversation);
+    }
+    let flag2 = true;
+    for(let j=0;j<state.messageList.length;j++){
+        if(Number(payload.gid) === Number(state.messageList[j].key)){
+            flag2 = false;
+            let msgs = state.messageList[j].msgs;
+            if(msgs.length === 0){
+                if(!state.messageList[j].addGroupOther){
+                    state.messageList[j].addGroupOther = [];
+                }
+                state.messageList[j].addGroupOther.push({
+                    tip: addGroupOther,
+                    operation,
+                    ctime_ms: (new Date()).getTime(),
+                    time_show: true
+                });
+            }else{
+                let addGroupTemp = msgs[msgs.length - 1].addGroupOther;
+                if(addGroupTemp){
+                    addGroupTemp.push({
+                        tip: addGroupOther,
+                        operation,
+                        ctime_ms: (new Date()).getTime(),
+                        time_show: util.fiveMinutes(addGroupTemp[addGroupTemp.length - 1].ctime_ms, (new Date()).getTime())
+                    });
+                }else{
+                    msgs[msgs.length - 1].addGroupOther = [{
+                        tip: addGroupOther,
+                        operation,
+                        ctime_ms: (new Date()).getTime(),
+                        time_show: util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, (new Date()).getTime())
+                    }]
+                }
+            }
+            break;
+        }
+    }
+    if(flag2){
         state.messageList.push({
             key: payload.gid,
             msgs: [],
-            addGroupMembers: true
-        })
+            addGroupOther: [
+                {
+                    tip: addGroupOther,
+                    operation,
+                    ctime_ms: (new Date()).getTime(),
+                    time_show: true
+                }
+            ]
+        });
     }
 }
 // 删除群成员
@@ -588,9 +687,17 @@ function deleteConversationItem(state: ChatStore, payload){
             break;
         }
     }
+    for(let i=0;i<state.groupList.length;i++){
+        let flag = Number(state.groupList[i].gid) === Number(payload.item.key) || Number(state.groupList[i].gid) === Number(payload.item.gid);
+        if(flag){
+            state.groupList[i] = Object.assign({}, state.groupList[i], payload.item);
+            break;
+        }
+    }
     if(Number(payload.item.key) === Number(state.activePerson.key)){
         state.defaultPanelIsShow = true;
-        state.activePerson.activeIndex = -1;        
+        state.activePerson.activeIndex = -1;
+        state.activePerson.key = '0';
     }
 }
 // 添加消息到消息面板
