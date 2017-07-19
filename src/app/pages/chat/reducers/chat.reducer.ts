@@ -84,7 +84,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.changeActivePerson:
             // 更换当前会话用户
             clearTimer(state);
-            state.activePerson = payload.item;
+            state.activePerson = Object.assign({}, payload.item, {});
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
             emptyUnreadNum(state, payload.item);
             state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
@@ -95,7 +95,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
             clearTimer(state);
-            state.activePerson = payload;
+            state.activePerson = Object.assign({}, payload, {});
             selectUserResult(state, payload);
             changeActivePerson(state);            
             emptyUnreadNum(state, payload);
@@ -167,7 +167,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case mainAction.createGroupSuccess:
             clearTimer(state);
-            state.activePerson = payload;
+            state.activePerson = Object.assign({}, payload, {});
             state.defaultPanelIsShow = false;
             selectUserResult(state, payload);
             changeActivePerson(state);
@@ -184,7 +184,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             if(payload.nickname){
                 payload.nickName = payload.nickname;
             }
-            state.activePerson = payload;
+            state.activePerson = Object.assign({}, payload, {});
             state.defaultPanelIsShow = false;
             selectUserResult(state, payload);
             changeActivePerson(state);
@@ -471,8 +471,9 @@ function filterImageViewer(state: ChatStore){
             imgResult.push({
                 src: content.msg_body.media_url,
                 width: content.msg_body.width,
-                height: content.msg_body.height
-            })
+                height: content.msg_body.height,
+                index: j
+            });
         }
     }
     return imgResult;
@@ -489,7 +490,7 @@ function changeActivePerson(state: ChatStore){
     }
     let list = state.messageList[state.activePerson.activeIndex];
     for(let i=0;i<list.msgs.length;i++){
-        if(list.msgs[i].content.msg_type === 'file' && list.msgs[i].content.msg_body.extras && list.msgs[i].content.msg_body.extras.video === 'video'){
+        if(list.msgs[i].content.msg_type === 'file' && list.msgs[i].content.msg_body.extras && list.msgs[i].content.msg_body.extras.video){
             //audio 0 正在加载  1 加载完成  2 正在播放
             list.msgs[i].content.load = 0;
             // 加载进度 0%
@@ -709,7 +710,8 @@ function addMessage(state: ChatStore, payload){
             state.imageViewer.push({
                 src: payload.msgs.content.msg_body.media_url,
                 width: payload.msgs.content.msg_body.width,
-                height: payload.msgs.content.msg_body.height
+                height: payload.msgs.content.msg_body.height,
+                index: state.messageList[state.activePerson.activeIndex].msgs.length
             })
         }
         for(let i=0;i<state.messageList.length;i++){
@@ -753,14 +755,16 @@ function addMessage(state: ChatStore, payload){
                 state.imageViewer.push({
                     src: payload.messages[j].content.msg_body.media_url,
                     width: payload.messages[j].content.msg_body.width,
-                    height: payload.messages[j].content.msg_body.height
+                    height: payload.messages[j].content.msg_body.height,
+                    index: state.messageList[state.activePerson.activeIndex].msgs.length
                 })
             }
             if(payload.messages[j].msg_type === 4 && payload.messages[j].from_gid == state.activePerson.key && payload.messages[j].content.msg_type === 'image'){
                 state.imageViewer.push({
                     src: payload.messages[j].content.msg_body.media_url,
                     width: payload.messages[j].content.msg_body.width,
-                    height: payload.messages[j].content.msg_body.height
+                    height: payload.messages[j].content.msg_body.height,
+                    index: state.messageList[state.activePerson.activeIndex].msgs.length
                 })
             }
             if(payload.messages[j].content.msg_type === 'voice'){

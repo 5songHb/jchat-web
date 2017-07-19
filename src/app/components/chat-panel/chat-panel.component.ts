@@ -11,6 +11,7 @@ import { Util } from '../../services/util';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import{ StorageService } from '../../services/common';
 declare let Emoji;
+let download = require("downloadjs");
 
 @Component({
     selector: 'chat-panel-component',
@@ -84,8 +85,10 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     private loadingCount = 1;
     private imageViewer = {
         result: [],
-        active: {},
-        show: false
+        active: {
+            index: -1
+        },
+        show: false,
     }
     private voiceState = [];
     constructor(
@@ -259,10 +262,11 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 break;
         }
     }
-    private imageViewerShow(src){
+    private imageViewerShow(src, index){
         for(let i=0;i<this.imageViewer.result.length;i++){
-            if(this.imageViewer.result[i].src === src){
+            if(this.imageViewer.result[i].index === index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)){
                 this.imageViewer.active = this.imageViewer.result[i];
+                this.imageViewer.active.index = i;
                 break;
             }
         }
@@ -334,7 +338,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
             draft = draft.replace(/^(<br>){1,}$/g,'');
             draft = draft.replace(/&nbsp;/g,' ');
             draft = draft.replace(/<br>/g, '\n');
-            let imgReg = new RegExp(`<img.{1,}?${imgRouter}.{1,}?\.png">`, 'g');
+            let imgReg = new RegExp(`<img.+?${imgRouter}.{1,}?\.png".*?>`, 'g');
             if(draft.match(imgReg)){
                 let arr = draft.match(imgReg);
                 for(let i=0;i<arr.length;i++){
@@ -355,7 +359,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     private sendPicAction(event){
         let pic = this.elementRef.nativeElement.querySelector('#sendPic'),
-            img = this.util.getFileFormData(pic);
+            img = this.util.getFileFormData(pic, 'pic');
         this.sendPic.emit(img);
         event.target.value = '';
         this.contentDiv.focus();
@@ -363,7 +367,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     private sendFileAction(event){
         let fileData = this.elementRef.nativeElement.querySelector('#sendFile'),
-            file = this.util.getFileFormData(fileData);
+            file = this.util.getFileFormData(fileData, 'file');
         this.sendFile.emit({
             file,
             fileData: this.elementRef.nativeElement.querySelector('#sendFile').files[0]
@@ -622,5 +626,11 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }
+    }
+    private stopPropagation(event){
+        event.stopPropagation();
+    }
+    private fileDownload(url){
+        download(url);
     }
 }

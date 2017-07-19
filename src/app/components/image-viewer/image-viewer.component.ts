@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
-
+let download = require("downloadjs");
 @Component({
     selector: 'image-viewer-component',
     templateUrl: './image-viewer.component.html',
@@ -119,36 +119,39 @@ export class ImageViewerComponent implements OnInit {
         this.zoomTo(this.ratio - 0.2);
     }
     private prev(){
-        for(let i=0;i<this.imageViewer.result.length;i++){
-            if(this.imageViewer.result[i].src === this.imageViewer.active.src){
-                let index = i > 0 ? i - 1: i;
-                this.imageViewer.active = this.imageViewer.result[index];
-                if(index !== i){
-                    this.imgHidden = true;
-                    this.imageViewer.active = this.imageViewer.result[index];                    
-                    this.initImviewer();
-                    this.ratio = 1;
-                }else{
-                    this.showTip('已经是第一张了');
-                }
-                break;
+        let activeIndex = this.imageViewer.active.index,
+            index = activeIndex > 0 ? activeIndex - 1: activeIndex;
+        if(index !== activeIndex){
+            // 为了解决相邻两张相同的base64图片不触发onload事件
+            if(this.imageViewer.active.src === this.imageViewer.result[index].src){
+                this.imgHidden = false;
+            }else{
+                this.imgHidden = true;
             }
+            this.imageViewer.active = this.imageViewer.result[index];
+            this.imageViewer.active.index = index;
+            this.initImviewer();
+            this.ratio = 1;
+        }else{
+            this.showTip('已经是第一张了');
         }
     }
     private next(){
-        for(let i=0;i<this.imageViewer.result.length;i++){
-            if(this.imageViewer.result[i].src === this.imageViewer.active.src){
-                let index = i < this.imageViewer.result.length - 1 ? i + 1: i;
-                if(index !== i){
-                    this.imgHidden = true;
-                    this.imageViewer.active = this.imageViewer.result[index];                    
-                    this.initImviewer();
-                    this.ratio = 1;
-                }else{
-                    this.showTip('已经是最后一张了');
-                }
-                break;
+        let activeIndex = this.imageViewer.active.index,
+            index = activeIndex < this.imageViewer.result.length - 1 ? activeIndex + 1: activeIndex;
+        if(index !== activeIndex){
+            // 为了解决相邻两张相同的base64图片不触发onload事件
+            if(this.imageViewer.active.src === this.imageViewer.result[index].src){
+                this.imgHidden = false;
+            }else{
+                this.imgHidden = true;
             }
+            this.imageViewer.active = this.imageViewer.result[index];
+            this.imageViewer.active.index = index;                 
+            this.initImviewer();
+            this.ratio = 1;
+        }else{
+            this.showTip('已经是最后一张了');
         }
     }
     private closeViewerAction(){
@@ -156,5 +159,8 @@ export class ImageViewerComponent implements OnInit {
     }
     private imgLoad(){
         this.imgHidden = false;
+    }
+    private download(url){
+        download(url);
     }
 }

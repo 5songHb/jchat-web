@@ -10,10 +10,20 @@ export class Util {
      * params id: string , input file的id
      * return FormData对象
      */
-    getFileFormData(file){
+    getFileFormData(file, type: string){
         let fd = new FormData();
         if(!file.files[0]) {
             throw new Error('获取文件失败');
+        }
+        console.log(555, file.files[0].name);
+        if(type === 'file'){
+            let index = file.files[0].name.lastIndexOf('.'),
+                ext = file.files[0].name.substring(index),
+                doc = ['.ppt', '.pptx', '.doc', '.docx', '.pdf', '.xls', '.xlsx', '.txt', '.wps'],
+                video = [],
+                audio = [],
+                image = [],
+                other = [];
         }
         fd.append(file.files[0].name, file.files[0]);
         return fd;
@@ -27,7 +37,7 @@ export class Util {
         let files = file.files[0];
         if(!/image\/\w+/.test(files.type)){ 
             alert("文件必须为图片！"); 
-            return false; 
+            return false;
         }
         let reader = new FileReader();
         reader.readAsDataURL(files);
@@ -184,7 +194,6 @@ export class Util {
         //     range.select();
         // }else 
         if (window.getSelection) {//ie11 10 9 ff safari
-            obj.focus(); //解决ff不获取焦点无法定位问题
             let range = window.getSelection();//创建range
             range.selectAllChildren(obj);//range 选择obj下所有子内容
             // range.collapseToEnd();//光标移至最后
@@ -214,34 +223,45 @@ export class Util {
                 data: []
             },
             flag = false;
-        for(let j=0;j<letter.length;j++){
-            let temp = {
-                letter: letter[j],
+        for(let i=0;i<letter.length;i++){
+            result.push({
+                letter: letter[i],
                 data: []
-            }
-            for(let i=0;i<payload.length;i++){
+            })
+        }
+        result.push({
+            letter: '#',
+            data: []
+        });
+        for(let i=0;i<payload.length;i++){
+            let flag = false;     
+            for(let j=0;j<result.length;j++){
                 let name = (payload[i].nickName && payload[i].nickName !== '') ? payload[i].nickName : payload[i].name,
                     firstLetter = name.charAt(0);
-                if(name === '' && j === 0)
-                    defaultResult.data.push(payload[i]);
-                if(name === '') continue;
+                if(name === ''){
+                    break;
+                }
                 if(name.match(/^[a-zA-Z]/)){
-                    if(firstLetter.toUpperCase() === letter[j])
-                    temp.data.push(payload[i]);
+                    if(firstLetter.toUpperCase() === result[j].letter){
+                        result[j].data.push(payload[i]);
+                        flag = true;
+                        break;
+                    }
                 }else if(this.firstLetterIsChinese(name)){
                     let py = pinyin(firstLetter,{
                         style: pinyin.STYLE_NORMAL
                     });
-                    if(py[0][0].charAt(0).toUpperCase() === letter[j])
-                    temp.data.push(payload[i]);
-                }else if(flag === false){
-                    defaultResult.data.push(payload[i]);
+                    if(py[0][0].charAt(0).toUpperCase() === result[j].letter){
+                        result[j].data.push(payload[i]);
+                        flag = true;
+                        break;
+                    }
                 }
             }
-            result = result.concat(temp);
-            flag = true;
+            if(!flag){
+                result[result.length - 1].data.push(payload[i]);
+            }
         }
-        result.push(defaultResult);
         return result;
     }
     /**

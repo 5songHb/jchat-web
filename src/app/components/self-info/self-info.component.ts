@@ -115,7 +115,7 @@ export class SelfInfoComponent implements OnChanges {
                 this.cameraShadow = false;
             })
         }
-        this.newAvatar.formData = this.util.getFileFormData(selfAvatarInput);
+        this.newAvatar.formData = this.util.getFileFormData(selfAvatarInput, 'pic');
     }
     private toEdit(){
         this.isEdit = true;

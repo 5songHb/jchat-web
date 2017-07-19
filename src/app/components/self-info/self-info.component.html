@@ -11,7 +11,7 @@
             <input spellcheck="false" (change)="selfAvatarChange()" type="file" id="selfAvatarInput" style="display:none;">
             <p class="self-info-avatar-username">{{selfInfo.nickname ? selfInfo.nickname : selfInfo.username}}</p>
             <div class="self-info-signature">
-                <input spellcheck="false" [ngModel]="selfInfo.signature" (change)="signatureChange($event)" class="self-info-input input-focus" [hidden]="!isEdit" spellcheck="false" type="text" placeholder="输入个性签名">
+                <input spellcheck="false" maxlength="30" [ngModel]="selfInfo.signature" (change)="signatureChange($event)" class="self-info-input input-focus" [hidden]="!isEdit" spellcheck="false" type="text" placeholder="输入个性签名">
                 <p [hidden]="isEdit" [title]="selfInfo.signature ? selfInfo.signature : '暂无签名'">{{selfInfo.signature ? (selfInfo.signature | ellipsis: 32) : '暂无签名'}}</p>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { global, authPayload, StorageService } from '../../services/common';
@@ -73,6 +73,9 @@ export class ChatComponent implements OnInit {
         private storageService: StorageService,
         private elementRef: ElementRef
     ){}
+    @HostListener('window:beforeunload') onBeforeunloadWindow(){
+        console.log(555555)
+    }
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
         this.subscribeStore();
@@ -94,16 +97,19 @@ export class ChatComponent implements OnInit {
         });
         //异常断线监听
         global.JIM.onDisconnect(function(){
-            that.store$.dispatch({
-                type: mainAction.logoutKickShow,
-                payload: {
-                    show: true,
-                    info: {
-                        title: '提示',
-                        tip: '网络断线，请检查网络或重新登陆'
+            // 定时器是为了解决火狐下刷新时弹出断线提示
+            setTimeout(function(){
+                that.store$.dispatch({
+                    type: mainAction.logoutKickShow,
+                    payload: {
+                        show: true,
+                        info: {
+                            title: '提示',
+                            tip: '网络断线，请检查网络或重新登陆'
+                        }
                     }
-                }
-            });
+                });
+            }, 2000);
             console.log("【disconnect】");
         });
         global.JIM.onEventNotification(function(data) {
@@ -589,7 +595,9 @@ export class ChatComponent implements OnInit {
                 target_nickname: this.active.nickName,
                 appkey: authPayload.appKey,
                 extras: {
-                    media_id: this.selfInfo.avatar
+                    media_id: this.selfInfo.avatar,
+                    fileSize: data.fileData.size,
+                    fileType: ''
                 }
             }
             msgs.singleFile = singleFile;

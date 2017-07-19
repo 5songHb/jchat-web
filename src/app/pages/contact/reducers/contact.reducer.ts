@@ -83,6 +83,7 @@ function addStranger(state, payload){
 }
 // 删除会话时将会话的信息转移到群
 function addInfoToGroup(state, payload){
+    console.log(7777, payload.item);
     for(let i=0;i<state.groupList.length;i++){
         for(let j=0;j<state.groupList[i].data.length;j++){
             let flag = Number(state.groupList[i].data[j].gid) === Number(payload.item.key) || Number(state.groupList[i].data[j].gid) === Number(payload.item.gid);
