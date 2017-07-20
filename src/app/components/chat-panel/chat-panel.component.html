@@ -86,7 +86,7 @@
                                 <div class="float-left chat-panel-file-you">
                                     <div class="display-flex chat-panel-file-icon-you" [title]="i.content.msg_body.fname">
                                         <img src="../../../assets/images/file-send.png" alt="">
-                                        <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 21}}</p>
+                                        <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 18}}</p>
                                     </div>
                                     <div class="chat-panel-range">
                                         <div>
@@ -214,7 +214,7 @@
                                 <div *ngIf="i.success === 3" class="chat-panel-send-error" (click)="repeatSendFileAction(i)"></div>
                                 <div class="display-flex chat-panel-file-icon-me" [title]="i.content.msg_body.fname">
                                     <img src="../../../assets/images/file-send.png" alt="">
-                                    <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 21}}</p>
+                                    <p class="flex-1">{{i.content.msg_body.fname | ellipsis: 18}}</p>
                                 </div>
                                 <div class="chat-panel-range">
                                     <p  *ngIf="i.success === 1"></p>

@@ -20,7 +20,6 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 })
 export class MainComponent implements OnInit, OnDestroy {
     private util: Util = new Util();
-    private mainLoading = false;
     private mainStream$;
     private global = global;
     private listTab = 0;
@@ -169,11 +168,6 @@ export class MainComponent implements OnInit, OnDestroy {
     private stateChanged(mainState, contactState){
         console.log('main',mainState.actionType);
         switch(mainState.actionType){
-            case chatAction.getConversationSuccess:
-                if(mainState.mainLoading){
-                    this.mainLoading = mainState.mainLoading;
-                }
-                break;
             case contactAction.selectContactItem:
                 this.listTab = mainState.listTab;
                 break;

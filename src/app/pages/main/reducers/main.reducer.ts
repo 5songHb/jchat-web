@@ -10,11 +10,6 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
         case mainAction.init:
             state = init;
             break;
-        case chatAction.getConversationSuccess:
-            if(payload.conversation){
-                state.mainLoading = true;
-            }
-            break;
             // 成功获取个人信息
         case mainAction.showSelfInfo:
             if (payload.show !== 'undefined') {

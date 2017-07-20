@@ -142,11 +142,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                     }
                     // this.change = chatState.activePerson.change;
                 }
-                setTimeout(function(){
-                    this.componentScroll.update();
-                    this.componentScroll.scrollToBottom();
-                    this.contentDiv.focus();
-                }.bind(this), 200);
                 // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
                 break;
@@ -160,9 +155,9 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 //     this.msg = msgs;
                 // }
                 let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(message&& message.length > 20){
+                if(message && message.length > 20){
                     this.msg = message.slice(message.length - 20);
-                }else if(message && message.length < 20){
+                }else if(message && message.length <= 20){
                     this.msg = message;                
                 }
                 this.allPointerToMap(true);
@@ -229,7 +224,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
                 if(msg && msg.length > 20){
                     this.msg = msg.slice(msg.length - 20);
-                }else if(msg && msg.length < 20){
+                }else if(msg && msg.length <= 20){
                     this.msg = msg;
                 }
                 this.allPointerToMap(true);                
@@ -319,6 +314,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         if((!this.change && this.active.change) || this.active.change !== this.change){
             this.componentScroll.update();
             this.componentScroll.scrollToBottom();
+            console.log(777777)
             // let msgs = this.messageList[this.active.activeIndex].msgs;
             // if(msgs && this.msg.length <= 20 && msgs.length > 20){
             //     this.msg = msgs.slice(msgs.length - 20);

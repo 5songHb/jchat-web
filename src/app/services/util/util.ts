@@ -343,6 +343,8 @@ export class Util {
             return 'yesterday';
         }else if(gapDate <= 0){
             return 'today';
+        }else{
+            return false;
         }
     }
     /**

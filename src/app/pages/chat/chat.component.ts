@@ -1,6 +1,6 @@
 import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { Store } from '@ngrx/store';
-
+import { Subject } from 'rxjs/Subject';
 import { global, authPayload, StorageService } from '../../services/common';
 import { AppStore } from '../../app.store';
 import { chatAction } from './actions';
@@ -14,6 +14,9 @@ import { contactAction } from '../contact/actions';
     templateUrl: './chat.component.html'
 })
 export class ChatComponent implements OnInit {
+    private isLoadedSubject = new Subject();
+    private isLoaded$ = this.isLoadedSubject.asObservable();
+    private isLoaded = false;
     private util: Util = new Util();
     private chatStream$;
     private conversationList;
@@ -67,15 +70,13 @@ export class ChatComponent implements OnInit {
     private playVideoShow = {
         show: false,
         url: ''
-    }
+    };
+    private eventArr = [];
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
         private elementRef: ElementRef
     ){}
-    @HostListener('window:beforeunload') onBeforeunloadWindow(){
-        console.log(555555)
-    }
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
         this.subscribeStore();
@@ -89,10 +90,13 @@ export class ChatComponent implements OnInit {
         });
         let that = this;
         global.JIM.onMsgReceive(function(data) {
-            console.log('收到的消息',data);
+            console.log('收到的消息', data);
             that.store$.dispatch({
-                type: chatAction.receiveMessage, 
-                payload: data
+                type: chatAction.receiveMessage,
+                payload: {
+                    data,
+                    conversation: that.conversationList
+                }
             });
         });
         //异常断线监听
@@ -114,33 +118,63 @@ export class ChatComponent implements OnInit {
         });
         global.JIM.onEventNotification(function(data) {
             console.log('event',data);
-            switch(data.event_type){
-                case 1:
-                    that.store$.dispatch({
-                        type: mainAction.logoutKickShow,
-                        payload: {
-                            show: true,
-                            info: {
-                                title: '提示',
-                                tip: '您的账号在其他设备登录'
+            // 如果是离线消息则存在数组里
+            if(data.ctime * 1000 < (new Date).getTime() - 5000){
+                that.eventArr.push(data);
+                console.log(4444, that.eventArr);
+            }
+            if(that.eventArr.length === 0){
+                switch(data.event_type){
+                    case 1:
+                        that.store$.dispatch({
+                            type: mainAction.logoutKickShow,
+                            payload: {
+                                show: true,
+                                info: {
+                                    title: '提示',
+                                    tip: '您的账号在其他设备登录'
+                                }
                             }
-                        }
-                    });
-                    break;
-                case 10:
-                    that.store$.dispatch({
-                        type: chatAction.addGroupMembersEvent,
-                        payload: data
-                    });
-                    break;
-                case 11:
-                    that.store$.dispatch({
-                        type: chatAction.deleteGroupMembersEvent,
-                        payload: data
-                    });
-                    break;
+                        });
+                        break;
+                    case 10:
+                        that.store$.dispatch({
+                            type: chatAction.addGroupMembersEvent,
+                            payload: data
+                        });
+                        break;
+                    case 11:
+                        that.store$.dispatch({
+                            type: chatAction.deleteGroupMembersEvent,
+                            payload: data
+                        });
+                        break;
+                }
             }
         });
+        // 离线业务消息监听，加载完数据之后才执行
+        this.isLoaded$.subscribe((isLoaded) => {
+            if(isLoaded){
+                console.log(8888, this.eventArr)
+                for(let i=0;i<this.eventArr.length;i++){
+                    switch(this.eventArr[i].event_type){
+                        case 10:
+                            that.store$.dispatch({
+                                type: chatAction.addGroupMembersEvent,
+                                payload: this.eventArr[i]
+                            });
+                            break;
+                        case 11:
+                            that.store$.dispatch({
+                                type: chatAction.deleteGroupMembersEvent,
+                                payload: this.eventArr[i]
+                            });
+                            break;
+                    }
+                }
+                this.eventArr = [];
+            }
+        })
         //离线消息同步监听
         global.JIM.onSyncConversation(function(data) { 
             console.log('离线消息列表',data);
@@ -172,7 +206,11 @@ export class ChatComponent implements OnInit {
                 this.store$.dispatch({
                     type: chatAction.dispatchConversationList,
                     payload: chatState.conversation
-                })
+                });
+                if(chatState.isLoaded){
+                    this.isLoaded = chatState.isLoaded;
+                    this.isLoadedSubject.next(this.isLoaded);
+                }
                 break;
             case chatAction.getAllMessageSuccess:
                 this.messageList = chatState.messageList;
@@ -181,7 +219,7 @@ export class ChatComponent implements OnInit {
                 }
                 break;
             case chatAction.receiveMessageSuccess:
-                let isActive = this.active.key == chatState.newMessage.from_uid || this.active.key == chatState.newMessage.from_gid;
+                let isActive = Number(this.active.key === chatState.newMessage.from_uid) || Number(this.active.key) === Number(chatState.newMessage.from_gid);
                 if(chatState.msgId.length > 0 && isActive){
                     this.storageMsgId(chatState.msgId);
                     this.active.change = !this.active.change;
@@ -830,9 +868,10 @@ export class ChatComponent implements OnInit {
             payload: {
                 show: true,
                 info: {
-                    title: '提示',
-                    tip: '该成员已经在黑名单了',
-                    actionType: '[chat] already black'
+                    title: '加入黑名单',
+                    tip: '此用户已在黑名单列表，不可重复添加',
+                    actionType: '[chat] already black',
+                    cancel: true
                 }
             }
         })

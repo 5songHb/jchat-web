@@ -11,7 +11,7 @@ import { global, authPayload } from '../../../services/common';
 import * as moment from 'moment';
 import { md5 } from '../../../services/tools';
 import { Util } from '../../../services/util';
-
+import { indexAction } from '../../index/actions';
 let util = new Util();
 
 @Injectable()
@@ -33,6 +33,7 @@ export class MainEffect {
                 'username' : global.user
             }).onSuccess(function(data) {
                 if(!data.user_info.avatar || data.user_info.avatar === ''){
+                    data.user_info.avatarUrl = '';
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo, 
                         payload: {
@@ -64,7 +65,7 @@ export class MainEffect {
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -104,7 +105,7 @@ export class MainEffect {
                     })
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                     console.log('error:' + JSON.stringify(error));
@@ -131,7 +132,7 @@ export class MainEffect {
                     })
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -175,7 +176,7 @@ export class MainEffect {
                         console.log('success:' + JSON.stringify(data));
                     }).onFail(function(error) {
                         that.store$.dispatch({
-                            type: '[index] error api tip',
+                            type: indexAction.errorApiTip,
                             payload: error
                         });
                         console.log('error:' + JSON.stringify(error))
@@ -189,7 +190,7 @@ export class MainEffect {
                 
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -216,7 +217,7 @@ export class MainEffect {
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error))
@@ -262,7 +263,7 @@ export class MainEffect {
                 console.log(data);
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -326,7 +327,7 @@ export class MainEffect {
                     })
                 }else{
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                 }
@@ -385,7 +386,7 @@ export class MainEffect {
                     })
                 }else{
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                 }
@@ -437,7 +438,7 @@ export class MainEffect {
                 }
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -466,7 +467,7 @@ export class MainEffect {
                 })
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -505,7 +506,7 @@ export class MainEffect {
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -548,7 +549,7 @@ export class MainEffect {
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error))
@@ -587,7 +588,7 @@ export class MainEffect {
                 })
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
             });
@@ -623,7 +624,7 @@ export class MainEffect {
                     }
                 }).onFail(function(error) {
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: indexAction.errorApiTip,
                         payload: error
                     });
                 }).onTimeout(function(data) {
@@ -631,7 +632,7 @@ export class MainEffect {
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
-                    type: '[index] error api tip',
+                    type: indexAction.errorApiTip,
                     payload: error
                 });
             }).onTimeout(function(data) {

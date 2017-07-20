@@ -10,7 +10,7 @@
             {{info && info.tip ? info.tip : ''}}
             </p>
         <p class="modal-btn" *ngIf="!info || !info.success">
-            <button type="button" (click)="modalTip($event)" class="btn-cancel btn-white">取消</button>
+            <button *ngIf="!info.cancel" type="button" (click)="modalTip($event)" class="btn-cancel btn-white">取消</button>
             <button type="button" (click)="modalTip($event, info)" class="btn-confirm btn-active">确定</button>            
         </p>
     </div>

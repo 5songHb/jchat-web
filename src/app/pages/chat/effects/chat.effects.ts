@@ -30,53 +30,82 @@ export class ChatEffect {
     private receiveMessage$: Observable<Action> = this.actions$
         .ofType(chatAction.receiveMessage)
         .map(toPayload)
-        .switchMap((data) => {
+        .switchMap((obj) => {
             let that = this,
                 count = 0,
-                messages = data.messages;
+                increase = 0,
+                messages = obj.data.messages;
             for(let i=0;i<messages.length;i++){
                 global.JIM.getUserInfo({
                     'username' : messages[i].content.from_id
                 }).onSuccess(function(user) {
                     if(!user.user_info.avatar || user.user_info.avatar === ''){
                         count ++;
-                        if(count === messages.length){
+                        if(count === messages.length + increase){
                             that.store$.dispatch({
                                 type: chatAction.receiveMessageSuccess,
-                                payload: data
+                                payload: obj.data
                             });
+                            return;                            
                         }
-                        return;
                     }
                     global.JIM.getResource({'media_id' : user.user_info.avatar})
                     .onSuccess(function(urlInfo){
-                        messages[i].content.avatarUrl = urlInfo.url;
+                        obj.data.messages[i].content.avatarUrl = urlInfo.url;
                         count ++;
-                        if(count === messages.length){
+                        if(count === messages.length + increase){
                             that.store$.dispatch({
                                 type: chatAction.receiveMessageSuccess,
-                                payload: data
+                                payload: obj.data
                             });
                         }
                     }).onFail(function(error){
                         count ++;
-                        if(count === messages.length){
+                        if(count === messages.length + increase){
                             that.store$.dispatch({
                                 type: chatAction.receiveMessageSuccess,
-                                payload: data
+                                payload: obj.data
                             });
                         }
                     });
                 }).onFail(function(error) {
                     count ++;
-                    if(count === messages.length){
+                    if(count === messages.length + increase){
                         that.store$.dispatch({
                             type: chatAction.receiveMessageSuccess,
-                            payload: data
+                            payload: obj.data
                         });
                     }
                     console.log('error:' + JSON.stringify(error));
                 });
+                // 如果消息所在的群聊不在消息列表中，且群名为空，需要获取群的成员，将群成员的昵称或用户名拼接             
+                let result = obj.conversation.filter((item) => {
+                    return obj.data.messages[i].msg_type === 4 && Number(obj.data.messages[i].from_gid) === Number(item.key);
+                });
+                if(result.length === 0 && !obj.data.messages[i].content.target_name){
+                    increase ++;
+                    global.JIM.getGroupMembers({'gid': obj.data.messages[i].content.target_id})
+                    .onSuccess(function(data) {
+                        let name = '';
+                        for(let i=0;i<data.member_list.length;i++){
+                            name += (data.member_list[i].nickName !== '' ? data.member_list[i].nickName : data.member_list[i].usernmae) + '、';
+                        }
+                        if(name.length > 20){
+                            obj.data.messages[i].content.target_name = name.slice(0, 20);
+                        }else{
+                            obj.data.messages[i].content.target_name = name.slice(0, name.length - 1);
+                        }
+                        that.store$.dispatch({
+                            type: chatAction.receiveMessageSuccess,
+                            payload: obj.data
+                        });
+                    }).onFail(function(error) {
+                        that.store$.dispatch({
+                            type: indexAction.errorApiTip,
+                            payload: error
+                        });
+                    });
+                }
             }
             return Observable.of('receiveMessage')
                     .map(() => {
@@ -110,7 +139,7 @@ export class ChatEffect {
             let that = this,
             conversationObj = global.JIM.getConversation()
             .onSuccess(function(info) {
-                console.log('会话列表',info.conversations)
+                console.log('会话列表', info.conversations.length, info.conversations)
                 info.conversations = info.conversations.reverse();
                 that.store$.dispatch({
                     type: chatAction.getConversationSuccess, 
@@ -182,7 +211,7 @@ export class ChatEffect {
             for(let i=0;i<msg.length;i++){
                 let msgBody = msg[i].content.msg_body;
                 if(msgBody.media_id && !msgBody.media_url){
-                    global.JIM.getResource({'media_id' : msgBody.media_id})
+                    global.JIM.getResource({'media_id': msgBody.media_id})
                     .onSuccess(function(urlInfo){
                         msg[i].content.msg_body.media_url = urlInfo.url;
                         that.store$.dispatch({
@@ -212,7 +241,8 @@ export class ChatEffect {
             let that = this,
                 msg = info.messageList[info.active.activeIndex].msgs;
             for(let i=0;i<msg.length;i++){
-                if(msg[i].content.msg_body.extras){
+                // web端的消息
+                if(msg[i].content.from_platform === 'web' && msg[i].content.msg_body.extras.media_id !== ''){
                     global.JIM.getResource({'media_id': msg[i].content.msg_body.extras.media_id})
                     .onSuccess(function(urlInfo){
                         msg[i].content.avatarUrl = urlInfo.url;
@@ -221,7 +251,25 @@ export class ChatEffect {
                             payload: info.messageList
                         })
                     }).onFail(function(error){
-
+                        
+                    });
+                // 移动端的消息
+                }else{
+                    global.JIM.getUserInfo({
+                        'username' : msg[i].content.from_id
+                    }).onSuccess(function(data) {
+                        global.JIM.getResource({'media_id': data.user_info.avatar})
+                        .onSuccess(function(urlInfo){
+                            msg[i].content.avatarUrl = urlInfo.url;
+                            that.store$.dispatch({
+                                type: chatAction.getAllMessageSuccess,
+                                payload: info.messageList
+                            })
+                        }).onFail(function(error){
+                            
+                        });
+                    }).onFail(function(error) {
+                        
                     });
                 }
             }
@@ -727,9 +775,10 @@ export class ChatEffect {
         .map(toPayload)
         .switchMap((active) => {
             let that = this;
-            if(active.shield){
+            if(active.shield === 'switchRight'){
                 global.JIM.delGroupShield({'gid': active.key}).onSuccess(function(data) {
                     console.log('success:' + JSON.stringify(data));
+                    active.shield = 'switchLeft';
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
@@ -744,6 +793,7 @@ export class ChatEffect {
             }else{
                 global.JIM.addGroupShield({'gid': active.key}).onSuccess(function(data) {
                     console.log('success:' + JSON.stringify(data));
+                    active.shield = 'switchRight';
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
@@ -767,15 +817,19 @@ export class ChatEffect {
         .ofType(chatAction.addGroupMembersEvent)
         .map(toPayload)
         .switchMap((eventData) => {
-            let that = this,
-            groupInfoObj = global.JIM.getGroupInfo({'gid': eventData.gid})
-            .onSuccess(function(data) {
-                eventData.name = data.group_info.name;
-                that.store$.dispatch({
+            if(global.user === eventData.from_username){
+                this.store$.dispatch({
                     type: chatAction.addGroupMembersEventSuccess,
                     payload: eventData
-                })
-                console.log('success:' + JSON.stringify(data));
+                });
+                return Observable.of('addGroupMembersEventObj')
+                    .map(() => {
+                        return {type: '[chat] add group members event useless'};
+                    });
+            }
+            let that = this,
+            groupInfoObj = global.JIM.getGroupInfo({'gid': eventData.gid})
+            .onSuccess(function(obj) {
                 global.JIM.getGroupMembers({'gid': eventData.gid})
                 .onSuccess(function(data) {
                     that.store$.dispatch({
@@ -784,9 +838,11 @@ export class ChatEffect {
                             memberList: data.member_list,
                             eventData
                         }
-                    })
+                    });
+                    let name = '';
                     for(let i=0;i<data.member_list.length;i++){
-                        if(data.member_list[i].avatar){
+                        name += (data.member_list[i].nickName !== '' ? data.member_list[i].nickName : data.member_list[i].username) + '、';
+                        if(data.member_list[i].avatar && data.member_list[i].avatar !== ''){
                             global.JIM.getResource({'media_id' : data.member_list[i].avatar})
                             .onSuccess(function(urlInfo){
                                 data.member_list[i].avatarUrl = urlInfo.url;
@@ -802,7 +858,18 @@ export class ChatEffect {
                             });
                         }
                     }
-                    console.log('success:' + JSON.stringify(data));
+                    if(name.length > 20){
+                        eventData.name = name.slice(0, 20);
+                    }else{
+                        eventData.name = name.slice(0, name.length - 1);
+                    }
+                    if(obj.group_info.name && obj.group_info.name !== ''){
+                        eventData.name = obj.group_info.name;
+                    }
+                    that.store$.dispatch({
+                        type: chatAction.addGroupMembersEventSuccess,
+                        payload: eventData
+                    });
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,

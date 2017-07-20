@@ -11,3 +11,6 @@
 <video-component [hidden]="!playVideoShow.show" [url]="playVideoShow.url" (colseVideo)="colseVideoEmit()"></video-component>
 <other-info-component *ngIf="otherInfo.show" [otherInfo]="otherInfo" (alreadyBlack)="alreadyBlackEmit()" (isShow)="OtherInfoEmit($event)" (addBlackList)="addBlackListEmit($event)"></other-info-component>
 <group-description-component [hidden]="!groupDescription.show" [description]="groupDescription.description" (updateGroupInfo)="updateGroupInfoEmit($event)"></group-description-component>
+<div *ngIf="!isLoaded" class="modal-shadow chat-loading">
+    <img src="../../../assets/images/app-loading.gif" alt="">
+</div>

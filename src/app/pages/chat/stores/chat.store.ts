@@ -43,5 +43,6 @@ export interface ChatStore{
     playVideoShow: {
         url: string,
         show: boolean
-    }
+    },
+    isLoaded: boolean
 }

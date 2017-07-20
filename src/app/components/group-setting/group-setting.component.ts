@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, ViewChild, HostListener, ElementRef, DoCheck } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener, ElementRef, DoCheck } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
@@ -11,15 +11,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 @Component({
     selector: 'group-setting-component',
     templateUrl: './group-setting.component.html',
-    styleUrls: ['./group-setting.component.scss'],
-    animations: [
-        trigger('flyInOut', [
-            state('in', style({transform: 'translateX(0)'})),
-            state('void', style({transform: 'translateX(100%)'})),
-            transition('void => in', animate(200)),
-            transition('in => void', animate(200))
-        ])
-    ]
+    styleUrls: ['./group-setting.component.scss']
 })
 
 export class GroupSettingComponent implements OnInit, DoCheck {

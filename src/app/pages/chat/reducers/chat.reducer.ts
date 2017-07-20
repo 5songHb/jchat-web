@@ -25,6 +25,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             if(state.messageList.length > 0 || payload.conversation){
                 completionMessageList(state);
             }
+            if(payload.conversation){
+                state.isLoaded = true;
+            }
             break;
         case chatAction.getAllMessageSuccess:
             // 登陆后，离线消息同步消息列表
@@ -43,6 +46,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 接收消息
         case chatAction.receiveMessageSuccess:
+            console.log(6666, payload)
             addMessage(state, payload);
             let newMsgKey = [];
             for(let i=0;i<payload.messages.length;i++){
@@ -145,12 +149,31 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 获取群组信息
         case chatAction.groupInfo:
+            let name = '';
             if(payload.groupInfo){
                 state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo = payload.groupInfo;
+                if(name !== '' && payload.groupInfo.name === ''){
+                    state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo.name = name;
+                }
             }
             if(payload.memberList){
                 sortGroupMember(payload.memberList);
-                state.messageList[state.activePerson.activeIndex].groupSetting.memberList = payload.memberList;
+                let groupSetting = state.messageList[state.activePerson.activeIndex].groupSetting;
+                groupSetting.memberList = payload.memberList;
+                // 如果群没有名字，给其用群成员名字代替
+                name = '';
+                for(let i=0;i<groupSetting.memberList.length;i++){
+                    name += (groupSetting.memberList[i].nickName !== '' ? groupSetting.memberList[i].nickName : groupSetting.memberList[i].usernmae) + '、';
+                }
+                if(name.length > 20){
+                    name = name.slice(0, 20);
+                }else{
+                    name = name.slice(0, name.length - 1);
+                }
+                let groupInfo = state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo;
+                if(name !== '' && groupInfo && groupInfo.name === ''){
+                    groupInfo.name = name;
+                }
             }
             break;
             // 显示隐藏群组设置
@@ -315,10 +338,29 @@ function updateGroupMembers(state: ChatStore, payload){
         }
     }
 }
+function isRecentmsg(state, payload, addGroupOther, operation){
+    for(let j=0;j<state.messageList.length;j++){
+        if(Number(state.conversation[0].key) === Number(state.messageList[j].key)){
+            if(payload.ctime * 1000 > state.messageList[j]['msgs'][state.messageList[j]['msgs'].length - 1].ctime_ms){
+                state.conversation[0].recentMsg = {
+                    ctime_ms: payload.ctime * 1000,
+                    content: {
+                        msg_body: {
+                            text: addGroupOther + operation
+                        },
+                        msg_type: 'groupEvent'
+                    },
+                    conversation_time_show: 'today',
+                    msg_type: 4
+                }
+            }
+            break;
+        }
+    }
+}
 // 被添加进群的事件
 function groupMembersEvent(state: ChatStore, payload, operation){
-    let flag = true,
-        usernames = payload.to_usernames,
+    let usernames = payload.to_usernames,
         addGroupOther = '';
     for(let i=0;i<usernames.length;i++){
         if(usernames[i].username === global.user){
@@ -339,23 +381,31 @@ function groupMembersEvent(state: ChatStore, payload, operation){
     let flag1 = true;
     for(let i=0;i<state.conversation.length;i++){
         if(Number(payload.gid) === Number(state.conversation[i].key)){
+            if(state.conversation[i].shield){
+                return ;
+            }
             flag1 = false;
             let item = state.conversation.splice(i, 1);
             state.conversation.unshift(item[0]);
             if(Number(state.activePerson.key) !== Number(state.conversation[0].key)){
                 state.conversation[0].unreadNum ++;
             }
+            isRecentmsg(state, payload, addGroupOther, operation);
             break;
         }
     }
     if(flag1){
         for(let i=0;i<state.groupList.length;i++){
             if(Number(state.groupList[i].gid) === Number(payload.gid)){
+                if(state.groupList[i].shield){
+                    return ;
+                }
                 state.groupList[i].type = 4;
                 state.groupList[i].key = state.groupList[i].gid;
                 state.groupList[i].unreadNum ++;
                 state.conversation.unshift(state.groupList[i]);
-                flag1 = false;            
+                flag1 = false;
+                isRecentmsg(state, payload, addGroupOther, operation);
                 break;
             }
         }
@@ -365,7 +415,18 @@ function groupMembersEvent(state: ChatStore, payload, operation){
             key: payload.gid,
             name: payload.name,
             type: 4,
-            unreadNum: 1
+            unreadNum: 1,
+            recentMsg: {
+                ctime_ms: payload.ctime * 1000,
+                content: {
+                    msg_body: {
+                        text: addGroupOther + operation
+                    },
+                    msg_type: 'groupEvent'
+                },
+                conversation_time_show: 'today',
+                msg_type: 4
+            }
         }
         state.conversation.unshift(conversation);
     }
@@ -381,25 +442,55 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                 state.messageList[j].addGroupOther.push({
                     tip: addGroupOther,
                     operation,
-                    ctime_ms: (new Date()).getTime(),
+                    ctime_ms: payload.ctime,
                     time_show: true
                 });
             }else{
-                let addGroupTemp = msgs[msgs.length - 1].addGroupOther;
-                if(addGroupTemp){
-                    addGroupTemp.push({
-                        tip: addGroupOther,
-                        operation,
-                        ctime_ms: (new Date()).getTime(),
-                        time_show: util.fiveMinutes(addGroupTemp[addGroupTemp.length - 1].ctime_ms, (new Date()).getTime())
-                    });
-                }else{
-                    msgs[msgs.length - 1].addGroupOther = [{
-                        tip: addGroupOther,
-                        operation,
-                        ctime_ms: (new Date()).getTime(),
-                        time_show: util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, (new Date()).getTime())
-                    }]
+                for(let i=0;i<msgs.length;i++){
+                    if(payload.ctime <= msgs[0].ctime){
+                        let eventObj = {
+                            tip: addGroupOther,
+                            operation,
+                            ctime_ms: payload.ctime * 1000,
+                            time_show: true
+                        };
+                        if(msgs.addGroupOther){
+                            eventObj.time_show = util.fiveMinutes(msgs.addGroupOther[msgs.addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                            msgs.addGroupOther.push(eventObj);
+                        }else{
+                            msgs.addGroupOther = [eventObj];
+                        }
+                        return ;
+                    }
+                    if(payload.ctime >= msgs[msgs.length - 1].ctime){
+                        let eventObj = {
+                            tip: addGroupOther,
+                            operation,
+                            ctime_ms: payload.ctime * 1000,
+                            time_show: util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, payload.ctime * 1000)
+                        }
+                        if(msgs[msgs.length - 1].addGroupOther){
+                            eventObj.time_show = util.fiveMinutes(msgs[msgs.length - 1].addGroupOther[msgs[msgs.length - 1].addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                            msgs[msgs.length - 1].addGroupOther.push(eventObj);
+                        }else{
+                            msgs[msgs.length - 1].addGroupOther = [eventObj];
+                        }
+                        return ;
+                    }
+                    if(payload.ctime > msgs[i].ctime && payload.ctime < msgs[i + 1].ctime){
+                        let eventObj = {
+                            tip: addGroupOther,
+                            operation,
+                            ctime_ms: payload.ctime * 1000,
+                            time_show: util.fiveMinutes(msgs[i].ctime_ms, payload.ctime * 1000)
+                        }
+                        if(msgs[i].addGroupOther){
+                            eventObj.time_show = util.fiveMinutes(msgs[i].addGroupOther[msgs[i].addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                            msgs[i].addGroupOther.push(eventObj);
+                        }else{
+                            msgs[i].addGroupOther = [eventObj];
+                        }
+                    }
                 }
             }
             break;
@@ -413,7 +504,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                 {
                     tip: addGroupOther,
                     operation,
-                    ctime_ms: (new Date()).getTime(),
+                    ctime_ms: payload.ctime * 1000,
                     time_show: true
                 }
             ]
@@ -452,7 +543,7 @@ function addGroupShield(state: ChatStore, shield){
     for(let i=0;i<shield.length;i++){
         for(let j=0;j<state.conversation.length;j++){
             if(Number(shield[i].gid) === Number(state.conversation[j].key)){
-                state.conversation[j].shield = true;
+                state.conversation[j].shield = 'switchRight';
                 break;
             }
         }
@@ -703,7 +794,7 @@ function deleteConversationItem(state: ChatStore, payload){
 }
 // 添加消息到消息面板
 function addMessage(state: ChatStore, payload){
-    // 自己发消息将消息添加到消息列表   
+    // 自己发消息将消息添加到消息列表
     if(payload.key){
         // 更新imageViewer的数组
         if(payload.msgs && payload.msgs.content.from_id === global.user && payload.msgs.content.msg_type === 'image'){
@@ -833,6 +924,7 @@ function addMessage(state: ChatStore, payload){
                     }
                     conversationItem = {
                         avatar: "",
+                        avatarUrl: payload.messages[j].content.avatarUrl,
                         key: payload.messages[j].from_uid,
                         mtime: payload.messages[j].ctime_ms,
                         name: payload.messages[j].content.from_id,
@@ -851,6 +943,7 @@ function addMessage(state: ChatStore, payload){
                     }
                     conversationItem = {
                         avatar: "",
+                        avatarUrl: payload.messages[j].content.avatarUrl,
                         key: payload.messages[j].from_gid,
                         mtime: payload.messages[j].ctime_ms,
                         name: payload.messages[j].content.target_name,
@@ -858,7 +951,7 @@ function addMessage(state: ChatStore, payload){
                         unreadNum: 1
                     }
                 }
-                payload.messages[j].time_show = 'today';                
+                payload.messages[j].conversation_time_show = 'today';                
                 state.newMessage = msg;
                 state.messageList.push(msg);
                 state.conversation.unshift(conversationItem);

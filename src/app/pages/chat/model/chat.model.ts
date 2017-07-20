@@ -39,5 +39,6 @@ export const chatInit = {
     playVideoShow: {
         url: '',
         show: false
-    }
+    },
+    isLoaded: false
 }
