@@ -80,10 +80,10 @@ export class ChatComponent implements OnInit {
     public ngOnInit() {
         this.storageKey = 'msgId' + global.user;
         this.subscribeStore();
-        this.store$.dispatch({
-            type: chatAction.getConversation, 
-            payload: null
-        });
+        // this.store$.dispatch({
+        //     type: chatAction.getConversation, 
+        //     payload: null
+        // });
         this.store$.dispatch({
             type: chatAction.getVoiceState, 
             payload: 'voiceState' + global.user
@@ -200,6 +200,7 @@ export class ChatComponent implements OnInit {
         switch(chatState.actionType){
             case chatAction.getConversationSuccess:
                 this.conversationList = chatState.conversation;
+                this.messageList = chatState.messageList;
                 if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){                
                     this.storageMsgId(chatState.msgId);
                 }
@@ -212,12 +213,12 @@ export class ChatComponent implements OnInit {
                     this.isLoadedSubject.next(this.isLoaded);
                 }
                 break;
-            case chatAction.getAllMessageSuccess:
-                this.messageList = chatState.messageList;
-                if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){
-                    this.storageMsgId(chatState.msgId);
-                }
-                break;
+            // case chatAction.getAllMessageSuccess:
+            //     this.messageList = chatState.messageList;
+            //     if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){
+            //         this.storageMsgId(chatState.msgId);
+            //     }
+            //     break;
             case chatAction.receiveMessageSuccess:
                 let isActive = Number(this.active.key === chatState.newMessage.from_uid) || Number(this.active.key) === Number(chatState.newMessage.from_gid);
                 if(chatState.msgId.length > 0 && isActive){

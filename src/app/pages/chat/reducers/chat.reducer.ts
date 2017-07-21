@@ -12,37 +12,24 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     switch (type) {
         case chatAction.getConversationSuccess:
             // 初始化会话
-            if(!payload.storage && payload.conversation){
+            if(payload.storage){
                 state.conversation = payload.conversation;
-            }else if(!payload.storage && payload.shield){
-                addGroupShield(state, payload.shield);
-            }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
+                state.messageList = payload.messageList;
+                state.imageViewer = filterImageViewer(state);
                 unreadNum(state, payload);
-                console.log('00000000000', state.conversation, state.messageList);
                 filterRecentMsg(state);
                 state.msgId = filterMsgId(state, 'init');
-            }
-            if(state.messageList.length > 0 || payload.conversation){
+                state.isLoaded = true;
                 completionMessageList(state);
             }
-            if(payload.conversation){
-                state.isLoaded = true;
+            if(payload.shield){
+                addGroupShield(state, payload.shield);
             }
             break;
         case chatAction.getAllMessageSuccess:
             // 登陆后，离线消息同步消息列表
-            if(!payload.storage){
-                state.messageList = payload;
-                state.imageViewer = filterImageViewer(state);
-            }else if(state.messageList.length > 0 && state.messageList[0].msgs.length > 0 && state.conversation.length > 0 && state.conversation[0].type){
-                unreadNum(state, payload);
-                console.log('11111111111', state.conversation, state.messageList);
-                filterRecentMsg(state);
-                state.msgId = filterMsgId(state, 'init');
-            }
-            if(state.conversation.length > 0){
-                completionMessageList(state);
-            }
+            state.messageList = payload;
+            state.imageViewer = filterImageViewer(state);
             break;
             // 接收消息
         case chatAction.receiveMessageSuccess:
@@ -558,7 +545,7 @@ function filterImageViewer(state: ChatStore){
         msgs = messageList.msgs;
     for(let j=0;j<msgs.length;j++){
         let content = msgs[j].content;
-        if(content.msg_type === 'image' && (!content.msg_body.extras || !content.msg_body.extras.kLargeEmoticon ||   content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon')){
+        if(content.msg_type === 'image' && (!content.msg_body.extras || !content.msg_body.extras.kLargeEmoticon || content.msg_body.extras.kLargeEmoticon !== 'kLargeEmoticon')){
             imgResult.push({
                 src: content.msg_body.media_url,
                 width: content.msg_body.width,

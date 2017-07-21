@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { indexAction } from './actions';
 import { global } from '../../services/common/global';
 import '../../../assets/static/js/jmessage-sdk-web.2.3.0.1.min.js';
-declare function JMessage(obj): void;
+declare function JMessage(obj ?: Object): void;
 
 @Component({
     selector: 'my-app',
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
     ){}
     ngOnInit(){
         // 创建JIM 对象
-        global.JIM = new JMessage({debug:true});
+        global.JIM = new JMessage();
         this.indexStream$ = this.store$.select((state) => {
             let indexState = state['indexReducer'];
             switch(indexState.actionType){

@@ -131,74 +131,74 @@ export class ChatEffect {
                     })
         })
     // 获取会话列表
-    @Effect()
-    private getConversation$: Observable<Action> = this.actions$
-        .ofType(chatAction.getConversation)
-        .map(toPayload)
-        .switchMap(() => {
-            let that = this,
-            conversationObj = global.JIM.getConversation()
-            .onSuccess(function(info) {
-                console.log('会话列表', info.conversations.length, info.conversations)
-                info.conversations = info.conversations.reverse();
-                that.store$.dispatch({
-                    type: chatAction.getConversationSuccess, 
-                    payload: {
-                        conversation: info.conversations
-                    }
-                });
-                let msgId = JSON.parse(that.storageService.get('msgId' + global.user));
-                that.store$.dispatch({
-                    type: chatAction.getAllMessageSuccess,
-                    payload: {
-                        storage: true,
-                        msgId
-                    }
-                });
-                // 获取头像url
-                for(let i=0;i<info.conversations.length;i++){
-                    if(info.conversations[i].avatar && info.conversations[i].avatar !== '' && info.conversations[i].type === 3){
-                        global.JIM.getResource({'media_id': info.conversations[i].avatar})
-                        .onSuccess(function(urlInfo){
-                            info.conversations[i].avatarUrl = urlInfo.url;
-                            that.store$.dispatch({
-                                type: chatAction.getConversationSuccess, 
-                                payload: {
-                                    conversation: info.conversations
-                                }
-                            });
-                        }).onFail(function(error){
+    // @Effect()
+    // private getConversation$: Observable<Action> = this.actions$
+    //     .ofType(chatAction.getConversation)
+    //     .map(toPayload)
+    //     .switchMap(() => {
+    //         let that = this,
+    //         conversationObj = global.JIM.getConversation()
+    //         .onSuccess(function(info) {
+    //             console.log('会话列表', info.conversations.length, info.conversations)
+    //             info.conversations = info.conversations.reverse();
+    //             that.store$.dispatch({
+    //                 type: chatAction.getConversationSuccess, 
+    //                 payload: {
+    //                     conversation: info.conversations
+    //                 }
+    //             });
+    //             let msgId = JSON.parse(that.storageService.get('msgId' + global.user));
+    //             that.store$.dispatch({
+    //                 type: chatAction.getAllMessageSuccess,
+    //                 payload: {
+    //                     storage: true,
+    //                     msgId
+    //                 }
+    //             });
+    //             // 获取头像url
+    //             for(let i=0;i<info.conversations.length;i++){
+    //                 if(info.conversations[i].avatar && info.conversations[i].avatar !== '' && info.conversations[i].type === 3){
+    //                     global.JIM.getResource({'media_id': info.conversations[i].avatar})
+    //                     .onSuccess(function(urlInfo){
+    //                         info.conversations[i].avatarUrl = urlInfo.url;
+    //                         that.store$.dispatch({
+    //                             type: chatAction.getConversationSuccess, 
+    //                             payload: {
+    //                                 conversation: info.conversations
+    //                             }
+    //                         });
+    //                     }).onFail(function(error){
                             
-                        });
-                    }
-                }
-                // 获取屏蔽列表
-                global.JIM.groupShieldList().onSuccess(function(data) {
-                    that.store$.dispatch({
-                        type: chatAction.getConversationSuccess, 
-                        payload: {
-                            shield: data.groups
-                        }
-                    });
-                }).onFail(function(error) {
-                    that.store$.dispatch({
-                        type: indexAction.errorApiTip,
-                        payload: error
-                    });
-                    console.log('error:' + JSON.stringify(error));
-                });
-            }).onFail(function(error) {
-                that.store$.dispatch({
-                    type: indexAction.errorApiTip,
-                    payload: error
-                });
-                console.log('error:' + JSON.stringify(error));
-            });
-            return Observable.of(conversationObj)
-                    .map(() => {
-                        return {type: '[chat] get conversation useless'};
-                    })
-    })
+    //                     });
+    //                 }
+    //             }
+    //             // 获取屏蔽列表
+    //             global.JIM.groupShieldList().onSuccess(function(data) {
+    //                 that.store$.dispatch({
+    //                     type: chatAction.getConversationSuccess, 
+    //                     payload: {
+    //                         shield: data.groups
+    //                     }
+    //                 });
+    //             }).onFail(function(error) {
+    //                 that.store$.dispatch({
+    //                     type: indexAction.errorApiTip,
+    //                     payload: error
+    //                 });
+    //                 console.log('error:' + JSON.stringify(error));
+    //             });
+    //         }).onFail(function(error) {
+    //             that.store$.dispatch({
+    //                 type: indexAction.errorApiTip,
+    //                 payload: error
+    //             });
+    //             console.log('error:' + JSON.stringify(error));
+    //         });
+    //         return Observable.of(conversationObj)
+    //                 .map(() => {
+    //                     return {type: '[chat] get conversation useless'};
+    //                 })
+    // })
     // 获取messageList 图片消息url
     @Effect()
     private getSourceUrl$: Observable<Action> = this.actions$
@@ -283,7 +283,7 @@ export class ChatEffect {
     private getAllMessage$: Observable<Action> = this.actions$
         .ofType(chatAction.getAllMessage)
         .map(toPayload)
-        .map((data) => {
+        .switchMap((data) => {
             let that = this;
             // let count = 0,
             //     resourceArray = [];groupInfo.groupName
@@ -334,16 +334,61 @@ export class ChatEffect {
                     // }
                 }
             }
-            let msgId = JSON.parse(this.storageService.get('msgId' + global.user));
-            console.log(555555, 'msgId' + global.user)
-            this.store$.dispatch({
-                type: chatAction.getConversationSuccess,
-                payload: {
-                    storage: true,
-                    msgId
+            let conversationObj = global.JIM.getConversation()
+            .onSuccess(function(info) {
+                console.log('会话列表', info.conversations.length, info.conversations)
+                info.conversations = info.conversations.reverse();
+                // 获取头像url
+                let count = 0;
+                for(let i=0;i<info.conversations.length;i++){
+                    if(info.conversations[i].avatar && info.conversations[i].avatar !== '' && info.conversations[i].type === 3){
+                        count ++;
+                        global.JIM.getResource({'media_id': info.conversations[i].avatar})
+                        .onSuccess(function(urlInfo){
+                            info.conversations[i].avatarUrl = urlInfo.url;
+                            count --;
+                            if(count <= 0){
+                                that.store$.dispatch({
+                                    type: chatAction.getConversationSuccess, 
+                                    payload: {
+                                        conversation: info.conversations,
+                                        msgId: JSON.parse(that.storageService.get('msgId' + global.user)),
+                                        storage: true,
+                                        messageList: data
+                                    }
+                                });
+                            }
+                        }).onFail(function(error){
+                            
+                        });
+                    }
                 }
-            })
-            return {type: chatAction.getAllMessageSuccess, payload: data};
+                // 获取屏蔽列表
+                global.JIM.groupShieldList().onSuccess(function(data) {
+                    that.store$.dispatch({
+                        type: chatAction.getConversationSuccess, 
+                        payload: {
+                            shield: data.groups
+                        }
+                    });
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: indexAction.errorApiTip,
+                        payload: error
+                    });
+                    console.log('error:' + JSON.stringify(error));
+                });
+            }).onFail(function(error) {
+                that.store$.dispatch({
+                    type: indexAction.errorApiTip,
+                    payload: error
+                });
+                console.log('error:' + JSON.stringify(error));
+            });
+            return Observable.of(conversationObj)
+                    .map(() => {
+                        return {type: '[chat] get all messageList useless'};
+                    })
     })
     
     // 发送单人消息
