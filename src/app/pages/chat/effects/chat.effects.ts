@@ -46,7 +46,7 @@ export class ChatEffect {
                                 type: chatAction.receiveMessageSuccess,
                                 payload: obj.data
                             });
-                            return;                            
+                            return;
                         }
                     }
                     global.JIM.getResource({'media_id' : user.user_info.avatar})
@@ -86,6 +86,7 @@ export class ChatEffect {
                     increase ++;
                     global.JIM.getGroupMembers({'gid': obj.data.messages[i].content.target_id})
                     .onSuccess(function(data) {
+                        count ++;
                         let name = '';
                         for(let i=0;i<data.member_list.length;i++){
                             name += (data.member_list[i].nickName !== '' ? data.member_list[i].nickName : data.member_list[i].usernmae) + '、';
@@ -95,11 +96,20 @@ export class ChatEffect {
                         }else{
                             obj.data.messages[i].content.target_name = name.slice(0, name.length - 1);
                         }
-                        that.store$.dispatch({
-                            type: chatAction.receiveMessageSuccess,
-                            payload: obj.data
-                        });
+                        if(count === messages.length + increase){
+                            that.store$.dispatch({
+                                type: chatAction.receiveMessageSuccess,
+                                payload: obj.data
+                            });
+                        }
                     }).onFail(function(error) {
+                        count ++;
+                        if(count === messages.length + increase){
+                            that.store$.dispatch({
+                                type: chatAction.receiveMessageSuccess,
+                                payload: obj.data
+                            });
+                        }
                         that.store$.dispatch({
                             type: indexAction.errorApiTip,
                             payload: error
@@ -359,9 +369,31 @@ export class ChatEffect {
                                 });
                             }
                         }).onFail(function(error){
-                            
+                            count --;
+                            if(count <= 0){
+                                that.store$.dispatch({
+                                    type: chatAction.getConversationSuccess, 
+                                    payload: {
+                                        conversation: info.conversations,
+                                        msgId: JSON.parse(that.storageService.get('msgId' + global.user)),
+                                        storage: true,
+                                        messageList: data
+                                    }
+                                });
+                            }
                         });
                     }
+                }
+                if(count === 0){
+                    that.store$.dispatch({
+                        type: chatAction.getConversationSuccess, 
+                        payload: {
+                            conversation: info.conversations,
+                            msgId: JSON.parse(that.storageService.get('msgId' + global.user)),
+                            storage: true,
+                            messageList: data
+                        }
+                    });
                 }
                 // 获取屏蔽列表
                 global.JIM.groupShieldList().onSuccess(function(data) {

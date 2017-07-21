@@ -72,6 +72,7 @@ export class ChatComponent implements OnInit {
         url: ''
     };
     private eventArr = [];
+    private hasOffline = false;
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
@@ -84,6 +85,7 @@ export class ChatComponent implements OnInit {
         //     type: chatAction.getConversation, 
         //     payload: null
         // });
+        
         this.store$.dispatch({
             type: chatAction.getVoiceState, 
             payload: 'voiceState' + global.user
@@ -118,8 +120,8 @@ export class ChatComponent implements OnInit {
         });
         global.JIM.onEventNotification(function(data) {
             console.log('event',data);
-            // 如果是离线消息则存在数组里
-            if(data.ctime * 1000 < (new Date).getTime() - 5000){
+            // 如果是离线业务消息则存在数组里
+            if(data.ctime * 1000 < (new Date).getTime() - 1000){
                 that.eventArr.push(data);
                 console.log(4444, that.eventArr);
             }
@@ -176,13 +178,22 @@ export class ChatComponent implements OnInit {
             }
         })
         //离线消息同步监听
-        global.JIM.onSyncConversation(function(data) { 
+        global.JIM.onSyncConversation(function(data) {
             console.log('离线消息列表',data);
+            that.hasOffline = true;
             that.store$.dispatch({
                 type: chatAction.getAllMessage, 
                 payload: data
             });
-        });       
+        });
+        setTimeout(function(){
+            if(!that.hasOffline){
+                that.store$.dispatch({
+                    type: chatAction.getAllMessage, 
+                    payload: []
+                });
+            }
+        }, 3000);    
     }
     private subscribeStore(){
         this.chatStream$ = this.store$.select((state) => {

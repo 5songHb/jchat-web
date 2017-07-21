@@ -53,6 +53,9 @@ export class CreateGroupComponent implements OnInit {
                 if(mainState.createGroupSearch.info){
                     let result = [];
                     result.push(mainState.createGroupSearch.info);
+                    if(result[0].name === global.user){
+                        result[0].disabled = true;
+                    }
                     for(let i=0;i<this.selectList.length;i++){
                         if(Number(result[0].key) === Number(this.selectList[i].key)){
                             result[0].checked = this.selectList[i].checked;
@@ -92,6 +95,8 @@ export class CreateGroupComponent implements OnInit {
                 if(keyFlag){
                     this.createGroup.list[i].data[j].checked = true;
                     this.createGroup.list[i].data[j].disabled = true;
+                    this.createGroup.info.activeSingle.disabled = true;
+                    this.createGroup.info.activeSingle.checked = true;
                     this.selectList.push(this.createGroup.info.activeSingle);
                 }
            }
@@ -162,6 +167,7 @@ export class CreateGroupComponent implements OnInit {
             }
         }
         if(flag){
+            item.checked = true;
             this.selectList.push(item);
         }
         for(let i=0;i<this.createGroup.list.length;i++){

@@ -314,7 +314,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         if((!this.change && this.active.change) || this.active.change !== this.change){
             this.componentScroll.update();
             this.componentScroll.scrollToBottom();
-            console.log(777777)
             // let msgs = this.messageList[this.active.activeIndex].msgs;
             // if(msgs && this.msg.length <= 20 && msgs.length > 20){
             //     this.msg = msgs.slice(msgs.length - 20);

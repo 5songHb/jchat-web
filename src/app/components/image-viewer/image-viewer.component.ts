@@ -128,7 +128,7 @@ export class ImageViewerComponent implements OnInit {
             }else{
                 this.imgHidden = true;
             }
-            this.imageViewer.active = this.imageViewer.result[index];
+            this.imageViewer.active = Object.assign({}, this.imageViewer.result[index], {});
             this.imageViewer.active.index = index;
             this.initImviewer();
             this.ratio = 1;
@@ -146,7 +146,7 @@ export class ImageViewerComponent implements OnInit {
             }else{
                 this.imgHidden = true;
             }
-            this.imageViewer.active = this.imageViewer.result[index];
+            this.imageViewer.active = Object.assign({}, this.imageViewer.result[index], {});
             this.imageViewer.active.index = index;                 
             this.initImviewer();
             this.ratio = 1;

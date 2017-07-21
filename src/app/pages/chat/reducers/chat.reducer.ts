@@ -33,7 +33,6 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 接收消息
         case chatAction.receiveMessageSuccess:
-            console.log(6666, payload)
             addMessage(state, payload);
             let newMsgKey = [];
             for(let i=0;i<payload.messages.length;i++){
@@ -274,6 +273,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
         case chatAction.deleteGroupMembersEvent:
             groupMembersEvent(state, payload, '被移出群聊了');
+            deleteGroupMembersEvent(state, payload);
             break;
         // 获取voice是否已经播放的状态
         case chatAction.getVoiceStateSuccess:
@@ -286,6 +286,20 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     }
     return state;
 };
+function deleteGroupMembersEvent(state, payload){
+    for(let i=0;i<state.messageList.length;i++){
+        if(Number(state.messageList[i].key) === Number(payload.gid)){
+            if(state.messageList[i].groupSetting && state.messageList[i].groupSetting.memberList){
+                state.messageList[i].groupSetting.memberList = state.messageList[i].groupSetting.memberList.filter(function(item1) {
+                    return payload.to_usernames.every(function(item2) {
+                        return item2.username !== item1.username;
+                    })
+                })
+            }
+            break;
+        }
+    }
+}
 function updateGroupName(state, payload){
     for(let i=0;i<state.groupList.length;i++){
         if(Number(payload.gid) === Number(state.groupList[i].gid)){
@@ -296,7 +310,7 @@ function updateGroupName(state, payload){
 }
 // 切换用户前清除语音的定时器
 function clearTimer(state: ChatStore){
-    if(state.activePerson.activeIndex < 0){
+    if(state.activePerson.activeIndex < 0 && !state.messageList[state.activePerson.activeIndex]){
         return;
     }
     let msg = state.messageList[state.activePerson.activeIndex].msgs;
@@ -434,7 +448,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                 });
             }else{
                 for(let i=0;i<msgs.length;i++){
-                    if(payload.ctime <= msgs[0].ctime){
+                    if(payload.ctime * 1000 <= msgs[0].ctime_ms){
                         let eventObj = {
                             tip: addGroupOther,
                             operation,
@@ -449,7 +463,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                         }
                         return ;
                     }
-                    if(payload.ctime >= msgs[msgs.length - 1].ctime){
+                    if(payload.ctime * 1000 >= msgs[msgs.length - 1].ctime_ms){
                         let eventObj = {
                             tip: addGroupOther,
                             operation,
@@ -464,7 +478,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                         }
                         return ;
                     }
-                    if(payload.ctime > msgs[i].ctime && payload.ctime < msgs[i + 1].ctime){
+                    if(payload.ctime * 1000 > msgs[i].ctime_ms && payload.ctime * 1000 < msgs[i + 1].ctime_ms){
                         let eventObj = {
                             tip: addGroupOther,
                             operation,
