@@ -7,31 +7,41 @@ export class Util {
     constructor(){}
     /**
      * 将input file转化成formData对象
-     * params id: string , input file的id
-     * return FormData对象
+     * @param id: string
+     * @return FormData对象
      */
-    getFileFormData(file, type: string){
+    getFileFormData(file){
         let fd = new FormData();
         if(!file.files[0]) {
             throw new Error('获取文件失败');
-        }
-        console.log(555, file.files[0].name);
-        if(type === 'file'){
-            let index = file.files[0].name.lastIndexOf('.'),
-                ext = file.files[0].name.substring(index),
-                doc = ['.ppt', '.pptx', '.doc', '.docx', '.pdf', '.xls', '.xlsx', '.txt', '.wps'],
-                video = [],
-                audio = [],
-                image = [],
-                other = [];
         }
         fd.append(file.files[0].name, file.files[0]);
         return fd;
     }
     /**
+     * 发送文件时截取后缀名作为拓展字段
+     * @param name string
+     * @return 
+     */
+    getExt(name){
+        let index = name.lastIndexOf('.'),
+            ext = name.substring(index),
+            extArr = ['.ppt', '.pptx', '.doc', '.docx', '.pdf', '.xls', '.xlsx', '.txt', '.wps',
+                        '.mp4', '.mov', '.rm', '.rmvb', '.wmv', '.avi', '.3gp', '.mkv',
+                        '.wav', '.mp3', '.wma', '.midi',
+                        '.jpeg', '.png', '.bmp', '.gif'];
+        for(let item of extArr){
+            if(item.match(ext)){
+                return ext;
+            }
+        }
+        return 'other';
+    }
+    /**
      * fileReader预览图片返回img url
-     * params file: input file 对象, callback 回调函数
-     * return null
+     * @param file:Object, input file 对象
+     * @param callback: function 回调函数
+     * @return null
      */
     imgReader(file, callback?: Function){
         let files = file.files[0];
@@ -65,7 +75,7 @@ export class Util {
     }
     /**
      * fileReader预览图片url
-     * params file: input file 对象
+     * @param file: Object, input file 对象
      */
     fileReader(file){
         let files = file.files[0];
@@ -86,8 +96,8 @@ export class Util {
     }
     /**
      * 对象深度拷贝
-     * params oldObj: Object   需要拷贝的对象
-     * return Object 新对象
+     * @param oldObj: Object   需要拷贝的对象
+     * @return Object 新对象
      */
     // deepCopy(oldObj) {
     //     let newObject = {};
@@ -113,7 +123,8 @@ export class Util {
     // }
     /**
      * contenteditable输入框插入表情
-     * params field: object  输入框dom对象， value: string 需要插入的内容
+     * @param field: Object  输入框dom对象
+     * @param value: string 需要插入的内容
      */
     
     insertAtCursor (field, value, selectPastedContent) {
@@ -183,7 +194,7 @@ export class Util {
     }
     /**
      * contenteditable输入框光标聚焦到最后
-     * params obj: object  输入框dom对象
+     * @param obj: Object  输入框dom对象
      */
     focusLast(obj) {
         // if (document.selection) {//ie10 9 8 7 6 5
@@ -202,8 +213,8 @@ export class Util {
     }
     /**
      * 判断字符串首字母是否是中文
-     * params str: string  需要操作的字符串
-     * return boolean
+     * @param str: string  需要操作的字符串
+     * @return boolean
      */
     firstLetterIsChinese(str){
       let re=/^[\\u4e00-\\u9fa5]/;
@@ -212,8 +223,8 @@ export class Util {
     }
     /**
      * 将数组中的字符串按照首字母及中文拼音首字母排序
-     * params payload: 数组  需要排序的数组
-     * return 排好序的数组array
+     * @param payload: array 需要排序的数组
+     * @return array 排好序的数组array
      */
     sortByLetter(payload){
         let letter = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
@@ -266,8 +277,9 @@ export class Util {
     }
     /**
      * 将元素插入按首字母排序的数组中
-     * params arr: 之前排好序的数组 array， payload: object  需要插入的元素
-     * return 插入元素之后的数组array
+     * @param arr: array 之前排好序的数组 
+     * @param payload: Object  需要插入的元素
+     * @return array 插入元素之后的数组
      */
     insertSortByLetter(arr, payload){
         let name = (payload.nickName && payload.nickName !== '') ? payload.nickName : payload.name,
@@ -292,8 +304,7 @@ export class Util {
     }
     /**
      * 将接收到的地理定位坐标转化为百度地图
-     * params obj: 坐标对象
-     * return null
+     * @param obj: Object 坐标对象
      */
     theLocation(obj){
         // 百度地图API功能
@@ -310,8 +321,8 @@ export class Util {
     }
     /**
      * 将时间转化成需要的格式
-     * params msgTime: 需要转换的时间毫秒数
-     * return string 时间的标识，根据标识可以再页面应用不同的date管道
+     * @param msgTime: 需要转换的时间毫秒数
+     * @return string 时间的标识，根据标识可以再页面应用不同的date管道
      * 
      * 当天 --- today
      * 昨天和前天 --- yesterday或the day before
@@ -344,12 +355,14 @@ export class Util {
         }else if(gapDate <= 0){
             return 'today';
         }else{
-            return false;
+            return '';
         }
     }
     /**
      * 判断两个时间间隔是否超过5分钟
-     * params oldTime: number, newTime: number
+     * @param oldTime: number
+     * @param newTime: number
+     * @return boolean
      */
     fiveMinutes(oldTime, newTime){
         let gap = newTime - oldTime;
@@ -361,8 +374,8 @@ export class Util {
     }
     /**
      * 生成JIM初始化的签名
-     * params timestamp: 当前的时间毫秒数
-     * return string 签名
+     * @param timestamp: number 当前的时间毫秒数
+     * @return string 签名
      */
     createSignature(timestamp : number){
         return md5(`appkey=${authPayload.appKey}&timestamp=${timestamp}&random_str=${authPayload.randomStr}&key=${authPayload.masterkey}`);

@@ -354,7 +354,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     private sendPicAction(event){
         let pic = this.elementRef.nativeElement.querySelector('#sendPic'),
-            img = this.util.getFileFormData(pic, 'pic');
+            img = this.util.getFileFormData(pic);
         this.sendPic.emit(img);
         event.target.value = '';
         this.contentDiv.focus();
@@ -362,7 +362,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     private sendFileAction(event){
         let fileData = this.elementRef.nativeElement.querySelector('#sendFile'),
-            file = this.util.getFileFormData(fileData, 'file');
+            file = this.util.getFileFormData(fileData);
         this.sendFile.emit({
             file,
             fileData: this.elementRef.nativeElement.querySelector('#sendFile').files[0]

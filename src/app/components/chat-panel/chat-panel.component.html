@@ -23,11 +23,16 @@
                 <!-- 时间 -->
                 <div *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex].addGroupOther && messageList[active.activeIndex].addGroupOther.length > 0">
                     <div *ngFor="let item of messageList[active.activeIndex].addGroupOther">
-                        <p *ngIf="item.time_show" class="chat-panel-time" [ngClass]="{'first': num === 0}">
-                            <time style="top: 0;">{{item.ctime_ms | time:"HH:mm"}}</time>
+                        <p *ngIf="item.time_show" class="chat-panel-time" [ngClass]="{'first': num === 0}" [ngSwitch]="item.time_show">
+                            <time style="top: 0;" *ngSwitchCase="'year'">{{item.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>
+                            <time style="top: 0;" *ngSwitchCase="'month'">{{item.ctime_ms | time:"MM-dd HH:mm"}}</time>
+                            <time style="top: 0;" *ngSwitchCase="'day'">{{item.ctime_ms | day}} {{item.ctime_ms | time:"HH:mm"}}</time>
+                            <time style="top: 0;" *ngSwitchCase="'the day before'">前天 {{item.ctime_ms | time:"HH:mm"}}</time>
+                            <time style="top: 0;" *ngSwitchCase="'yesterday'">昨天 {{item.ctime_ms | time:"HH:mm"}}</time>
+                            <time style="top: 0;" *ngSwitchCase="'today'">{{item.ctime_ms | time:"HH:mm"}}</time>
                         </p>
                         <p class="chat-panel-add-members">
-                            <span>{{item.tip}}被添加进群聊了</span>
+                            <span>{{item.text}}</span>
                         </p>
                     </div>
                 </div>
@@ -302,11 +307,16 @@
                     </p> -->
                     <div *ngIf="i.addGroupOther && i.addGroupOther.length > 0">
                         <div *ngFor="let item of i.addGroupOther">
-                            <p *ngIf="item.time_show" class="chat-panel-time">
-                                <time style="top: 0;">{{item.ctime_ms | time:"HH:mm"}}</time>
+                            <p *ngIf="item.time_show" class="chat-panel-time" [ngSwitch]="item.time_show">
+                                <time style="top: 0;" *ngSwitchCase="'year'">{{item.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>
+                                <time style="top: 0;" *ngSwitchCase="'month'">{{item.ctime_ms | time:"MM-dd HH:mm"}}</time>
+                                <time style="top: 0;" *ngSwitchCase="'day'">{{item.ctime_ms | day}} {{item.ctime_ms | time:"HH:mm"}}</time>
+                                <time style="top: 0;" *ngSwitchCase="'the day before'">前天 {{item.ctime_ms | time:"HH:mm"}}</time>
+                                <time style="top: 0;" *ngSwitchCase="'yesterday'">昨天 {{item.ctime_ms | time:"HH:mm"}}</time>
+                                <time style="top: 0;" *ngSwitchCase="'today'">{{item.ctime_ms | time:"HH:mm"}}</time>
                             </p>
                             <p class="chat-panel-add-members">
-                                <span>{{item.tip}}{{item.operation}}</span>
+                                <span>{{item.text}}</span>
                             </p>
                         </div>
                     </div>

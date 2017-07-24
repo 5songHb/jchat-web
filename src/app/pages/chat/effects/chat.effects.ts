@@ -907,59 +907,114 @@ export class ChatEffect {
             let that = this,
             groupInfoObj = global.JIM.getGroupInfo({'gid': eventData.gid})
             .onSuccess(function(obj) {
-                global.JIM.getGroupMembers({'gid': eventData.gid})
-                .onSuccess(function(data) {
-                    that.store$.dispatch({
-                        type: chatAction.updateGroupMembersEvent,
-                        payload: {
-                            memberList: data.member_list,
-                            eventData
-                        }
-                    });
-                    let name = '';
-                    for(let i=0;i<data.member_list.length;i++){
-                        name += (data.member_list[i].nickName !== '' ? data.member_list[i].nickName : data.member_list[i].username) + '、';
-                        if(data.member_list[i].avatar && data.member_list[i].avatar !== ''){
-                            global.JIM.getResource({'media_id' : data.member_list[i].avatar})
-                            .onSuccess(function(urlInfo){
-                                data.member_list[i].avatarUrl = urlInfo.url;
-                                that.store$.dispatch({
-                                    type: chatAction.updateGroupMembersEvent,
-                                    payload: {
-                                        memberList: data.member_list,
-                                        eventData
-                                    }
-                                })
-                            }).onFail(function(error){
-
-                            });
-                        }
-                    }
-                    if(name.length > 20){
-                        eventData.name = name.slice(0, 20);
-                    }else{
-                        eventData.name = name.slice(0, name.length - 1);
-                    }
-                    if(obj.group_info.name && obj.group_info.name !== ''){
-                        eventData.name = obj.group_info.name;
-                    }
+                if(obj.group_info.name && obj.group_info.name !== ''){
+                    eventData.name = obj.group_info.name;
                     that.store$.dispatch({
                         type: chatAction.addGroupMembersEventSuccess,
                         payload: eventData
                     });
-                }).onFail(function(error) {
-                    that.store$.dispatch({
-                        type: indexAction.errorApiTip,
-                        payload: error
+                    let count = 0;
+                    for(let i=0;i<eventData.to_usernames.length;i++){
+                        global.JIM.getUserInfo({
+                            'username' : eventData.to_usernames[i].username
+                        }).onSuccess(function(user) {
+                            eventData.to_usernames.key = user.uid;
+                                if(count === eventData.to_usernames.length){
+                                    that.store$.dispatch({
+                                        type: chatAction.updateGroupMembersEvent,
+                                        payload: {
+                                            eventData
+                                        }
+                                    });
+                                }
+                            global.JIM.getResource({'media_id' : user.user_info.avatar})
+                            .onSuccess(function(urlInfo){
+                                eventData.to_usernames.avatarUrl = urlInfo.url;
+                                count ++;
+                                if(count === eventData.to_usernames.length){
+                                    that.store$.dispatch({
+                                        type: chatAction.updateGroupMembersEvent,
+                                        payload: {
+                                            eventData
+                                        }
+                                    });
+                                }
+                            }).onFail(function(error){
+                                count ++;
+                                if(count === eventData.to_usernames.length){
+                                    that.store$.dispatch({
+                                        type: chatAction.updateGroupMembersEvent,
+                                        payload: {
+                                            eventData
+                                        }
+                                    });
+                                }
+                            });
+                        }).onFail(function(error) {
+                            
+                        });
+                    }
+                }else{
+                    global.JIM.getGroupMembers({'gid': eventData.gid})
+                    .onSuccess(function(data) {
+                        let name = '',
+                            count = 0;
+                        for(let i=0;i<data.member_list.length;i++){
+                            name += (data.member_list[i].nickName !== '' ? data.member_list[i].nickName : data.member_list[i].username) + '、';
+                            for(let j=0;j<eventData.to_usernames.length;j++){
+                                if(eventData.to_usernames[j].username === data.member_list[i].username){
+                                    global.JIM.getResource({'media_id' : data.member_list[i].avatar})
+                                    .onSuccess(function(urlInfo){
+                                        eventData.to_usernames[j].avatarUrl = urlInfo.url;                                        
+                                        count ++;
+                                        if(count === eventData.to_usernames.length){
+                                            that.store$.dispatch({
+                                                type: chatAction.updateGroupMembersEvent,
+                                                payload: {
+                                                    eventData
+                                                }
+                                            });
+                                        }
+                                    }).onFail(function(error){
+                                        count ++;
+                                        if(count === eventData.to_usernames.length){
+                                            that.store$.dispatch({
+                                                type: chatAction.updateGroupMembersEvent,
+                                                payload: {
+                                                    eventData
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        if(name.length > 20){
+                            eventData.name = name.slice(0, 20);
+                        }else{
+                            eventData.name = name.slice(0, name.length - 1);
+                        }
+                        that.store$.dispatch({
+                            type: chatAction.addGroupMembersEventSuccess,
+                            payload: eventData
+                        });
+                    }).onFail(function(error) {
+                        that.store$.dispatch({
+                            type: indexAction.errorApiTip,
+                            payload: error
+                        });
+                        that.store$.dispatch({
+                            type: chatAction.addGroupMembersEventSuccess,
+                            payload: eventData
+                        });
                     });
-                    console.log('error:' + JSON.stringify(error));
-                });
+                }
+                
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of('addGroupMembersEventObj')
                     .map(() => {

@@ -119,9 +119,9 @@ export class ChatComponent implements OnInit {
             console.log("【disconnect】");
         });
         global.JIM.onEventNotification(function(data) {
-            console.log('event',data);
+            console.log('event', data);
             // 如果是离线业务消息则存在数组里
-            if(data.ctime * 1000 < (new Date).getTime() - 1000){
+            if(data.ctime * 1000 < (new Date).getTime() + 10000){
                 that.eventArr.push(data);
                 console.log(4444, that.eventArr);
             }
@@ -199,7 +199,7 @@ export class ChatComponent implements OnInit {
         this.chatStream$ = this.store$.select((state) => {
             let chatState = state['chatReducer'];
             let mainState = state['mainReducer'];
-            console.log('chat',chatState);
+            console.log('chat', chatState);
             this.stateChanged(chatState, mainState);
             return state;
         }).subscribe((state) => {
@@ -207,7 +207,7 @@ export class ChatComponent implements OnInit {
         });
     }
     private stateChanged(chatState, mainState){
-        console.log('chat',chatState.actionType);
+        console.log('chat', chatState);
         switch(chatState.actionType){
             case chatAction.getConversationSuccess:
                 this.conversationList = chatState.conversation;
@@ -250,8 +250,6 @@ export class ChatComponent implements OnInit {
             case chatAction.sendSingleFile:
                 
             case chatAction.sendGroupFile:
-
-            case chatAction.addGroupMembersEventSuccess:
 
             case chatAction.updateGroupMembersEvent:
 
@@ -623,6 +621,7 @@ export class ChatComponent implements OnInit {
         // 发送单聊文件
         let msgs;        
         if(!data.repeatSend){
+            let ext = this.util.getExt(data.fileData.name);
             msgs  = {
                 content: {
                     create_time: (new Date()).getTime(),
@@ -631,6 +630,10 @@ export class ChatComponent implements OnInit {
                     msg_body: {
                         fname: data.fileData.name,
                         fsize: data.fileData.size
+                    },
+                    extras:{
+                        fileSize: data.fileData.size,
+                        fileType: ext
                     }
                 },
                 ctime_ms: (new Date()).getTime(),
@@ -639,6 +642,7 @@ export class ChatComponent implements OnInit {
             }
         }
         if(this.active.type == 3 && !data.repeatSend){
+            let ext = this.util.getExt(data.fileData.name);
             let singleFile = {
                 file: data.file,
                 target_username: this.active.name,
@@ -647,7 +651,7 @@ export class ChatComponent implements OnInit {
                 extras: {
                     media_id: this.selfInfo.avatar,
                     fileSize: data.fileData.size,
-                    fileType: ''
+                    fileType: ext
                 }
             }
             msgs.singleFile = singleFile;
@@ -662,12 +666,15 @@ export class ChatComponent implements OnInit {
             })
         // 发送群组文件
         }else if(this.active.type == 4 && !data.repeatSend){
+            let ext = this.util.getExt(data.fileData.name);
             let groupFile = {
                 file : data.file,
                 target_gid: this.active.key,
 			    target_gname: this.active.name,
                 extras: {
-                    media_id: this.selfInfo.avatar
+                    media_id: this.selfInfo.avatar,
+                    fileSize: data.fileData.size,
+                    fileType: ext
                 }
             }
             msgs.groupFile = groupFile;

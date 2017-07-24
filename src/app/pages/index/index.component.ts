@@ -21,7 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
     ){}
     ngOnInit(){
         // 创建JIM 对象
-        global.JIM = new JMessage({debug: true});
+        global.JIM = new JMessage();
         this.indexStream$ = this.store$.select((state) => {
             let indexState = state['indexReducer'];
             switch(indexState.actionType){

@@ -171,6 +171,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.messageList[state.activePerson.activeIndex].groupSetting.show = payload.show;
             break;
         case mainAction.createSingleChatSuccess:
+            clearTimer(state);
             state.otherInfo.info = payload;
             state.otherInfo.show = true;
             break;
@@ -310,7 +311,7 @@ function updateGroupName(state, payload){
 }
 // 切换用户前清除语音的定时器
 function clearTimer(state: ChatStore){
-    if(state.activePerson.activeIndex < 0 && !state.messageList[state.activePerson.activeIndex]){
+    if(state.activePerson.activeIndex < 0 || !state.messageList[state.activePerson.activeIndex]){
         return;
     }
     let msg = state.messageList[state.activePerson.activeIndex].msgs;
@@ -333,16 +334,19 @@ function updateGroupMembers(state: ChatStore, payload){
     for(let i=0;i<state.messageList.length;i++){
         if(Number(state.messageList[i].key) === Number(payload.eventData.gid)){
             if(state.messageList[i].groupSetting){
-                state.messageList[i].groupSetting.memberList = payload.memberList;
+                state.messageList[i].groupSetting.memberList = state.messageList[i].groupSetting.memberList.concat(payload.eventData.to_usernames);
             }
             break;
         }
     }
 }
 function isRecentmsg(state, payload, addGroupOther, operation){
+    let flag = false;
     for(let j=0;j<state.messageList.length;j++){
         if(Number(state.conversation[0].key) === Number(state.messageList[j].key)){
-            if(payload.ctime * 1000 > state.messageList[j]['msgs'][state.messageList[j]['msgs'].length - 1].ctime_ms){
+            flag = true;
+            let msg = state.messageList[j]['msgs'];
+            if(msg.length === 0 || payload.ctime * 1000 > msg[msg.length - 1].ctime_ms){
                 state.conversation[0].recentMsg = {
                     ctime_ms: payload.ctime * 1000,
                     content: {
@@ -351,11 +355,24 @@ function isRecentmsg(state, payload, addGroupOther, operation){
                         },
                         msg_type: 'groupEvent'
                     },
-                    conversation_time_show: 'today',
+                    conversation_time_show: util.reducerDate(payload.ctime * 1000),
                     msg_type: 4
                 }
             }
             break;
+        }
+    }
+    if(!flag){
+        state.conversation[0].recentMsg = {
+            ctime_ms: payload.ctime * 1000,
+            content: {
+                msg_body: {
+                    text: addGroupOther + operation
+                },
+                msg_type: 'groupEvent'
+            },
+            conversation_time_show: util.reducerDate(payload.ctime * 1000),
+            msg_type: 4
         }
     }
 }
@@ -403,7 +420,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                 }
                 state.groupList[i].type = 4;
                 state.groupList[i].key = state.groupList[i].gid;
-                state.groupList[i].unreadNum ++;
+                state.groupList[i].unreadNum = 1;
                 state.conversation.unshift(state.groupList[i]);
                 flag1 = false;
                 isRecentmsg(state, payload, addGroupOther, operation);
@@ -425,7 +442,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                     },
                     msg_type: 'groupEvent'
                 },
-                conversation_time_show: 'today',
+                conversation_time_show: util.reducerDate(payload.ctime * 1000),
                 msg_type: 4
             }
         }
@@ -437,58 +454,72 @@ function groupMembersEvent(state: ChatStore, payload, operation){
             flag2 = false;
             let msgs = state.messageList[j].msgs;
             if(msgs.length === 0){
-                if(!state.messageList[j].addGroupOther){
-                    state.messageList[j].addGroupOther = [];
+                let eventObj = {
+                    text: addGroupOther + operation,
+                    ctime_ms: payload.ctime * 1000,
+                    time_show: util.reducerDate(payload.ctime * 1000)
+                },
+                add = state.messageList[j].addGroupOther;
+                if(add){
+                    let fiveMinutes = util.fiveMinutes(add[add.length - 1].ctime_ms, payload.ctime * 1000);
+                    if(!fiveMinutes){
+                        eventObj.time_show = '';
+                    }
+                    state.messageList[j].addGroupOther.push(eventObj);
+                }else{
+                    state.messageList[j].addGroupOther = [eventObj];
                 }
-                state.messageList[j].addGroupOther.push({
-                    tip: addGroupOther,
-                    operation,
-                    ctime_ms: payload.ctime,
-                    time_show: true
-                });
             }else{
                 for(let i=0;i<msgs.length;i++){
+                    let eventObj = {
+                        text: addGroupOther + operation,
+                        ctime_ms: payload.ctime * 1000,
+                        time_show: ''
+                    };
                     if(payload.ctime * 1000 <= msgs[0].ctime_ms){
-                        let eventObj = {
-                            tip: addGroupOther,
-                            operation,
-                            ctime_ms: payload.ctime * 1000,
-                            time_show: true
-                        };
-                        if(msgs.addGroupOther){
-                            eventObj.time_show = util.fiveMinutes(msgs.addGroupOther[msgs.addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                        let add = msgs.addGroupOther;
+                        if(add){
+                            let fiveMinutes = util.fiveMinutes(add[add.length - 1].ctime_ms, payload.ctime * 1000);
+                            if(fiveMinutes){
+                                eventObj.time_show = util.reducerDate(payload.ctime * 1000);
+                            }
                             msgs.addGroupOther.push(eventObj);
                         }else{
+                            eventObj.time_show = util.reducerDate(payload.ctime * 1000);
                             msgs.addGroupOther = [eventObj];
                         }
                         return ;
                     }
                     if(payload.ctime * 1000 >= msgs[msgs.length - 1].ctime_ms){
-                        let eventObj = {
-                            tip: addGroupOther,
-                            operation,
-                            ctime_ms: payload.ctime * 1000,
-                            time_show: util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, payload.ctime * 1000)
-                        }
-                        if(msgs[msgs.length - 1].addGroupOther){
-                            eventObj.time_show = util.fiveMinutes(msgs[msgs.length - 1].addGroupOther[msgs[msgs.length - 1].addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                        let add = msgs[msgs.length - 1].addGroupOther;
+                        if(add){
+                            let fiveMinutes = util.fiveMinutes(add[add.length - 1].ctime_ms, payload.ctime * 1000);
+                            if(fiveMinutes){
+                                eventObj.time_show = util.reducerDate(payload.ctime * 1000);
+                            }
                             msgs[msgs.length - 1].addGroupOther.push(eventObj);
                         }else{
+                            let fiveMinutes = util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, payload.ctime * 1000);
+                            if(fiveMinutes){
+                                eventObj.time_show = util.reducerDate(payload.ctime * 1000);
+                            }
                             msgs[msgs.length - 1].addGroupOther = [eventObj];
                         }
                         return ;
                     }
                     if(payload.ctime * 1000 > msgs[i].ctime_ms && payload.ctime * 1000 < msgs[i + 1].ctime_ms){
-                        let eventObj = {
-                            tip: addGroupOther,
-                            operation,
-                            ctime_ms: payload.ctime * 1000,
-                            time_show: util.fiveMinutes(msgs[i].ctime_ms, payload.ctime * 1000)
-                        }
-                        if(msgs[i].addGroupOther){
-                            eventObj.time_show = util.fiveMinutes(msgs[i].addGroupOther[msgs[i].addGroupOther.length - 1].ctime_ms, payload.ctime * 1000);
+                        let add = msgs[i].addGroupOther;
+                        if(add){
+                            let fiveMinutes = util.fiveMinutes(add[add.length - 1].ctime_ms, payload.ctime * 1000);
+                            if(fiveMinutes){
+                                eventObj.time_show = util.reducerDate(payload.ctime * 1000);
+                            }
                             msgs[i].addGroupOther.push(eventObj);
                         }else{
+                            let fiveMinutes = util.fiveMinutes(msgs[i].ctime_ms, payload.ctime * 1000);
+                            if(fiveMinutes){
+                                eventObj.time_show = util.reducerDate(payload.ctime * 1000);
+                            }
                             msgs[i].addGroupOther = [eventObj];
                         }
                     }
@@ -503,10 +534,9 @@ function groupMembersEvent(state: ChatStore, payload, operation){
             msgs: [],
             addGroupOther: [
                 {
-                    tip: addGroupOther,
-                    operation,
+                    text: addGroupOther + operation,
                     ctime_ms: payload.ctime * 1000,
-                    time_show: true
+                    time_show: util.reducerDate(payload.ctime * 1000)
                 }
             ]
         });
