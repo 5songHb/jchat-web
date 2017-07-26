@@ -78,6 +78,6 @@ export class ContactEffect {
             return Observable.of(groupListObj)
                     .map(() => {
                         return {type: '[main] get group list useless'};
-                    })
+                    });
         })
 }

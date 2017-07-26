@@ -73,7 +73,7 @@ export class MainEffect {
             return Observable.of(usrInfoObj)
                     .map(() => {
                         return {type: '[main] get selfInfo useless'};
-                    })
+                    });
     })
     // 退出登录
     @Effect()
@@ -86,7 +86,7 @@ export class MainEffect {
                     .map(() => {
                         this.router.navigate(['/login']);
                         return {type: '[main] login out useless'};
-                    })
+                    });
         })
     // 更新个人信息  
     @Effect()
@@ -102,7 +102,7 @@ export class MainEffect {
                         payload: {
                             info
                         }
-                    })
+                    });
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -113,7 +113,7 @@ export class MainEffect {
             return Observable.of(updateSelfInfo)
                     .map(() => {
                         return {type: '[main] update self info useless'};
-                    })
+                    });
         })
     // 更新个人头像信息  
     @Effect()
@@ -129,7 +129,7 @@ export class MainEffect {
                         payload: {
                             avatar
                         }
-                    })
+                    });
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -139,7 +139,7 @@ export class MainEffect {
             return Observable.of(updateSelfAvatar)
                     .map(() => {
                         return {type: '[main] update self info useless'};
-                    })
+                    });
         })
     // 创建群聊
     @Effect()
@@ -170,7 +170,7 @@ export class MainEffect {
                         'member_usernames': groupInfo.memberUsernames
                     }).onSuccess(function(data) {
                         that.store$.dispatch({
-                            type: mainAction.createGroupSuccess, 
+                            type: mainAction.createGroupSuccess,
                             payload: groupObj
                         });
                         console.log('success:' + JSON.stringify(data));
@@ -271,7 +271,7 @@ export class MainEffect {
             return Observable.of(passwordInfoObj)
                     .map(() => {
                         return {type: '[main] modify password useless'};
-                    })
+                    });
     });
     
     
@@ -324,7 +324,7 @@ export class MainEffect {
                             show: true,
                             info: '用户不存在'
                         }
-                    })
+                    });
                 }else{
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -336,7 +336,7 @@ export class MainEffect {
             return Observable.of(createSingleChatObj)
                     .map(() => {
                         return {type: '[main] create single chat action useless'};
-                    })
+                    });
     })
     // 创建群聊搜索联系人
     @Effect()
@@ -365,7 +365,7 @@ export class MainEffect {
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
                             payload: item
-                        })
+                        });
                     }).onFail(function(error){
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
@@ -376,14 +376,14 @@ export class MainEffect {
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: item
-                    })
+                    });
                 }
             }).onFail(function(error) {
                 if(error.code === 882002){
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: null
-                    })
+                    });
                 }else{
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -394,7 +394,7 @@ export class MainEffect {
             return Observable.of(createGroupSearchObj)
                     .map(() => {
                         return {type: '[main] create group search action useless'};
-                    })
+                    });
     })
     // 获取黑名单列表
     @Effect()
@@ -446,7 +446,7 @@ export class MainEffect {
             return Observable.of(blackMenuObj)
                     .map(() => {
                         return {type: '[main] black menu show useless'};
-                    })
+                    });
     })
     // 移出黑名单列表
     @Effect()
@@ -464,7 +464,7 @@ export class MainEffect {
                 that.store$.dispatch({
                     type: mainAction.delSingleBlackSuccess,
                     payload: user
-                })
+                });
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
@@ -475,7 +475,7 @@ export class MainEffect {
             return Observable.of(delSingleBlackObj)
                     .map(() => {
                         return {type: '[main] delete single black useless'};
-                    })
+                    });
     })
     // 加入黑名单
     @Effect()
@@ -502,7 +502,7 @@ export class MainEffect {
                             item: active
                         }
                     }
-                })
+                });
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -514,7 +514,7 @@ export class MainEffect {
             return Observable.of(addBlackListObj)
                     .map(() => {
                         return {type: '[main] add black list useless'};
-                    })
+                    });
     })
     // 退出群聊
     @Effect()
@@ -557,7 +557,7 @@ export class MainEffect {
             return Observable.of(exitGroupObj)
                     .map(() => {
                         return {type: '[main] exit group useless'};
-                    })
+                    });
     })
     // 删除群聊成员
     @Effect()
@@ -585,7 +585,7 @@ export class MainEffect {
                         deleteItem: info.deleteItem,
                         group: info.group
                     }
-                })
+                });
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
@@ -595,7 +595,7 @@ export class MainEffect {
             return Observable.of(deleteMember)
                     .map(() => {
                         return {type: '[main] delete group member useless'};
-                    })
+                    });
     })
     // 退出登录后重新登录
     @Effect()
@@ -641,6 +641,6 @@ export class MainEffect {
             return Observable.of(loginObj)
                     .map(() => {
                         return {type: '[main] login useless'};
-                    })
+                    });
     })
 }

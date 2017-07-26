@@ -42,6 +42,6 @@ export class LoginEffect {
             return Observable.of(loginObj)
                     .map((data) => {
                         return {type: '[login] login useless', payload: null};
-                    })
+                    });
         })
 }

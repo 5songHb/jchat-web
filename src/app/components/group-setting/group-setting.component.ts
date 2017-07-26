@@ -138,6 +138,7 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         this.modifyGroupNameShow = false;
     }
     private changeGroupShieldEmit(){
+        console.log(666, this.groupSetting)
         this.store$.dispatch({
             type: chatAction.changeGroupShield,
             payload: this.groupSetting.active

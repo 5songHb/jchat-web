@@ -67,7 +67,7 @@ export class RegisterEffect {
                             success: 1
                         }
                     }
-                })
+                });
             }).onFail(function(data) {
                 let usernameTip = '';
                 if(data.code === 882002){
@@ -83,7 +83,7 @@ export class RegisterEffect {
             return Observable.of(registerObj)
                     .map(() => {
                         return {type: '[register] register useless'};
-                    })
+                    });
         })
     // 用户名是否被注册
     @Effect()
@@ -126,7 +126,7 @@ export class RegisterEffect {
             return Observable.of(usernameObj)
                     .map(() => {
                         return {type: '[register] is username available useless'};
-                    })
+                    });
         })
     // 正则验证密码
     @Effect()
@@ -143,7 +143,7 @@ export class RegisterEffect {
             this.store$.dispatch({
                 type: registerAction.passwordTip, 
                 payload: passwordTip
-            })
+            });
             return val;
         })
         .map((val) =>{

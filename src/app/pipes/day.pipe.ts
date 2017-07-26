@@ -31,6 +31,7 @@ export class DayPipe implements PipeTransform {
         case 7:
             dayText = '星期日';
             break;
+        default:
     }
     return dayText;
   }

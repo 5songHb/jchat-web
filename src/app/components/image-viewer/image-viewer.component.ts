@@ -47,6 +47,7 @@ export class ImageViewerComponent implements OnInit {
             }
         }
         this.initImviewer();
+        console.log(555, this.imageViewer);
     }
     private initImviewer(){
         let viewerWrap = this.elementRef.nativeElement.querySelector('#viewerWrap');

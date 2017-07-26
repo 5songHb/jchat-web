@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 show: false,
                 info: {}
             }
-        })
+        });
     }
     private errorApiTip(errorMsg){
         let tip = '';
@@ -236,6 +236,6 @@ export class AppComponent implements OnInit, OnDestroy {
                     success: 2
                 }
             }
-        })
+        });
     }
 }

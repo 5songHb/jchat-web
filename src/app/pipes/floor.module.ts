@@ -2,19 +2,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { SrcPipe } from './src.pipe';
+import { FloorPipe } from './floor.pipe';
 
 @NgModule({
   declarations: [
-    SrcPipe
+    FloorPipe
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-      SrcPipe
+      FloorPipe
   ],
   providers: []
 })
-export class SrcPipeModule {}
+export class FloorPipeModule {}

@@ -2,19 +2,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { SrcPipe } from './src.pipe';
+import { BadgePipe } from './badge.pipe';
 
 @NgModule({
   declarations: [
-    SrcPipe
+    BadgePipe
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-      SrcPipe
+      BadgePipe
   ],
   providers: []
 })
-export class SrcPipeModule {}
+export class BadgePipeModule {}

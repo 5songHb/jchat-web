@@ -1,11 +1,13 @@
 import { Directive, ElementRef, Input, OnInit, HostListener, OnChanges } from '@angular/core';
-
+/**
+ * 实现非表单元素的双向绑定
+ */
 
 @Directive({ selector: '[myModel]' })
 
 export class myModelDirective implements OnInit{
     @Input()
-        myModel;
+        private myModel;
     constructor(private el: ElementRef) {
        
     }

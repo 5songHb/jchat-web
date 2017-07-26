@@ -40,5 +40,7 @@ export const chatAction = {
     playVideoShow: '[chat] play video show',
     updateContactInfo: '[chat] update contact info',
     updateGroupMembersEvent: '[chat] update group members',
-    deleteGroupMembersEvent: '[chat] delete group members event'
+    deleteGroupMembersEvent: '[chat] delete group members event',
+    exitGroupEvent: '[chat] exit group event',
+    createGroupEvent: '[chat] create group event'
 }

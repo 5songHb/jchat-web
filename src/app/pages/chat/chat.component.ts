@@ -73,13 +73,13 @@ export class ChatComponent implements OnInit {
     };
     private eventArr = [];
     private hasOffline = false;
+    private scrollBottom = false;
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
         private elementRef: ElementRef
     ){}
     public ngOnInit() {
-        this.storageKey = 'msgId' + global.user;
         this.subscribeStore();
         // this.store$.dispatch({
         //     type: chatAction.getConversation, 
@@ -90,7 +90,7 @@ export class ChatComponent implements OnInit {
             type: chatAction.getVoiceState, 
             payload: 'voiceState' + global.user
         });
-        let that = this;
+        const that = this;
         global.JIM.onMsgReceive(function(data) {
             console.log('收到的消息', data);
             that.store$.dispatch({
@@ -139,6 +139,33 @@ export class ChatComponent implements OnInit {
                             }
                         });
                         break;
+                    case 2:
+                        that.store$.dispatch({
+                            type: mainAction.logoutKickShow,
+                            payload: {
+                                show: true,
+                                info: {
+                                    title: '提示',
+                                    tip: '您的密码已在其他设备修改，请重新登录',
+                                    hideRepeateLoginBtn: true
+                                }
+                            }
+                        });
+                        break;
+                    case 8:
+                        that.store$.dispatch({
+                            type: chatAction.createGroupEvent,
+                            payload: data
+                        });
+                        break;
+                    case 9:
+                        if(data.to_usernames[0].username !== global.user){
+                            that.store$.dispatch({
+                                type: chatAction.exitGroupEvent,
+                                payload: data
+                            });
+                        }
+                        break;
                     case 10:
                         that.store$.dispatch({
                             type: chatAction.addGroupMembersEvent,
@@ -157,19 +184,27 @@ export class ChatComponent implements OnInit {
         // 离线业务消息监听，加载完数据之后才执行
         this.isLoaded$.subscribe((isLoaded) => {
             if(isLoaded){
-                console.log(8888, this.eventArr)
-                for(let i=0;i<this.eventArr.length;i++){
-                    switch(this.eventArr[i].event_type){
+                console.log(8888, this.eventArr);
+                for(let item of this.eventArr){
+                    switch(item.event_type){
+                        case 9:
+                            if(item.to_usernames[0].username !== global.user){
+                                that.store$.dispatch({
+                                    type: chatAction.exitGroupEvent,
+                                    payload: item
+                                });
+                            }
+                            break;
                         case 10:
                             that.store$.dispatch({
                                 type: chatAction.addGroupMembersEvent,
-                                payload: this.eventArr[i]
+                                payload: item
                             });
                             break;
                         case 11:
                             that.store$.dispatch({
                                 type: chatAction.deleteGroupMembersEvent,
-                                payload: this.eventArr[i]
+                                payload: item
                             });
                             break;
                     }
@@ -186,6 +221,7 @@ export class ChatComponent implements OnInit {
                 payload: data
             });
         });
+        // 如果3秒内没有加载离线消息则手动触发
         setTimeout(function(){
             if(!that.hasOffline){
                 that.store$.dispatch({
@@ -197,8 +233,8 @@ export class ChatComponent implements OnInit {
     }
     private subscribeStore(){
         this.chatStream$ = this.store$.select((state) => {
-            let chatState = state['chatReducer'];
-            let mainState = state['mainReducer'];
+            const chatState = state['chatReducer'];
+            const mainState = state['mainReducer'];
             console.log('chat', chatState);
             this.stateChanged(chatState, mainState);
             return state;
@@ -212,7 +248,9 @@ export class ChatComponent implements OnInit {
             case chatAction.getConversationSuccess:
                 this.conversationList = chatState.conversation;
                 this.messageList = chatState.messageList;
-                if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){                
+                // 如果是第一次登陆且有离线消息则存储当前msgId
+                this.storageKey = 'msgId' + global.user;                
+                if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){
                     this.storageMsgId(chatState.msgId);
                 }
                 this.store$.dispatch({
@@ -224,20 +262,14 @@ export class ChatComponent implements OnInit {
                     this.isLoadedSubject.next(this.isLoaded);
                 }
                 break;
-            // case chatAction.getAllMessageSuccess:
-            //     this.messageList = chatState.messageList;
-            //     if(chatState.msgId.length > 0 && !this.storageService.get(this.storageKey)){
-            //         this.storageMsgId(chatState.msgId);
-            //     }
-            //     break;
             case chatAction.receiveMessageSuccess:
-                let isActive = Number(this.active.key === chatState.newMessage.from_uid) || Number(this.active.key) === Number(chatState.newMessage.from_gid);
-                if(chatState.msgId.length > 0 && isActive){
-                    this.storageMsgId(chatState.msgId);
-                    this.active.change = !this.active.change;
+                if(chatState.newMessageIsActive){
+                    if(chatState.msgId.length > 0){
+                        this.storageMsgId(chatState.msgId);
+                    }
+                    this.scrollBottom = !this.scrollBottom;
                 }
                 this.messageList = chatState.messageList;
-                // this.storageMsgId(chatState.msgId);
                 break;
             case chatAction.sendSingleMessage:
 
@@ -252,9 +284,8 @@ export class ChatComponent implements OnInit {
             case chatAction.sendGroupFile:
 
             case chatAction.updateGroupMembersEvent:
-
                 // 触发滚动条向下滚动            
-                this.active.change = !this.active.change;
+                this.scrollBottom = !this.scrollBottom;
                 break;
             case chatAction.sendMsgComplete:
                 if(chatState.msgId.length > 0){
@@ -343,7 +374,7 @@ export class ChatComponent implements OnInit {
                         payload: {
                             show: false
                         }
-                    })
+                    });
                 }
                 break;
             case chatAction.groupDescription:
@@ -358,7 +389,7 @@ export class ChatComponent implements OnInit {
                         groupList: chatState.groupList,
                         conversation: chatState.conversation
                     }
-                })
+                });
                 break;
             case mainAction.showSelfInfo:
                 if(mainState.selfInfo.info){
@@ -378,9 +409,20 @@ export class ChatComponent implements OnInit {
             case chatAction.playVideoShow:
                 this.playVideoShow = chatState.playVideoShow;
                 break;
+            // 群聊事件
             case chatAction.addGroupMembersEventSuccess:
                 if(chatState.activePerson.activeIndex > 0 && chatState.messageList[chatState.activePerson.activeIndex].groupSetting){
                     this.groupSetting = Object.assign({}, this.groupSetting, chatState.messageList[chatState.activePerson.activeIndex].groupSetting);
+                }
+                if(chatState.currentIsActive){
+                    this.scrollBottom = !this.scrollBottom;
+                }
+                break;
+            case chatAction.deleteGroupMembersEvent:
+                
+            case chatAction.exitGroupEvent:
+                if(chatState.currentIsActive){
+                    this.scrollBottom = !this.scrollBottom;
                 }
                 break;
             default:
@@ -391,13 +433,13 @@ export class ChatComponent implements OnInit {
         this.chatStream$.unsubscribe();
     }
     private storageMsgId(msgId){
+        this.storageKey = 'msgId' + global.user;        
         this.storageService.set(this.storageKey, JSON.stringify(msgId));
     }
     // 更新当前对话用户信息
     private changeActivePerson(chatState){
-        let change = this.active.change;
         this.active = chatState.activePerson;
-        this.active.change = !change;
+        this.scrollBottom = !this.scrollBottom;
         this.groupSetting.show = false;
         // 判断是否已经缓存
         if(this.isCacheArr.indexOf(this.active.key) === -1){
@@ -409,7 +451,7 @@ export class ChatComponent implements OnInit {
                     active: this.active,
                     messageList: this.messageList
                 }
-            })
+            });
             // 获取messageList avatar url
             if(this.active.type === 4){
                 this.store$.dispatch({
@@ -418,12 +460,12 @@ export class ChatComponent implements OnInit {
                         active: this.active,
                         messageList: this.messageList
                     }
-                })
+                });
             }else{
                 this.store$.dispatch({
                     type: chatAction.getSingleAvatarUrl,
                     payload: null
-                })
+                });
             }
         }
     }
@@ -446,9 +488,10 @@ export class ChatComponent implements OnInit {
             payload: {
                 item
             }
-        })
+        });
     }
     private sendMsgEmit(data) {
+        // repeatSend = true重发消息
         // 发送单聊消息
         /**
          * success
@@ -474,10 +517,7 @@ export class ChatComponent implements OnInit {
             let singleMsg = {
                 target_username: this.active.name,
                 target_nickname: this.active.nickName,
-                content: data.content,
-                extras: {
-                    media_id: this.selfInfo.avatar
-                }
+                content: data.content
             }
             msgs.singleMsg = singleMsg;
             msgs.msg_type = 3;
@@ -494,10 +534,7 @@ export class ChatComponent implements OnInit {
             let groupMsg = {
                 target_gid: this.active.key,
                 target_gname: this.active.name,
-                content: data.content,
-                extras: {
-                    media_id: this.selfInfo.avatar
-                }
+                content: data.content
             }
             msgs.groupMsg = groupMsg;
             msgs.msg_type = 4;
@@ -508,7 +545,7 @@ export class ChatComponent implements OnInit {
                     key: this.active.key,
                     msgs
                 }
-            })
+            });
         }else if(this.active.type === 3 && data.repeatSend){
             this.store$.dispatch({
                 type: chatAction.sendSingleMessage, 
@@ -526,14 +563,14 @@ export class ChatComponent implements OnInit {
                     key: this.active.key,
                     msgs: data
                 }
-            })
+            });
         }
     }
     private sendPicEmit(data){
-        let msgs,
-            that = this,
-            file = this.elementRef.nativeElement.querySelector('#sendPic');
-        // 重发消息
+        let msgs;
+        const that = this;
+        const file = this.elementRef.nativeElement.querySelector('#sendPic');
+        // repeatSend = true重发消息
         if(data.repeatSend && this.active.type === 3){
             that.store$.dispatch({
                 type: chatAction.sendSinglePic, 
@@ -556,7 +593,20 @@ export class ChatComponent implements OnInit {
             return ;
         }
         // 发送消息
-        this.util.imgReader(file, function(value){
+        this.util.imgReader(file, () => {
+            that.store$.dispatch({
+                type: mainAction.showModalTip,
+                payload: {
+                    show: true,
+                    info: {
+                        title: '提示',
+                        tip: '选择的文件必须是图片',
+                        actionType: '[chat] must be image',
+                        cancel: true
+                    }
+                }
+            });
+        }, (value) => {
             msgs = {
                 content: {
                     from_id: global.user,
@@ -578,10 +628,7 @@ export class ChatComponent implements OnInit {
                     target_username: that.active.name,
                     target_nickname: that.active.nickName,
                     appkey: authPayload.appKey,
-                    image: data,
-                    extras: {
-                        media_id: that.selfInfo.avatar
-                    }
+                    image: data
                 }
                 msgs.singlePicFormData = singlePicFormData;
                 msgs.msg_type = 3;
@@ -592,16 +639,13 @@ export class ChatComponent implements OnInit {
                         key: that.active.key,
                         msgs
                     }
-                })
+                });
             // 发送群聊图片
             }else if(that.active.type === 4){
                 let groupPicFormData = {
                     target_gid: that.active.key,
                     target_gname: that.active.name,
-                    image: data,
-                    extras: {
-                        media_id: that.selfInfo.avatar
-                    }
+                    image: data
                 }
                 msgs.groupPicFormData = groupPicFormData;
                 msgs.msg_type = 4;
@@ -612,16 +656,17 @@ export class ChatComponent implements OnInit {
                         key: that.active.key,
                         msgs
                     }
-                })
+                });
             }
         })
         
     }
     private sendFileEmit(data){
+        // repeatSend = true重发消息
         // 发送单聊文件
         let msgs;        
         if(!data.repeatSend){
-            let ext = this.util.getExt(data.fileData.name);
+            const ext = this.util.getExt(data.fileData.name);
             msgs  = {
                 content: {
                     create_time: (new Date()).getTime(),
@@ -629,11 +674,11 @@ export class ChatComponent implements OnInit {
                     from_id: global.user,
                     msg_body: {
                         fname: data.fileData.name,
-                        fsize: data.fileData.size
-                    },
-                    extras:{
-                        fileSize: data.fileData.size,
-                        fileType: ext
+                        fsize: data.fileData.size,
+                        extras:{
+                            fileSize: data.fileData.size,
+                            fileType: ext
+                        }
                     }
                 },
                 ctime_ms: (new Date()).getTime(),
@@ -642,14 +687,13 @@ export class ChatComponent implements OnInit {
             }
         }
         if(this.active.type == 3 && !data.repeatSend){
-            let ext = this.util.getExt(data.fileData.name);
+            const ext = this.util.getExt(data.fileData.name);
             let singleFile = {
                 file: data.file,
                 target_username: this.active.name,
                 target_nickname: this.active.nickName,
                 appkey: authPayload.appKey,
                 extras: {
-                    media_id: this.selfInfo.avatar,
                     fileSize: data.fileData.size,
                     fileType: ext
                 }
@@ -663,16 +707,15 @@ export class ChatComponent implements OnInit {
                     msgs,
                     singleFile
                }
-            })
+            });
         // 发送群组文件
         }else if(this.active.type == 4 && !data.repeatSend){
-            let ext = this.util.getExt(data.fileData.name);
+            const ext = this.util.getExt(data.fileData.name);
             let groupFile = {
                 file : data.file,
                 target_gid: this.active.key,
 			    target_gname: this.active.name,
                 extras: {
-                    media_id: this.selfInfo.avatar,
                     fileSize: data.fileData.size,
                     fileType: ext
                 }
@@ -686,7 +729,7 @@ export class ChatComponent implements OnInit {
                     msgs,
                     groupFile
                 }
-            })
+            });
         }else if(this.active.type == 3 && data.repeatSend){
             this.store$.dispatch({
                 type: chatAction.sendSingleFile,
@@ -695,7 +738,7 @@ export class ChatComponent implements OnInit {
                     msgs: data,
                     singleFile: data.singleFile
                }
-            })
+            });
         }else if(this.active.type == 4 && data.repeatSend){
             this.store$.dispatch({
                 type: chatAction.sendGroupFile,
@@ -704,14 +747,14 @@ export class ChatComponent implements OnInit {
                     msgs: data,
                     groupFile: data.groupFile
                 }
-            })
+            });
         }
     }
     private saveDraftEmit(tempArr){
         this.store$.dispatch({
             type: chatAction.saveDraft,
             payload: tempArr
-        })
+        });
     }
     private watchOtherInfoEmit(info){
         this.store$.dispatch({
@@ -720,7 +763,7 @@ export class ChatComponent implements OnInit {
                 username: info.username,
                 active: this.active
             }
-        })
+        });
     }
     private watchSelfInfoEmit(){
         this.store$.dispatch({
@@ -735,7 +778,7 @@ export class ChatComponent implements OnInit {
             this.store$.dispatch({
                 type: chatAction.createOtherChat, 
                 payload: item
-            })
+            });
         }
         this.store$.dispatch({
             type: chatAction.hideOtherInfo,
@@ -743,7 +786,7 @@ export class ChatComponent implements OnInit {
                 show: false,
                 info: {}
             }
-        })
+        });
     }
     private groupSettingEmit(){
         this.store$.dispatch({
@@ -753,7 +796,7 @@ export class ChatComponent implements OnInit {
                 show: true,
                 isCache: this.messageList[this.active.activeIndex].groupSetting
             }
-        })
+        });
     }
     private closeGroupSettingEmit(){
         this.store$.dispatch({
@@ -761,9 +804,8 @@ export class ChatComponent implements OnInit {
             payload: {
                 show: false
             }
-        })
+        });
     }
-
     private exitGroupEmit(groupInfo){
         this.store$.dispatch({
             type: mainAction.showModalTip,
@@ -776,7 +818,7 @@ export class ChatComponent implements OnInit {
                     actionType: '[chat] exit group'
                 }
             }
-        })
+        });
     }
     private addBlackListEmit(otherInfo){
         this.store$.dispatch({
@@ -790,7 +832,7 @@ export class ChatComponent implements OnInit {
                     actionType: '[chat] add black list'
                 }
             }
-        })
+        });
     }
     private deleteMemberEmit(item){
         this.store$.dispatch({
@@ -805,7 +847,7 @@ export class ChatComponent implements OnInit {
                     actionType: '[chat] delete member'
                 }
             }
-        })
+        });
     }
     private modifyGroupDescriptionEmit(){
         this.store$.dispatch({
@@ -813,21 +855,21 @@ export class ChatComponent implements OnInit {
             payload: {
                 show: true
             }
-        })
+        });
     }
     private updateGroupInfoEmit(newGroupInfo){
         if(newGroupInfo){
             this.store$.dispatch({
                 type: chatAction.updateGroupInfo,
                 payload: newGroupInfo
-            })
+            });
         }else{
             this.store$.dispatch({
                 type: chatAction.groupDescription,
                 payload: {
                     show: false
                 }
-            })
+            });
         }
     }
     private addGroupEmit(){
@@ -841,7 +883,7 @@ export class ChatComponent implements OnInit {
                     selfInfo: this.selfInfo
                 }
             }
-        })
+        });
     }
     private addMemberEmit(){
         this.store$.dispatch({
@@ -854,14 +896,14 @@ export class ChatComponent implements OnInit {
                     activeGroup: this.active
                 }
             }
-        })
+        });
     }
     private modifyGroupNameEmit(newGroupName){
         let groupSetting = Object.assign({}, this.groupSetting.groupInfo, {name: newGroupName, actionType: 'modifyName'});
         this.store$.dispatch({
             type: chatAction.updateGroupInfo,
             payload: groupSetting
-        })
+        });
     }
     private playVideoEmit(url){
         this.store$.dispatch({
@@ -870,7 +912,7 @@ export class ChatComponent implements OnInit {
                 url: url,
                 show: true
             }
-        })
+        });
     }
     private colseVideoEmit(){
         this.store$.dispatch({
@@ -879,7 +921,7 @@ export class ChatComponent implements OnInit {
                 url: '',
                 show: false
             }
-        })
+        });
     }
     private alreadyBlackEmit(){
         this.store$.dispatch({
@@ -893,6 +935,6 @@ export class ChatComponent implements OnInit {
                     cancel: true
                 }
             }
-        })
+        });
     }
 }

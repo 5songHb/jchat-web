@@ -11,8 +11,10 @@ export class VideoComponent implements OnInit, AfterViewInit {
         private url;
     @Output()
         private colseVideo: EventEmitter<any> = new EventEmitter();
-    private state = 'pause';
+    private state = 'play';
     private video;
+    private timer = null;
+    private currentTime = 0;
     constructor(
         private cdr: ChangeDetectorRef
     ) {
@@ -31,17 +33,25 @@ export class VideoComponent implements OnInit, AfterViewInit {
     private play(){
         this.video.play();
         this.state = 'play';
-        console.log(this.video.duration ,this.video.currentTime)
+        this.timer = setInterval(function(){
+            this.currentTime = this.video.currentTime;
+        }.bind(this), 100);
     }
     private pause(){
         this.video.pause();
         this.state = 'pause';
+        clearInterval(this.timer);
     }
     private videoEnd(){
         this.state = 'pause';
+        clearInterval(this.timer);
     }
     private changeCurrentTime(event){
-        console.log(event.offsetX, event.offsetX / 438)
-        this.video.currentTime = event.offsetX / 438 * this.video.duration;
+        this.currentTime = this.video.currentTime = event.offsetX / 438 * this.video.duration;
+    }
+    private videoCanplay(){
+        this.timer = setInterval(function(){
+            this.currentTime = this.video.currentTime;
+        }.bind(this), 100);
     }
 }

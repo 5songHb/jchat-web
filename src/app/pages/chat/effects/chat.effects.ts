@@ -120,7 +120,7 @@ export class ChatEffect {
             return Observable.of('receiveMessage')
                     .map(() => {
                         return {type: '[chat] receive message useless'};
-                    })
+                    });
         })
     // 获取storage里的voice状态
     @Effect()
@@ -133,12 +133,12 @@ export class ChatEffect {
                 this.store$.dispatch({
                     type: chatAction.getVoiceStateSuccess,
                     payload: eval(voiceState)
-                })
+                });
             }
             return Observable.of('getVoiceState')
                     .map(() => {
                         return {type: '[chat] get voice state useless'};
-                    })
+                    });
         })
     // 获取会话列表
     // @Effect()
@@ -240,7 +240,7 @@ export class ChatEffect {
             return Observable.of('getSourceUrl')
                     .map(() => {
                         return {type: '[chat] get source url useless'};
-                    })
+                    });
         })
     // 获取messageList avatar url
     @Effect()
@@ -251,42 +251,33 @@ export class ChatEffect {
             let that = this,
                 msg = info.messageList[info.active.activeIndex].msgs;
             for(let i=0;i<msg.length;i++){
-                // web端的消息
-                if(msg[i].content.from_platform === 'web' && msg[i].content.msg_body.extras.media_id !== ''){
-                    global.JIM.getResource({'media_id': msg[i].content.msg_body.extras.media_id})
+                global.JIM.getUserInfo({
+                    'username' : msg[i].content.from_id
+                }).onSuccess(function(data) {
+                    global.JIM.getResource({'media_id': data.user_info.avatar})
                     .onSuccess(function(urlInfo){
                         msg[i].content.avatarUrl = urlInfo.url;
                         that.store$.dispatch({
                             type: chatAction.getAllMessageSuccess,
                             payload: info.messageList
-                        })
-                    }).onFail(function(error){
-                        
-                    });
-                // 移动端的消息
-                }else{
-                    global.JIM.getUserInfo({
-                        'username' : msg[i].content.from_id
-                    }).onSuccess(function(data) {
-                        global.JIM.getResource({'media_id': data.user_info.avatar})
-                        .onSuccess(function(urlInfo){
-                            msg[i].content.avatarUrl = urlInfo.url;
-                            that.store$.dispatch({
-                                type: chatAction.getAllMessageSuccess,
-                                payload: info.messageList
-                            })
-                        }).onFail(function(error){
-                            
                         });
-                    }).onFail(function(error) {
-                        
+                    }).onFail(function(error){
+                        that.store$.dispatch({
+                            type: chatAction.getAllMessageSuccess,
+                            payload: info.messageList
+                        });
                     });
-                }
+                }).onFail(function(error) {
+                    that.store$.dispatch({
+                        type: chatAction.getAllMessageSuccess,
+                        payload: info.messageList
+                    });
+                });
             }
             return Observable.of('getMemberAvatarUrl')
                     .map(() => {
                         return {type: '[chat] get member avatar url useless'};
-                    })
+                    });
         })
     // 获取所有漫游同步消息及资源路径
     @Effect()
@@ -346,8 +337,34 @@ export class ChatEffect {
             }
             let conversationObj = global.JIM.getConversation()
             .onSuccess(function(info) {
-                console.log('会话列表', info.conversations.length, info.conversations)
-                info.conversations = info.conversations.reverse();
+                console.log('会话列表', info.conversations.length, info.conversations);
+                // 退出群聊的会话，如果退出群聊后还有其他人在聊天，顺序与实际不符
+                for(let i=0;i<info.conversations.length;i++){
+                    let flag = false;
+                    for(let j=0;j<data.length;j++){
+                        if(Number(info.conversations[i].key) === Number(data[j].key)){
+                            info.conversations[i].lastMsgTime = data[j].msgs[data[j].msgs.length - 1].ctime_ms;
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(!flag){
+                        info.conversations[i].lastMsgTime = 0;
+                    }
+                }
+                let len = info.conversations.length;
+                let minIndex, temp;
+                for (let i = 0; i < len - 1; i++) {
+                    minIndex = i;
+                    for (let j = i + 1; j < len; j++) {
+                        if (info.conversations[j].lastMsgTime > info.conversations[minIndex].lastMsgTime) {
+                            minIndex = j;
+                        }
+                    }
+                    temp = info.conversations[i];
+                    info.conversations[i] = info.conversations[minIndex];
+                    info.conversations[minIndex] = temp;
+                }
                 // 获取头像url
                 let count = 0;
                 for(let i=0;i<info.conversations.length;i++){
@@ -420,7 +437,7 @@ export class ChatEffect {
             return Observable.of(conversationObj)
                     .map(() => {
                         return {type: '[chat] get all messageList useless'};
-                    })
+                    });
     })
     
     // 发送单人消息
@@ -446,7 +463,7 @@ export class ChatEffect {
                         success: 2,
                         msgId: msgs.msg_id
                     }
-                })
+                });
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
@@ -465,7 +482,7 @@ export class ChatEffect {
             return Observable.of(msgObj)
                     .map(() => {
                         return {type: '[chat] send single message useless'};
-                    })
+                    });
         });
     // 发送群组消息
     @Effect()
@@ -490,7 +507,7 @@ export class ChatEffect {
                         success: 2,
                         msgId: msgs.msg_id
                     }
-                })
+                });
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -500,7 +517,7 @@ export class ChatEffect {
                         key: text.key,
                         success: 3
                     }
-                })
+                });
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -510,7 +527,7 @@ export class ChatEffect {
             return Observable.of(groupMessageObj)
                     .map(() => {
                         return {type: '[chat] send group message useless'};
-                    })
+                    });
         })
     // 发送单个图片
     @Effect()
@@ -547,7 +564,7 @@ export class ChatEffect {
             return Observable.of(singlePicObj)
                     .map(() => {
                         return {type: '[chat] send single picture useless'};
-                    })
+                    });
         });
     // 发送群组图片
     @Effect()
@@ -566,7 +583,7 @@ export class ChatEffect {
                         success: 2,
                         msgId: msgs.msg_id
                     }
-                })
+                });
             }).onFail(function(error, msgs) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
@@ -575,7 +592,7 @@ export class ChatEffect {
                         key: img.key,
                         success: 3
                     }
-                })
+                });
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -585,9 +602,9 @@ export class ChatEffect {
             return Observable.of(sendGroupPicObj)
                     .map(() => {
                         return {type: '[chat] send group pic useless'};
-                    })
+                    });
         })
-    // 发送单个文件
+    // 发送单聊文件
     @Effect()
     private sendSingleFile$: Observable<Action> = this.actions$
         .ofType(chatAction.sendSingleFile)
@@ -604,8 +621,8 @@ export class ChatEffect {
                         success: 2,
                         msgId: msgs.msg_id
                     }
-                })
-                console.log('success:' + JSON.stringify(data));
+                });
+                console.log('发送成功:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
@@ -619,12 +636,20 @@ export class ChatEffect {
                     type: indexAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
+                console.log('发送错误:' + JSON.stringify(error));
+            }).onTimeout(function(data){
+                if (data.response_timeout) {
+                    console.log(55555, '响应超时');
+                    // do something when response timeout
+                } else {
+                    console.log(55555, '请求超时');
+                    // do something when request timeout
+                }
             });
             return Observable.of(sendSingleFileObj)
                     .map(() => {
                         return {type: '[chat] send single file useless'};
-                    })
+                    });
         })
     // 发送群组文件
     @Effect()
@@ -643,7 +668,7 @@ export class ChatEffect {
                         success: 2,
                         msgId: msgs.msg_id
                     }
-                })
+                });
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -663,7 +688,7 @@ export class ChatEffect {
             return Observable.of(sendgroupFileObj)
                     .map(() => {
                         return {type: '[chat] send group file useless'};
-                    })
+                    });
         })
     // 查看别人的资料
     @Effect()
@@ -707,7 +732,7 @@ export class ChatEffect {
                             info: data.user_info,
                             show: true
                         }
-                    })
+                    });
                     return ;
                 }
                 global.JIM.getResource({'media_id': data.user_info.avatar})
@@ -719,7 +744,7 @@ export class ChatEffect {
                             info: data.user_info,
                             show: true
                         }
-                    })
+                    });
                 }).onFail(function(error){
                     that.store$.dispatch({
                         type: chatAction.watchOtherInfoSuccess,
@@ -727,7 +752,7 @@ export class ChatEffect {
                             info: data.user_info,
                             show: true
                         }
-                    })
+                    });
                 });
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -739,7 +764,7 @@ export class ChatEffect {
             return Observable.of(OtherInfoObj)
                     .map(() => {
                         return {type: '[chat] watch other info useless'};
-                    })
+                    });
     });
     // 获取群组信息和群成员信息
     @Effect()
@@ -761,7 +786,7 @@ export class ChatEffect {
                     payload: {
                         groupInfo: data.group_info
                     }
-                })
+                });
                 console.log('success:' + JSON.stringify(data));
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -777,7 +802,7 @@ export class ChatEffect {
                     payload: {
                         memberList: data.member_list
                     }
-                })
+                });
                 for(let i=0;i<data.member_list.length;i++){
                     if(data.member_list[i].avatar){
                         global.JIM.getResource({'media_id' : data.member_list[i].avatar})
@@ -788,7 +813,7 @@ export class ChatEffect {
                                 payload: {
                                     memberList: data.member_list
                                 }
-                            })
+                            });
                         }).onFail(function(error){
 
                         });
@@ -805,7 +830,7 @@ export class ChatEffect {
             return Observable.of(groupInfoObj)
                     .map(() => {
                         return {type: '[chat] group info useless'};
-                    })
+                    });
     })
     // 更新群组资料
     @Effect()
@@ -823,7 +848,7 @@ export class ChatEffect {
                     that.store$.dispatch({
                         type: chatAction.groupName,
                         payload: info
-                    })
+                    });
                 }else{
                     that.store$.dispatch({
                         type: chatAction.groupDescription,
@@ -831,7 +856,7 @@ export class ChatEffect {
                             data,
                             show: false
                         }
-                    })
+                    });
                 }
             }).onFail(function(error) {
                 that.store$.dispatch({
@@ -843,7 +868,7 @@ export class ChatEffect {
             return Observable.of(groupInfoObj)
                     .map(() => {
                         return {type: '[chat] update group info useless'};
-                    })
+                    });
     });
     // 切换群屏蔽
     @Effect()
@@ -859,7 +884,7 @@ export class ChatEffect {
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
-                    })
+                    });
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -874,7 +899,7 @@ export class ChatEffect {
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
-                    })
+                    });
                 }).onFail(function(error) {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
@@ -886,7 +911,7 @@ export class ChatEffect {
             return Observable.of('changeNoDisturbObj')
                     .map(() => {
                         return {type: '[chat] change no disturb useless'};
-                    })
+                    });
     });
     // 被添加进群时获取群信息
     @Effect()
@@ -1009,7 +1034,6 @@ export class ChatEffect {
                         });
                     });
                 }
-                
             }).onFail(function(error) {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
@@ -1019,6 +1043,6 @@ export class ChatEffect {
             return Observable.of('addGroupMembersEventObj')
                     .map(() => {
                         return {type: '[chat] add group members event useless'};
-                    })
+                    });
     });
 }

@@ -2,19 +2,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { ImageViewerComponent } from './image-viewer.component';
+import { FileTypePipe } from './fileType.pipe';
 
 @NgModule({
   declarations: [
-    ImageViewerComponent
+    FileTypePipe
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-      ImageViewerComponent
+      FileTypePipe
   ],
   providers: []
 })
-export class ImageViewerModule {}
+export class FileTypePipeModule {}

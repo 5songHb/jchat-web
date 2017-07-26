@@ -35,11 +35,13 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.receiveMessageSuccess:
             addMessage(state, payload);
             let newMsgKey = [];
-            for(let i=0;i<payload.messages.length;i++){
-                newMsgKey.push({
-                    key: payload.messages[i].from_gid || payload.messages[i].from_uid
-                })
+            for(let item of payload.messages){
+                let key = item.msg_type === 4 ? item.from_gid : item.from_uid;
+                newMsgKey.push({key});
             }
+            let singleFlag = Number(state.activePerson.key) === Number(state.newMessage.from_uid) && state.newMessage.msg_type === 3,
+                groupFlag = Number(state.activePerson.key) === Number(state.newMessage.from_gid) && state.newMessage.msg_type === 4;
+            state.newMessageIsActive = (singleFlag || groupFlag) ? true : false;
             state.msgId = filterMsgId(state, 'update', newMsgKey);
             break;
             // 发送单聊文本消息
@@ -90,6 +92,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             changeActivePerson(state);            
             emptyUnreadNum(state, payload);
             state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
+            if(state.conversation[0].shield){
+                state.activePerson.shield = state.conversation[0].shield;
+            }
             break;
             // 删除本地会话列表
         case chatAction.deleteConversationItem:
@@ -146,10 +151,10 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 sortGroupMember(payload.memberList);
                 let groupSetting = state.messageList[state.activePerson.activeIndex].groupSetting;
                 groupSetting.memberList = payload.memberList;
-                // 如果群没有名字，给其用群成员名字代替
+                // 如果群没有名字，用其群成员名字代替
                 name = '';
-                for(let i=0;i<groupSetting.memberList.length;i++){
-                    name += (groupSetting.memberList[i].nickName !== '' ? groupSetting.memberList[i].nickName : groupSetting.memberList[i].usernmae) + '、';
+                for(let item of groupSetting.memberList){
+                    name += (item.nickName !== '' ? item.nickName : item.usernmae) + '、';
                 }
                 if(name.length > 20){
                     name = name.slice(0, 20);
@@ -261,19 +266,31 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.changeGroupShieldSuccess:
             for(let i=0;i<state.conversation.length;i++){
                 if(Number(payload.key) === Number(state.conversation[i].key)){
-                    state.conversation[i].shield = !state.conversation[i].shield;                
+                    if(state.conversation[i].shield === 'switchRight'){
+                        state.conversation[i].shield = 'switchLeft';
+                    }else{
+                        state.conversation[i].shield = 'switchRight';
+                    }
                     break;
                 }
             }
             break;
+        // 群聊事件
         case chatAction.addGroupMembersEventSuccess:
             groupMembersEvent(state, payload, '被添加进群聊了');
+            state.currentIsActive = currentIsActive(state, payload);
             break;
         case chatAction.updateGroupMembersEvent:
             updateGroupMembers(state, payload);
             break;
         case chatAction.deleteGroupMembersEvent:
             groupMembersEvent(state, payload, '被移出群聊了');
+            state.currentIsActive = currentIsActive(state, payload);
+            deleteGroupMembersEvent(state, payload);
+            break;
+        case chatAction.exitGroupEvent:
+            groupMembersEvent(state, payload, '退出群聊了');
+            state.currentIsActive = currentIsActive(state, payload);
             deleteGroupMembersEvent(state, payload);
             break;
         // 获取voice是否已经播放的状态
@@ -287,6 +304,12 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     }
     return state;
 };
+function currentIsActive(state, payload){
+    if(Number(state.activePerson.key) === Number(payload.gid)){
+        return true;
+    }
+    return false;
+}
 function deleteGroupMembersEvent(state, payload){
     for(let i=0;i<state.messageList.length;i++){
         if(Number(state.messageList[i].key) === Number(payload.gid)){
@@ -399,7 +422,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
     let flag1 = true;
     for(let i=0;i<state.conversation.length;i++){
         if(Number(payload.gid) === Number(state.conversation[i].key)){
-            if(state.conversation[i].shield){
+            if(state.conversation[i].shield === 'switchRight'){
                 return ;
             }
             flag1 = false;
@@ -415,7 +438,7 @@ function groupMembersEvent(state: ChatStore, payload, operation){
     if(flag1){
         for(let i=0;i<state.groupList.length;i++){
             if(Number(state.groupList[i].gid) === Number(payload.gid)){
-                if(state.groupList[i].shield){
+                if(state.groupList[i].shield === 'switchRight'){
                     return ;
                 }
                 state.groupList[i].type = 4;
@@ -682,6 +705,7 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
                 }
             }
         }
+        console.log('init', 111111, msgId);
         return msgId;
     }else if(operation === 'update'){
         let msgId;
@@ -714,6 +738,7 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
                 }
             }
         }
+        console.log('update',111111, state.msgId);
         return state.msgId;
     }
 }
@@ -728,6 +753,7 @@ function sortGroupMember(memberList){
     }
 }
 function unreadNum(state: ChatStore, payload){
+    console.log('00000', 'storage', payload)
     if(!payload.msgId){
         return ;
     }
@@ -982,7 +1008,8 @@ function addMessage(state: ChatStore, payload){
                         unreadNum: 1
                     }
                 }
-                payload.messages[j].conversation_time_show = 'today';                
+                payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].ctime_ms);  
+                payload.messages[j].time_show = util.reducerDate(payload.messages[j].ctime_ms);
                 state.newMessage = msg;
                 state.messageList.push(msg);
                 state.conversation.unshift(conversationItem);
@@ -1047,6 +1074,7 @@ function searchUser(state: ChatStore, payload){
 }
 // 选择搜索的用户、发起单聊
 function selectUserResult(state, payload){
+    console.log(555, payload)
     if(payload.gid){
         payload.key = payload.gid;
     }
@@ -1056,6 +1084,10 @@ function selectUserResult(state, payload){
         if((Number(conversation[i].key) === Number(payload.key) && payload.key)){
             let item = conversation.splice(i,1);
             conversation.unshift(item[0]);
+            if(!conversation[0].name){
+                conversation[0].name = payload.name;
+                conversation[0].unreadNum = 0;
+            }
             flag = true;
             break;
         }

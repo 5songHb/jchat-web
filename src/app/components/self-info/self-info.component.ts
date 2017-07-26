@@ -15,6 +15,8 @@ export class SelfInfoComponent implements OnChanges {
         private selfInfo;
     @Output()
         private isShow: EventEmitter<any> = new EventEmitter();
+    @Output()
+        private selectIsNotImage: EventEmitter<any> = new EventEmitter();
     private isEdit = false;
     private sexList = {
         active: {
@@ -105,9 +107,15 @@ export class SelfInfoComponent implements OnChanges {
         this.isShow.emit(newInfo);
     }
     private selfAvatarChange(){
-        let selfAvatarImg = this.elementRef.nativeElement.querySelector('#selfAvatarImg'),
-            selfAvatarInput = this.elementRef.nativeElement.querySelector('#selfAvatarInput'),
-            imgFile = this.util.fileReader(selfAvatarInput);
+        const selfAvatarImg = this.elementRef.nativeElement.querySelector('#selfAvatarImg'),
+                selfAvatarInput = this.elementRef.nativeElement.querySelector('#selfAvatarInput'),
+                that = this;
+        if(!selfAvatarInput.files[0]){
+            return;
+        }
+        let imgFile = this.util.fileReader(selfAvatarInput, () => {
+            that.selectIsNotImage.emit();
+        });
         if(imgFile){
             imgFile.then((url: string) => {
                 selfAvatarImg.src = url;

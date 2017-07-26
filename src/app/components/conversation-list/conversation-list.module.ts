@@ -5,7 +5,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
 
 import { ConversationListComponent } from './conversation-list.component';
-import { DayPipeModule, EmojiPipeModule, TimePipeModule } from '../../pipes';
+import { DayPipeModule, EmojiPipeModule, TimePipeModule, BadgePipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,8 @@ import { DayPipeModule, EmojiPipeModule, TimePipeModule } from '../../pipes';
     PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG),
     DayPipeModule,
     EmojiPipeModule,
-    TimePipeModule
+    TimePipeModule,
+    BadgePipeModule
   ],
   exports: [
       ConversationListComponent

@@ -9,7 +9,8 @@ export const chatInit = {
         nickName: '',
         activeIndex: -1,
         noDisturb: false,
-        avatarUrl: ''
+        avatarUrl: '',
+        shield: ''
     },
     defaultPanelIsShow: true,
     actionType: '',
@@ -40,5 +41,7 @@ export const chatInit = {
         url: '',
         show: false
     },
-    isLoaded: false
+    isLoaded: false,
+    currentIsActive: false,
+    newMessageIsActive: false
 }

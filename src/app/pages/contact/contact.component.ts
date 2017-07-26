@@ -57,6 +57,9 @@ export class ContactComponent implements OnInit {
                 this.groupList = contactState.groupList;
                 this.conversation = contactState.conversation;
                 break;
+            case mainAction.exitGroupSuccess:
+                this.groupList = contactState.groupList;
+                break;
         }
     }
     private selectContactItemEmit(item){
@@ -67,7 +70,7 @@ export class ContactComponent implements OnInit {
         this.store$.dispatch({
             type: contactAction.selectContactItem,
             payload: item
-        })
+        });
     }
     private changeTabEmit(tab){
         this.tab = tab;

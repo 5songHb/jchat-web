@@ -105,7 +105,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         this.store$.dispatch({
             type: registerAction.emptyTip,
             payload: type
-        })
+        });
     }
     private usernameBlur(){
         this.store$.dispatch({
@@ -132,7 +132,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         this.store$.dispatch({
             type: registerAction.initState,
             payload: null
-        })
+        });
         this.registerStream.unsubscribe();
     }
 }

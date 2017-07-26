@@ -337,7 +337,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.store$.dispatch({
             type: mainAction.searchUser,
             payload: searchInfo
-        })
+        });
     }
     // 点击搜索结果
     private selectUserResultEmit(item){
@@ -349,7 +349,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.store$.dispatch({
             type: mainAction.selectSearchUser,
             payload: item
-        })
+        });
     }
     // 点击创建单聊模态框确定取消按钮
     private createSingleChatEmit(singleName){
@@ -364,15 +364,29 @@ export class MainComponent implements OnInit, OnDestroy {
                     show: true,
                     info: '请输入要单聊的用户名'
                 }
-            })
+            });
             return ;
         }
         // 点击确定
-        if(singleName){
+        if(singleName === global.user){
+            this.store$.dispatch({
+                type: mainAction.showSelfInfo, 
+                payload: {
+                    show: true
+                }
+            });
+            this.store$.dispatch({
+                type: mainAction.createSingleChatShow,
+                payload: {
+                    show: false,
+                    info: ''
+                }
+            });
+        }else if(singleName){
             this.store$.dispatch({
                 type: mainAction.createSingleChatAction,
                 payload: singleName
-            })
+            });
         // 点击取消
         }else{
             this.store$.dispatch({
@@ -381,7 +395,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     show: false,
                     info: ''
                 }
-            })
+            });
         }
     }
     private emptySingleChatTipEmit(){
@@ -390,7 +404,7 @@ export class MainComponent implements OnInit, OnDestroy {
             payload: {
                 info: ''
             }
-        })
+        });
     }
     // 点击黑名单模态框确定按钮
     private blackMenuConfirmEmit(){
@@ -400,13 +414,13 @@ export class MainComponent implements OnInit, OnDestroy {
                 menu: [],
                 show: false
             }
-        })
+        });
     }
     private delSingleBlackEmit(user){
         this.store$.dispatch({
             type: mainAction.delSingleBlack,
             payload: user
-        })
+        });
     }
     private modalTipEmit(info){
         // 模态框点击确定按钮
@@ -422,13 +436,13 @@ export class MainComponent implements OnInit, OnDestroy {
                     this.store$.dispatch({
                         type: mainAction.addBlackListAction,
                         payload: info.active
-                    })
+                    });
                     break;
                 case '[chat] exit group':
                     this.store$.dispatch({
                         type: mainAction.exitGroupAction,
                         payload: info.groupInfo.gid
-                    })
+                    });
                     break;
                 case '[chat] delete member':
                     this.store$.dispatch({
@@ -437,7 +451,7 @@ export class MainComponent implements OnInit, OnDestroy {
                             deleteItem: info.deleteItem,
                             group: info.group
                         }
-                    })
+                    });
                     break;
                 default:
                     this.store$.dispatch({
@@ -446,7 +460,7 @@ export class MainComponent implements OnInit, OnDestroy {
                             show: false,
                             info: {}
                         }
-                    })
+                    });
             }
         // 模态框点击取消按钮
         }else{
@@ -456,7 +470,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     show: false,
                     info: {}
                 }
-            })
+            });
         }
     }
     private chatMenuShow(event){
@@ -476,7 +490,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     show: true,
                     info: ''
                 }
-            })
+            });
         }else if(item.key === 1){
             this.store$.dispatch({
                 type: mainAction.createGroupShow, 
@@ -512,7 +526,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.store$.dispatch({
                     type: mainAction.blackMenu,
                     payload: null
-                })
+                });
                 break;
             case 2:
                 // 展示全局的模态框
@@ -527,7 +541,7 @@ export class MainComponent implements OnInit, OnDestroy {
                             // success: 1 / 2               //成功的提示框/失败的提示框，会自动消失
                         }
                     }
-                })
+                });
                 break;
         }
         this.settingMenu.show = false;
@@ -553,10 +567,24 @@ export class MainComponent implements OnInit, OnDestroy {
                     md5: true,
                     reload: true
                 }
-            })
+            });
         // 去登录页面
         }else{
             this.router.navigate(['/login']);
         }
+    }
+    private selectIsNotImageEmit(){
+        this.store$.dispatch({
+            type: mainAction.showModalTip,
+            payload: {
+                show: true,
+                info: {
+                    title: '提示',
+                    tip: '选择的文件必须是图片',
+                    actionType: '[main] must be image',
+                    cancel: true
+                }
+            }
+        });
     }
 }

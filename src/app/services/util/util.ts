@@ -7,52 +7,38 @@ export class Util {
     constructor(){}
     /**
      * 将input file转化成formData对象
-     * @param id: string
-     * @return FormData对象
+     * @param file: Object
+     * @return Object FormData对象
      */
     getFileFormData(file){
         let fd = new FormData();
-        if(!file.files[0]) {
-            throw new Error('获取文件失败');
-        }
         fd.append(file.files[0].name, file.files[0]);
         return fd;
     }
     /**
      * 发送文件时截取后缀名作为拓展字段
      * @param name string
-     * @return 
+     * @return string 后缀名
      */
     getExt(name){
-        let index = name.lastIndexOf('.'),
-            ext = name.substring(index),
-            extArr = ['.ppt', '.pptx', '.doc', '.docx', '.pdf', '.xls', '.xlsx', '.txt', '.wps',
-                        '.mp4', '.mov', '.rm', '.rmvb', '.wmv', '.avi', '.3gp', '.mkv',
-                        '.wav', '.mp3', '.wma', '.midi',
-                        '.jpeg', '.png', '.bmp', '.gif'];
-        for(let item of extArr){
-            if(item.match(ext)){
-                return ext;
-            }
-        }
-        return 'other';
+        const index = name.lastIndexOf('.');
+        return index === -1 ? '' : name.substring(index + 1);
     }
     /**
      * fileReader预览图片返回img url
-     * @param file:Object, input file 对象
+     * @param file: Object, input file 对象
      * @param callback: function 回调函数
-     * @return null
      */
-    imgReader(file, callback?: Function){
+    imgReader(file, callback ?: Function, callback2 ?: Function){
         let files = file.files[0];
-        if(!/image\/\w+/.test(files.type)){ 
-            alert("文件必须为图片！"); 
+        if(!/image\/\w+/.test(files.type)){
+            callback();
             return false;
         }
         let reader = new FileReader();
         reader.readAsDataURL(files);
         let img = new Image(),
-            promise = new Promise(function(resolve,reject){
+            promise = new Promise((resolve, reject) => {
             reader.onload = function(e){
                 img.src = this.result;
                 let that = this;
@@ -67,9 +53,9 @@ export class Util {
                 }
             }
         });
-        promise.then(function(value){
-            callback(value);
-        },function(value){
+        promise.then((value) => {
+            callback2(value);
+        }, (error) => {
 
         })
     }
@@ -77,56 +63,28 @@ export class Util {
      * fileReader预览图片url
      * @param file: Object, input file 对象
      */
-    fileReader(file){
+    fileReader(file, callback ?: Function){
         let files = file.files[0];
-        if(!files.type){
-            return;
+        if(!files.type && files.type !== ''){
+            return false;
         }
-        if(!/image\/\w+/.test(files.type)){ 
-            alert("文件必须为图片！"); 
+        if(!/image\/\w+/.test(files.type)){
+            callback();
             return false;
         }
         let reader = new FileReader();
         reader.readAsDataURL(files);
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             reader.onload = function(e){
                 resolve(this.result);
             }
         })
     }
     /**
-     * 对象深度拷贝
-     * @param oldObj: Object   需要拷贝的对象
-     * @return Object 新对象
-     */
-    // deepCopy(oldObj) {
-    //     let newObject = {};
-    //     if(oldObj){
-    //         if (oldObj.constructor === Object) {
-    //             newObject = new oldObj.constructor();
-    //         } else {
-    //             newObject = new oldObj.constructor(oldObj.valueOf());
-    //         }
-    //         for (const key in oldObj) {
-    //             if (newObject[key] !== oldObj[key]) {
-    //                 if (typeof(oldObj[key]) === 'object') {
-    //                     newObject[key] = this.deepCopy(oldObj[key]);
-    //                 } else {
-    //                     newObject[key] = oldObj[key];
-    //                 }
-    //             }
-    //         }
-    //         newObject.toString = oldObj.toString;
-    //         newObject.valueOf = oldObj.valueOf;
-    //         return newObject;
-    //     }
-    // }
-    /**
-     * contenteditable输入框插入表情
+     * contenteditable输入框插入内容（表情、粘贴文本等）
      * @param field: Object  输入框dom对象
      * @param value: string 需要插入的内容
      */
-    
     insertAtCursor (field, value, selectPastedContent) {
         let sel, range;
         // if (field.nodeName == 'PRE') {
@@ -144,7 +102,6 @@ export class Util {
                     }
                     let firstNode = frag.firstChild;
                     range.insertNode(frag);
-
                     if (lastNode) {
                         range = range.cloneRange();
                         range.setStartAfter(lastNode);
@@ -207,8 +164,7 @@ export class Util {
         if (window.getSelection) {//ie11 10 9 ff safari
             let range = window.getSelection();//创建range
             range.selectAllChildren(obj);//range 选择obj下所有子内容
-            // range.collapseToEnd();//光标移至最后
-            range.collapse(obj, obj.childNodes.length);
+            range.collapse(obj, obj.childNodes.length);//光标移至最后
         }
     }
     /**
@@ -217,7 +173,7 @@ export class Util {
      * @return boolean
      */
     firstLetterIsChinese(str){
-      let re=/^[\\u4e00-\\u9fa5]/;
+      const re = /^[\\u4e00-\\u9fa5]/;
       if (re.test(str)) return false ;
       return true ;
     }
@@ -244,17 +200,17 @@ export class Util {
             letter: '#',
             data: []
         });
-        for(let i=0;i<payload.length;i++){
+        for(let item of payload){
             let flag = false;     
             for(let j=0;j<result.length;j++){
-                let name = (payload[i].nickName && payload[i].nickName !== '') ? payload[i].nickName : payload[i].name,
+                let name = (item.nickName && item.nickName !== '') ? item.nickName : item.name,
                     firstLetter = name.charAt(0);
                 if(name === ''){
                     break;
                 }
                 if(name.match(/^[a-zA-Z]/)){
                     if(firstLetter.toUpperCase() === result[j].letter){
-                        result[j].data.push(payload[i]);
+                        result[j].data.push(item);
                         flag = true;
                         break;
                     }
@@ -263,14 +219,14 @@ export class Util {
                         style: pinyin.STYLE_NORMAL
                     });
                     if(py[0][0].charAt(0).toUpperCase() === result[j].letter){
-                        result[j].data.push(payload[i]);
+                        result[j].data.push(item);
                         flag = true;
                         break;
                     }
                 }
             }
             if(!flag){
-                result[result.length - 1].data.push(payload[i]);
+                result[result.length - 1].data.push(item);
             }
         }
         return result;
@@ -331,7 +287,7 @@ export class Util {
      * 今年之前的时间 --- year
      */
     reducerDate(msgTime){
-        let time = new Date(msgTime),
+        const time = new Date(msgTime),
             now = new Date(),
             msgYear = time.getFullYear(),
             nowYear = now.getFullYear(),
@@ -365,7 +321,7 @@ export class Util {
      * @return boolean
      */
     fiveMinutes(oldTime, newTime){
-        let gap = newTime - oldTime;
+        const gap = newTime - oldTime;
         if(gap / 1000 / 60 > 5){
             return true;
         }else{

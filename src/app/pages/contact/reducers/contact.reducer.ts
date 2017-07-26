@@ -28,7 +28,8 @@ export const contactReducer = (state: ContactStore = contactInit, {type, payload
             }
             break;
         case mainAction.exitGroupSuccess:
-        
+            exitGroup(state, payload);
+            break;
         case chatAction.deleteConversationItem:
             addInfoToGroup(state, payload);
             break;
@@ -40,41 +41,37 @@ export const contactReducer = (state: ContactStore = contactInit, {type, payload
     }
     return state;
 };
+// 退出群聊时删除群组列表
+function exitGroup(state, payload){
+    console.log(payload);
+    for(let i=0;i<state.groupList.length;i++){
+        for(let j=0;j<state.groupList[i].data.length;j++){
+            if(Number(payload.item.key) === Number(state.groupList[i].data[j].gid)){
+                state.groupList[i].data.splice(j, 1);
+                break;
+            }
+        }
+    }
+}
 // 陌生人发消息给自己将其添加到联系人中
 function addStranger(state, payload){
     for(let a=0;a<payload.messages.length;a++){
-        let flag = 0;      
+        let flag = false;
         for(let i=0;i<state.conversation.length;i++){
             for(let j=0;j<state.conversation[i].data.length;j++){
-                let groupFlag = (payload.messages[a].msg_type === 4 && Number(state.conversation[i].data[j].key) === Number(payload.messages[a].from_gid)),
-                    singleFlag = (payload.messages[a].msg_type === 3 && Number(state.conversation[i].data[j].key) === Number(payload.messages[a].from_uid));
-                if(groupFlag){
-                    flag = 1;
-                    break;
-                }
+                let singleFlag = (payload.messages[a].msg_type === 3 && (Number(state.conversation[i].data[j].key) === Number(payload.messages[a].from_uid)));
                 if(singleFlag){
-                    flag = 2;
+                    flag = true;
                     break;
-                }
-            }
-        }
-        // 群聊
-        if(flag === 1){
-            for(let b=0;b<state.groupList.length;b++){
-                for(let c=0;c<state.groupList[b].data.length;c++){
-                    if(Number(payload.messages[a].from_gid) === Number(state.groupList[b].data[c].gid)){
-                        state.groupList[b].data[c].type = 4;
-                        state.conversation = flagGroup(util.insertSortByLetter(state.conversation, state.groupList[b].data[c]));
-                        break;
-                    }
                 }
             }
         }
         // 单聊
-        if(flag === 2){
+        if(!flag && payload.messages[a].msg_type === 3){
             payload.messages[a].name = payload.messages[a].content.from_id;
             payload.messages[a].type = 3;
             payload.messages[a].avatarUrl = payload.messages[a].content.avatarUrl;
+            payload.messages[a].key = payload.messages[a].from_uid;
             state.conversation = flagGroup(util.insertSortByLetter(state.conversation, payload.messages[a]));
         }
     }
@@ -82,7 +79,6 @@ function addStranger(state, payload){
 }
 // 删除会话时将会话的信息转移到群
 function addInfoToGroup(state, payload){
-    console.log(7777, payload.item);
     for(let i=0;i<state.groupList.length;i++){
         for(let j=0;j<state.groupList[i].data.length;j++){
             let flag = Number(state.groupList[i].data[j].gid) === Number(payload.item.key) || Number(state.groupList[i].data[j].gid) === Number(payload.item.gid);

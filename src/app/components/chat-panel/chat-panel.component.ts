@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter,ViewChild, OnInit, DoCheck, OnChanges, AfterViewInit, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter,ViewChild, OnInit,
+        OnChanges, AfterViewInit, HostListener, ElementRef, SimpleChanges } from '@angular/core';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { Store } from '@ngrx/store';
 import { AppStore } from '../../app.store';
@@ -19,7 +20,7 @@ let download = require("downloadjs");
     styleUrls: ['./chat-panel.component.scss']
 })
 
-export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnChanges{
+export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
     private util: Util = new Util();
     @ViewChild(PerfectScrollbarComponent) componentScroll;
     @Input()
@@ -28,6 +29,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         private active;
     @Input()
         private selfInfo;
+    @Input()
+        private scrollBottom;
     @Output()
         private sendMsg: EventEmitter<any> = new EventEmitter();
     @Output()
@@ -91,6 +94,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         show: false,
     }
     private voiceState = [];
+    private loadFlag = true;
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
@@ -103,8 +107,11 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         // if(!this.messageList[this.active.activeIndex].draft){
         //     this.messageList[this.active.activeIndex].draft = '';
         // }
+        // 禁止火狐下点击发送消息的输入框中的表情进行缩放
+        document.designMode = "off";
+        document.execCommand('enableObjectResizing', false, 'false');
     }
-    ngOnChanges(){
+    ngOnChanges(changes: SimpleChanges){
         if(!this.messageList || this.messageList.length === 0){
             this.messageList = [{
                 draft: ''
@@ -113,6 +120,16 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         if(!this.active.activeIndex){
             this.active.activeIndex = 0;
         }
+        if(changes.scrollBottom){
+            this.loadFlag = false;
+            setTimeout(function(){
+                this.componentScroll.update();
+                this.componentScroll.scrollToBottom();
+                this.contentDiv.focus();
+                this.util.focusLast(this.contentDiv);
+                this.loadFlag = true;
+            }.bind(this),150);
+        }
     }
     @HostListener('window:click') onClickWindow(){
         this.inputToLast = true;
@@ -120,7 +137,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     private subscribeStore(){
         this.chatStream$ = this.store$.select((state) => {
-            let chatState = state['chatReducer'];
+            const chatState = state['chatReducer'];
             this.stateChanged(chatState);
             return state;
         }).subscribe((state) => {
@@ -132,15 +149,13 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         switch(chatState.actionType){
             case chatAction.receiveMessageSuccess:
                 this.messageList = chatState.messageList;
-                // this.msg.push(chatState.newMessage);
-                if(chatState.activePerson.activeIndex !== -1 && chatState.activePerson.activeIndex === this.active.activeIndex){
+                if(chatState.activePerson.activeIndex >= 0 && chatState.newMessageIsActive){
                     let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
                     if(msg.length > 20){
                         this.msg = msg.slice(msg.length - this.msg.length);
                     }else{
                         this.msg = msg;
                     }
-                    // this.change = chatState.activePerson.change;
                 }
                 // 经纬度转换成地图                              
                 this.pointerToMap(chatState);
@@ -148,12 +163,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
-                // let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                // if(msgs.length > 20){
-                //     this.msg = msgs.slice(msgs.length - 20);
-                // }else{
-                //     this.msg = msgs;
-                // }
                 let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
                 if(message && message.length > 20){
                     this.msg = message.slice(message.length - 20);
@@ -163,21 +172,6 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
                 this.voiceState = chatState.voiceState;
-                
-                // let count = 0,
-                // timer = setInterval(function(){
-                //     // this.allPointerToMap(true);
-                //     this.componentScroll.update();
-                //     this.componentScroll.scrollToBottom();
-                //     this.contentDiv.focus();
-                //     this.util.focusLast(this.contentDiv);
-                //     if(count > 20){
-                //         clearInterval(timer);
-                //     }
-                //     count ++;
-                // }.bind(this), 10);
-                // this.change = chatState.activePerson.change;
-                // console.log(888, this.change, chatState.activePerson.change);
                 break;
             case chatAction.sendGroupFile:
 
@@ -203,13 +197,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 }else{
                     this.msg = msgs;
                 }
-                setTimeout(function(){
-                    this.componentScroll.update();
-                    this.componentScroll.scrollToBottom();
-                    this.contentDiv.focus();
-                }.bind(this), 200);
                 this.imageViewer.result = chatState.imageViewer;
-                // this.change = chatState.activePerson.change;
                 this.messageList = chatState.messageList;
                 break;
             case mainAction.selectSearchUser:
@@ -227,20 +215,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 }else if(msg && msg.length <= 20){
                     this.msg = msg;
                 }
-                this.allPointerToMap(true);                
-                // let count2 = 0,
-                // timer2 = setInterval(function(){
-                //     this.componentScroll.update();
-                //     this.componentScroll.scrollToBottom();
-                //     this.contentDiv.focus();
-                //     this.util.focusLast(this.contentDiv);
-                //     if(count2 > 20){
-                //         clearInterval(timer2);
-                //     }
-                //     count2 ++;
-                // }.bind(this), 10);
+                this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
-                // this.change = chatState.activePerson.change;
                 break;
             case chatAction.getAllMessageSuccess:
                 if(chatState.imageViewer !== []){
@@ -249,18 +225,14 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 break;
             case chatAction.addGroupMembersEventSuccess:
                 this.messageList = chatState.messageList;
-                setTimeout(function(){
-                    this.componentScroll.update();
-                    this.componentScroll.scrollToBottom();
-                    this.contentDiv.focus();
-                }.bind(this), 200);
                 break;
         }
     }
     private imageViewerShow(src, index){
+        console.log(444, index, this.messageList[this.active.activeIndex].msgs.length, this.msg.length);
         for(let i=0;i<this.imageViewer.result.length;i++){
             if(this.imageViewer.result[i].index === index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)){
-                this.imageViewer.active = this.imageViewer.result[i];
+                this.imageViewer.active = Object.assign({}, this.imageViewer.result[i], {});
                 this.imageViewer.active.index = i;
                 break;
             }
@@ -268,13 +240,13 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         this.imageViewer.show = true;
     }
     private allPointerToMap(timeout: boolean, index ?: number){
-        let num = index ? index : this.msg.length;
+        const num = index ? index : this.msg.length;
         for(let i=0;i<num;i++){
             if(this.msg[i].content.msg_type === 'location'){
                 if(timeout){
-                    let that = this;
+                    const that = this;
                     (function(i){
-                        setTimeout(function(){
+                        setTimeout(() => {
                             that.util.theLocation({
                                 id: 'allmap' + i,
                                 longitude: that.msg[i].content.msg_body.longitude,
@@ -293,7 +265,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         }
     }
     private pointerToMap(chatState){
-        let single = (Number(this.active.key) === Number(chatState.newMessage.from_uid) && chatState.newMessage.msg_type === 3),
+        const single = (Number(this.active.key) === Number(chatState.newMessage.from_uid) && chatState.newMessage.msg_type === 3),
             group = (Number(this.active.key) === Number(chatState.newMessage.from_gid) && chatState.newMessage.msg_type === 4);
         if(chatState.newMessage.content.msg_type === 'location' && (single || group)){
             setTimeout(function(){
@@ -309,23 +281,15 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         this.allPointerToMap(true);
         this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
     }
-    ngDoCheck(){
-        // console.log(777777, this.active.change, this.change);
-        if((!this.change && this.active.change) || this.active.change !== this.change){
-            this.componentScroll.update();
-            this.componentScroll.scrollToBottom();
-            // let msgs = this.messageList[this.active.activeIndex].msgs;
-            // if(msgs && this.msg.length <= 20 && msgs.length > 20){
-            //     this.msg = msgs.slice(msgs.length - 20);
-            // }else if(msgs && this.msg.length <= 20 && msgs.length < 20){
-            //     this.msg = msgs;                
-            // }
-            setTimeout(function(){
-                this.change = this.active.change;
-                this.contentDiv.focus();
-                this.util.focusLast(this.contentDiv);
-            }.bind(this),150);
-        }
+    private pasteMessage(event){
+        let clipboardData = event.clipboardData || (<any>window).clipboardData;
+        let pastedData = clipboardData.getData('Text');
+        pastedData = pastedData.replace(/</g, '&lt;');
+        pastedData = pastedData.replace(/>/g, '&gt;');
+        pastedData = pastedData.replace(/\n/g, '<br>');
+        pastedData = pastedData.replace(/ /g, '&nbsp;'); 
+        this.util.insertAtCursor(this.contentDiv, pastedData, false);
+        return false;
     }
     private sendMsgAction(){
         let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
@@ -333,7 +297,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
             draft = draft.replace(/^(<br>){1,}$/g,'');
             draft = draft.replace(/&nbsp;/g,' ');
             draft = draft.replace(/<br>/g, '\n');
-            let imgReg = new RegExp(`<img.+?${imgRouter}.{1,}?\.png".*?>`, 'g');
+            const imgReg = new RegExp(`<img.+?${imgRouter}.{1,}?\.png".*?>`, 'g');
             if(draft.match(imgReg)){
                 let arr = draft.match(imgReg);
                 for(let i=0;i<arr.length;i++){
@@ -353,21 +317,27 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         }
     }
     private sendPicAction(event){
-        let pic = this.elementRef.nativeElement.querySelector('#sendPic'),
-            img = this.util.getFileFormData(pic);
+        const pic = this.elementRef.nativeElement.querySelector('#sendPic');
+        // 为了防止首次选择了文件，第二次选择文件的时候点击取消按钮时触发change事件的报错
+        if(!pic.files[0]){
+            return;
+        }
+        let img = this.util.getFileFormData(pic);
         this.sendPic.emit(img);
-        event.target.value = '';
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
     }
     private sendFileAction(event){
-        let fileData = this.elementRef.nativeElement.querySelector('#sendFile'),
-            file = this.util.getFileFormData(fileData);
+        const fileData = this.elementRef.nativeElement.querySelector('#sendFile');
+        // 为了防止首次选择了文件，第二次选择文件的时候点击取消按钮时触发change事件的报错
+        if(!fileData.files[0]){
+            return;
+        }
+        let file = this.util.getFileFormData(fileData);
         this.sendFile.emit({
             file,
             fileData: this.elementRef.nativeElement.querySelector('#sendFile').files[0]
         });
-        event.target.value = '';
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
     }
@@ -424,8 +394,8 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     // ctrl + enter换行，enter发送消息
     private preKeydown(event){
         if(event.keyCode === 13 && event.ctrlKey){
-            let contentId = this.elementRef.nativeElement.querySelector('#' + this.emojiInfo.contentId),
-            insertHtml = '<br>';
+            const contentId = this.elementRef.nativeElement.querySelector('#' + this.emojiInfo.contentId);
+            let insertHtml = '<br>';
             if(window.getSelection){
                 let next = window.getSelection().focusNode.nextSibling;
                 do{
@@ -467,9 +437,9 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
     }
     // 加载更多消息
     private scrollTopEvent(){
-        // console.log(666, this.change, this.active.change);
-        if((!this.change && this.active.change) || this.active.change !== this.change)
+        if(!this.loadFlag){
             return;
+        }
         /**
          * this.loadingFlag
          * value    1           2           3
@@ -477,7 +447,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
          */
         if(this.loadingFlag === 1 && this.msg.length >= 20){
             this.loadingFlag = 2;
-            let oldContentHeight = this.componentScroll.contentHeight,
+            const oldContentHeight = this.componentScroll.contentHeight,
                 activeKey = this.active.key;
             setTimeout(function(){
                 if(activeKey !== this.active.key || !this.messageList[this.active.activeIndex])
@@ -488,7 +458,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 if(msgs.length === this.msg.length){
                     this.loadingFlag = 3;
                 }else{
-                    let oldLength = this.msg.length;
+                    const oldLength = this.msg.length;
                     if(msgs.length < 20 * ++ this.loadingCount){
                         this.msg = msgs;
                         setTimeout(function(){
@@ -500,12 +470,12 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                             this.loadingFlag = 1;
                         }.bind(this), 0);
                     }
-                    let newLength = this.msg.length;
+                    const newLength = this.msg.length;
                     this.allPointerToMap(newLength - oldLength);
-                    let that = this;
+                    const that = this;
                     return new Promise ((resolve, reject) => {
                         setTimeout(function(){
-                            let newContentHeight = that.componentScroll.contentHeight;
+                            const newContentHeight = that.componentScroll.contentHeight;
                             that.componentScroll.scrollTo(0, newContentHeight - oldContentHeight);
                             resolve();
                         }, 0);
@@ -524,7 +494,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         this.emojiInfo.show = false;
     }
     private playVoice(index){
-        let audio = this.elementRef.nativeElement.querySelector('#audio' + index);
+        const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         if (audio.paused) {
             this.clearTimer(index);
             audio.play();
@@ -574,7 +544,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
                 clearInterval(this.msg[i].content.timer1);
                 clearInterval(this.msg[i].content.timer2);
                 clearInterval(this.msg[i].content.timer3);
-                let otherAudio = this.elementRef.nativeElement.querySelector('#audio' + i);
+                const otherAudio = this.elementRef.nativeElement.querySelector('#audio' + i);
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
                 this.msg[i].content.playing = {
@@ -586,7 +556,7 @@ export class ChatPanelComponent implements OnInit , DoCheck , AfterViewInit, OnC
         }
     }
     private voiceEnded(index){
-        let audio = this.elementRef.nativeElement.querySelector('#audio' + index);
+        const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         clearInterval(this.msg[index].content.timer1);
         clearInterval(this.msg[index].content.timer2);
         clearInterval(this.msg[index].content.timer3);

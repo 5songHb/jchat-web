@@ -4,11 +4,11 @@
     </div>
     <div class="chat-conversation flex-1">
         <default-panel-component [hidden]="!defaultPanelIsShow"></default-panel-component>        
-        <chat-panel-component [hidden]="defaultPanelIsShow" [selfInfo]="selfInfo" [messageList]="messageList" [active]="active" (videoPlay)="playVideoEmit($event)" (sendMsg)="sendMsgEmit($event)" (sendPic)="sendPicEmit($event)" (sendFile)="sendFileEmit($event)" (saveDraft) ="saveDraftEmit($event)" (otherInfo)="watchOtherInfoEmit($event)" (selfInfoEmit)="watchSelfInfoEmit()" (groupSetting)="groupSettingEmit()" (addGroup)="addGroupEmit()"></chat-panel-component>        
+        <chat-panel-component [scrollBottom]="scrollBottom" [hidden]="defaultPanelIsShow" [selfInfo]="selfInfo" [messageList]="messageList" [active]="active" (videoPlay)="playVideoEmit($event)" (sendMsg)="sendMsgEmit($event)" (sendPic)="sendPicEmit($event)" (sendFile)="sendFileEmit($event)" (saveDraft) ="saveDraftEmit($event)" (otherInfo)="watchOtherInfoEmit($event)" (selfInfoEmit)="watchSelfInfoEmit()" (groupSetting)="groupSettingEmit()" (addGroup)="addGroupEmit()"></chat-panel-component>        
         <group-setting-component [groupSetting]="groupSetting" (closeGroupSetting)="closeGroupSettingEmit()" (exitGroup)="exitGroupEmit($event)" (modifyGroupDescription)="modifyGroupDescriptionEmit()" (addMember)="addMemberEmit()" (watchOtherInfo)="watchOtherInfoEmit($event)" (watchSelfInfo)="watchSelfInfoEmit()" (deleteMember)="deleteMemberEmit($event)" (modifyGroupName)="modifyGroupNameEmit($event)"></group-setting-component>        
     </div>
 </div>
-<video-component [hidden]="!playVideoShow.show" [url]="playVideoShow.url" (colseVideo)="colseVideoEmit()"></video-component>
+<video-component *ngIf="playVideoShow.show" [url]="playVideoShow.url" (colseVideo)="colseVideoEmit()"></video-component>
 <other-info-component *ngIf="otherInfo.show" [otherInfo]="otherInfo" (alreadyBlack)="alreadyBlackEmit()" (isShow)="OtherInfoEmit($event)" (addBlackList)="addBlackListEmit($event)"></other-info-component>
 <group-description-component [hidden]="!groupDescription.show" [description]="groupDescription.description" (updateGroupInfo)="updateGroupInfoEmit($event)"></group-description-component>
 <div *ngIf="!isLoaded" class="modal-shadow chat-loading">

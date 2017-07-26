@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 /**
- * 将毫秒数转化固定的日期格式
+ * 将毫秒数转化固定的日期格式，为了解决angular2原生的date管道在IE下的兼容问题
  */
 @Pipe({
     name: 'time'

@@ -2,7 +2,7 @@
 export interface ChatStore{
     conversation: Array<any>, //会话列表
     messageList: Array<any>, //消息记录列表
-    newMessage: object,
+    newMessage: any,
     activePerson: {//当前激活的对话用户
         key: string,
         name: string,
@@ -13,6 +13,7 @@ export interface ChatStore{
         noDisturb: boolean,
         avatarUrl?: string,
         type?: number,
+        shield: string
     },
     groupList: Array<any>,
     defaultPanelIsShow: boolean,
@@ -44,5 +45,7 @@ export interface ChatStore{
         url: string,
         show: boolean
     },
-    isLoaded: boolean
+    isLoaded: boolean,
+    currentIsActive: boolean,
+    newMessageIsActive: boolean
 }
