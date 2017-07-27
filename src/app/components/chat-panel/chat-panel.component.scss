@@ -140,7 +140,7 @@
                     width: 100%;
                     border-radius: 5px;
                 }
-                .chat-panel-video-paly{
+                .chat-panel-video-play{
                     border-radius: 5px;
                     position: absolute;
                     width: 100%;
@@ -151,6 +151,14 @@
                     z-index: 2;
                     &:hover{
                         background-image: url(../../../assets/images/video-active.png);
+                    }
+                    span{
+                        position: absolute;
+                        bottom: 5px;
+                        right: 8px;
+                        line-height: 14px;
+                        color: #fff;
+                        font-size: 14px;
                     }
                 }
                 .chat-panel-video-shadow{
@@ -424,6 +432,7 @@
                     background-size: 24px;
                     margin: 44px 0 0 14px;
                     cursor: pointer;
+                    position: relative;
                 }
             }
             .chat-panel-send-error{

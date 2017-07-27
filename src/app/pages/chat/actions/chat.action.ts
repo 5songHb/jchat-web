@@ -42,5 +42,6 @@ export const chatAction = {
     updateGroupMembersEvent: '[chat] update group members',
     deleteGroupMembersEvent: '[chat] delete group members event',
     exitGroupEvent: '[chat] exit group event',
-    createGroupEvent: '[chat] create group event'
+    createGroupEvent: '[chat] create group event',
+    createGroupSuccessEvent: '[chat] create group success event'
 }

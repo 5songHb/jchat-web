@@ -172,6 +172,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.listTab = mainState.listTab;
                 break;
             case mainAction.showSelfInfo:
+                console.log(5555, this.self)
                 if(mainState.selfInfo.info){
                     this.self.info = mainState.selfInfo.info;
                 }
@@ -276,12 +277,14 @@ export class MainComponent implements OnInit, OnDestroy {
         });
     }
     private selfInfoEmit(newInfo){
-        this.store$.dispatch({
-            type: mainAction.showSelfInfo, 
-            payload: {
-                show: false
-            }
-        });
+        if(!newInfo){
+            this.store$.dispatch({
+                type: mainAction.showSelfInfo, 
+                payload: {
+                    show: false
+                }
+            });
+        }
         if(newInfo && newInfo.info){
             this.store$.dispatch({
                 type: mainAction.updateSelfInfo, 

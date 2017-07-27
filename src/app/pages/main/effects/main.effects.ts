@@ -100,7 +100,8 @@ export class MainEffect {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
                         payload: {
-                            info
+                            info,
+                            show: true
                         }
                     });
                 }).onFail(function(error) {
@@ -108,7 +109,6 @@ export class MainEffect {
                         type: indexAction.errorApiTip,
                         payload: error
                     });
-                    console.log('error:' + JSON.stringify(error));
                 });
             return Observable.of(updateSelfInfo)
                     .map(() => {
@@ -127,7 +127,8 @@ export class MainEffect {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
                         payload: {
-                            avatar
+                            avatar,
+                            show: true
                         }
                     });
                 }).onFail(function(error) {

@@ -14,10 +14,10 @@ export class hoverEventDirective implements OnInit{
     ngOnInit(){
         
     }
-    @HostListener('mouseenter') onBlur() {
+    @HostListener('mouseenter') onMouseenter() {
         this.hoverEvent.show = true;
     }
-    @HostListener('mouseleave') onkeyup() {
+    @HostListener('mouseleave') onMouseleave() {
         this.hoverEvent.show = false;
     }
 }

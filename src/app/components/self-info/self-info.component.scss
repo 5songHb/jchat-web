@@ -109,6 +109,18 @@
         .btn-confirm{
             width: 120px;
             margin: 0;
+            position: relative;
+            &.loading:after{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: block;
+                background: url(../../../assets/images/message-loading.gif) center center no-repeat;
+                background-size: 20px;
+            }
         }
     }
     .self-info-edit-btn{

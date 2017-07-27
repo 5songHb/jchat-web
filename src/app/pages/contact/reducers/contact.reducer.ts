@@ -12,6 +12,8 @@ export const contactReducer = (state: ContactStore = contactInit, {type, payload
         case contactAction.getGroupListSuccess:
             state.groupList = util.sortByLetter(payload);
             break;
+        case chatAction.createGroupSuccessEvent:
+        
         case mainAction.createGroupSuccess:
             state.groupList = util.insertSortByLetter(state.groupList, payload);
             state.conversation = flagGroup(util.insertSortByLetter(state.conversation, payload));            

@@ -17,11 +17,8 @@
                     <div></div>
                 </div>
                 <div class="chat-panel-see-more no-more" *ngIf="loadingFlag === 3 && this.msg.length > 20">没有更多消息了</div>
-                <!-- <p class="chat-panel-add-members">
-                    <span *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex]?.addGroupMyself?.bool === true">您{{messageList[active.activeIndex].addGroupMyself.tip}}</span>
-                </p> -->
-                <!-- 时间 -->
-                <div *ngIf="messageList[active.activeIndex] && messageList[active.activeIndex].addGroupOther && messageList[active.activeIndex].addGroupOther.length > 0">
+                <!-- 群聊事件消息 -->
+                <div *ngIf="messageList[active.activeIndex]?.addGroupOther?.length > 0">
                     <div *ngFor="let item of messageList[active.activeIndex].addGroupOther">
                         <p *ngIf="item.time_show" class="chat-panel-time" [ngClass]="{'first': num === 0}" [ngSwitch]="item.time_show">
                             <time style="top: 0;" *ngSwitchCase="'year'">{{item.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>
@@ -81,7 +78,7 @@
                             </div>
                         </div>
                         <!-- 文件消息 -->
-                        <div *ngIf="i.content.msg_type === 'file' && (!i.content.msg_body.extras || (i.content.msg_body.extras && !i.content.msg_body.extras.video))" class="clearfix">
+                        <div *ngIf="i.content.msg_type === 'file' && (!i.content.msg_body.extras || !i.content.msg_body.extras.video)" class="clearfix">
                             <div class="chat-panel-fromId-you float-left chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
@@ -100,7 +97,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="float-left chat-panel-download-file" (click)="fileDownload(i.content.msg_body.media_url)"></button>
+                                <button class="float-left chat-panel-download-file" [hoverEvent]="i.downloadHover" (click)="fileDownload(i.content.msg_body.media_url)">
+                                    <hover-tip-component [hidden]="!i.downloadHover.show" [hoverInfo]="i.downloadHover"></hover-tip-component>
+                                </button>
                             </div>                           
                         </div>
                         <!-- 视频消息 -->
@@ -115,7 +114,9 @@
                                     <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
                                         <!--<source [src]="i.content.msg_body.media_url">-->
                                     </video>
-                                    <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
+                                    <div class="chat-panel-video-play" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1">
+                                        <span>{{i.content.duration | videoTime}}</span>
+                                    </div>
                                     <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
                                 </div>
                             </div>
@@ -251,7 +252,9 @@
                                 <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
                                     <!--<source [src]="i.content.msg_body.media_url">-->
                                 </video>
-                                <div class="chat-panel-video-paly" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1"></div>
+                                <div class="chat-panel-video-play" (click)="playVideo(i.content.msg_body.media_url)" *ngIf="i.content.load === 1">
+                                    <span>{{i.content.duration | videoTime}}</span>
+                                </div>
                                 <div class="chat-panel-video-shadow" *ngIf="i.content.load === 0">{{i.content.range}}%</div>
                             </div>
                         </div>
@@ -302,10 +305,7 @@
                             </div>                      
                         </div>
                     </div>
-                    <!-- <p class="chat-panel-add-members">
-                        <span *ngIf="i.addGroupMyself && i.addGroupMyself.bool">您{{i.addGroupMyself.tip}}</span>
-                    </p> -->
-                    <div *ngIf="i.addGroupOther && i.addGroupOther.length > 0">
+                    <div *ngIf="i?.addGroupOther?.length > 0">
                         <div *ngFor="let item of i.addGroupOther">
                             <p *ngIf="item.time_show" class="chat-panel-time" [ngSwitch]="item.time_show">
                                 <time style="top: 0;" *ngSwitchCase="'year'">{{item.ctime_ms | time:"yy-MM-dd HH:mm"}}</time>

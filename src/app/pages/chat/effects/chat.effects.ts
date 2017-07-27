@@ -299,6 +299,17 @@ export class ChatEffect {
                                 data[i].msgs[j + 1].time_show = this.util.reducerDate(data[i].msgs[j + 1].ctime_ms);
                         }
                     }
+                    // 给文件消息添加下载按钮hove提示需要的数据
+                    if(data[i].msgs[j].content.msg_type === 'file'){
+                        data[i].msgs[j].downloadHover = {
+                            tip: '下载文件',
+                            position: {
+                                left: -20,
+                                top: 27
+                            },
+                            show: false
+                        }
+                    }
                     // if(data[i].msgs[j].content.msg_body.media_id){
                     //     count ++;
                     //     global.JIM.getResource({'media_id' : data[i].msgs[j].content.msg_body.media_id})
@@ -1043,6 +1054,33 @@ export class ChatEffect {
             return Observable.of('addGroupMembersEventObj')
                     .map(() => {
                         return {type: '[chat] add group members event useless'};
+                    });
+    });
+    // 创建群组事件
+    @Effect()
+    private createGroupEvent$: Observable<Action> = this.actions$
+        .ofType(chatAction.createGroupEvent)
+        .map(toPayload)
+        .switchMap((eventData) => {
+            let that = this;
+            let groupInfoObj = global.JIM.getGroupInfo({'gid': eventData.gid})
+            .onSuccess(function(obj) {
+                eventData.name = obj.group_info.name;
+                that.store$.dispatch({
+                    type: chatAction.createGroupSuccessEvent,
+                    payload: eventData
+                });
+            })
+            .onFail(function(error) {
+                eventData.name = '群名获取失败？？';
+                that.store$.dispatch({
+                    type: chatAction.createGroupSuccessEvent,
+                    payload: eventData
+                });
+            });
+            return Observable.of('createGroupEvent')
+                    .map(() => {
+                        return {type: '[chat] create group event useless'};
                     });
     });
 }

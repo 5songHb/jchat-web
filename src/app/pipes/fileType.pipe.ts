@@ -10,7 +10,7 @@ export class FileTypePipe implements PipeTransform {
     if(ext === ''){
         return 'other';
     }
-    const audio = ['.wav', '.mp3', '.wma', '.midi'],
+    const audio = ['wav', 'mp3', 'wma', 'midi'],
           document = ['ppt', 'pptx', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'wps'],
           video = ['mp4', 'mov', 'rm', 'rmvb', 'wmv', 'avi', '3gp', 'mkv'],
           image = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];

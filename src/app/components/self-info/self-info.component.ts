@@ -47,6 +47,7 @@ export class SelfInfoComponent implements OnChanges {
         url: ''
     };
     private cameraShadow = true;
+    private saveLoading = false;
     constructor(
         private elementRef: ElementRef
     ) {}
@@ -87,6 +88,9 @@ export class SelfInfoComponent implements OnChanges {
     }
     private selfCancel(){
         this.isEdit = false;
+    }
+    private selfClose(event){
+        event.stopPropagation();
         this.isShow.emit();
     }
     private signatureChange(event){
@@ -103,8 +107,12 @@ export class SelfInfoComponent implements OnChanges {
             info: Object.assign({},this.newInfo,{gender: this.sexList.active.key}),
             avatar: this.newAvatar
         };
-        this.isEdit = false;
+        this.saveLoading = true;
         this.isShow.emit(newInfo);
+        setTimeout(function(){
+            this.saveLoading = false;
+            this.isEdit = false;            
+        }.bind(this), 800);
     }
     private selfAvatarChange(){
         const selfAvatarImg = this.elementRef.nativeElement.querySelector('#selfAvatarImg'),

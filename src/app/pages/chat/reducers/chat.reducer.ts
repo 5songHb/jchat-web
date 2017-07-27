@@ -300,6 +300,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
         case chatAction.playVideoShow:
             state.playVideoShow = payload;
             break;
+        case chatAction.createGroupSuccessEvent:
+            createGroupSuccessEvent(state, payload);
+            break;
         default:
     }
     return state;
@@ -363,6 +366,37 @@ function updateGroupMembers(state: ChatStore, payload){
         }
     }
 }
+// 接收到管理员建群时自动添加会话和消息
+function createGroupSuccessEvent(state, payload){
+    state.conversation.unshift({
+        key: payload.gid,
+        name: payload.name,
+        type: 4,
+        unreadNum: 1,
+        recentMsg: {
+            ctime_ms: payload.ctime * 1000,
+            content: {
+                msg_body: {
+                    text: '创建群聊'
+                },
+                msg_type: 'groupEvent'
+            },
+            conversation_time_show: util.reducerDate(payload.ctime * 1000),
+            msg_type: 4
+        }
+    });
+    state.messageList.push({
+        key: payload.gid,
+        msgs: [],
+        addGroupOther: [
+            {
+                text: '创建群聊',
+                ctime_ms: payload.ctime * 1000,
+                time_show: 'today'
+            }
+        ]
+    });
+}
 function isRecentmsg(state, payload, addGroupOther, operation){
     let flag = false;
     for(let j=0;j<state.messageList.length;j++){
@@ -399,7 +433,7 @@ function isRecentmsg(state, payload, addGroupOther, operation){
         }
     }
 }
-// 被添加进群的事件
+// 被添加进群、移出群、退出群的事件
 function groupMembersEvent(state: ChatStore, payload, operation){
     let usernames = payload.to_usernames,
         addGroupOther = '';
@@ -500,16 +534,20 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                         time_show: ''
                     };
                     if(payload.ctime * 1000 <= msgs[0].ctime_ms){
-                        let add = msgs.addGroupOther;
+                        let add = state.messageList[j].addGroupOther;
                         if(add){
                             let fiveMinutes = util.fiveMinutes(add[add.length - 1].ctime_ms, payload.ctime * 1000);
                             if(fiveMinutes){
                                 eventObj.time_show = util.reducerDate(payload.ctime * 1000);
                             }
-                            msgs.addGroupOther.push(eventObj);
+                            state.messageList[j].addGroupOther.push(eventObj);
                         }else{
                             eventObj.time_show = util.reducerDate(payload.ctime * 1000);
-                            msgs.addGroupOther = [eventObj];
+                            state.messageList[j].addGroupOther = [eventObj];
+                        }
+                        // 如果与其之后的普通消息时间间隔小于五分钟，取消显示群聊消息之后的普通消息的时间
+                        if(!util.fiveMinutes(payload.ctime * 1000, msgs[0].ctime_ms) && msgs[0].time_show){
+                            msgs[0].time_show = '';
                         }
                         return ;
                     }
@@ -545,6 +583,11 @@ function groupMembersEvent(state: ChatStore, payload, operation){
                             }
                             msgs[i].addGroupOther = [eventObj];
                         }
+                        // 如果与其之后的普通消息时间间隔小于五分钟，取消显示群聊消息之后的普通消息的时间
+                        if(!util.fiveMinutes(payload.ctime * 1000, msgs[i + 1].ctime_ms) && msgs[i + 1].ctime_ms.time_show){
+                            msgs[i + 1].ctime_ms.time_show = '';
+                        }
+                        return ;
                     }
                 }
             }
@@ -705,7 +748,6 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
                 }
             }
         }
-        console.log('init', 111111, msgId);
         return msgId;
     }else if(operation === 'update'){
         let msgId;
@@ -738,7 +780,6 @@ function filterMsgId(state: ChatStore, operation: string, payload?){
                 }
             }
         }
-        console.log('update',111111, state.msgId);
         return state.msgId;
     }
 }
@@ -753,7 +794,6 @@ function sortGroupMember(memberList){
     }
 }
 function unreadNum(state: ChatStore, payload){
-    console.log('00000', 'storage', payload)
     if(!payload.msgId){
         return ;
     }
@@ -866,13 +906,27 @@ function addMessage(state: ChatStore, payload){
             if(state.messageList[i].key == payload.key && state.messageList[i].key){
                 let msgs = state.messageList[i].msgs;
                 if(msgs.length === 0){
-                    payload.msgs.time_show = 'today';
+                    // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
+                    if(state.messageList[i].addGroupOther && state.messageList[i].addGroupOther.length > 0){
+                        if(util.fiveMinutes(state.messageList[i].addGroupOther[0].ctime_ms, payload.msgs.ctime_ms)){
+                            payload.msgs.time_show = 'today';
+                        }
+                    }else{
+                        payload.msgs.time_show = 'today';
+                    }
                     msgs.push(payload.msgs);
                     state.newMessage = payload.msgs;
                     break ;
                 }
-                if((payload.msgs.ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
-                    payload.msgs.time_show = 'today';
+                if(util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, payload.msgs.ctime_ms)){
+                    // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
+                    if(msgs[msgs.length - 1].addGroupOther && msgs[msgs.length - 1].addGroupOther.length > 0){
+                        if(util.fiveMinutes(msgs[msgs.length - 1].addGroupOther.ctime_ms, payload.msgs.ctime_ms)){
+                            payload.msgs.time_show = 'today';
+                        }
+                    }else{
+                        payload.msgs.time_show = 'today';
+                    }
                 }
                 msgs.push(payload.msgs);
                 state.newMessage = payload.msgs;                 
@@ -881,7 +935,7 @@ function addMessage(state: ChatStore, payload){
         // 将当前会话放在第一位
         for(let a=0;a<state.conversation.length;a++){
             if(state.conversation[a].key == payload.key){
-                payload.msgs.conversation_time_show = util.reducerDate(payload.msgs.ctime_ms);
+                payload.msgs.conversation_time_show = 'today';
                 state.conversation[a].recentMsg = payload.msgs;
                 let item = state.conversation.splice(a,1);
                 state.conversation.unshift(item[0]);
@@ -915,6 +969,7 @@ function addMessage(state: ChatStore, payload){
                     index: state.messageList[state.activePerson.activeIndex].msgs.length
                 })
             }
+            // 接收到语音初始化播放动画
             if(payload.messages[j].content.msg_type === 'voice'){
                 payload.messages[j].content.playing = {
                     single: true,
@@ -923,9 +978,21 @@ function addMessage(state: ChatStore, payload){
                 };
                 payload.messages[j].content.havePlay = false;
             }
-            if(payload.messages[j].content.msg_type === 'file' && payload.messages[j].content.msg_body.extras && payload.messages[j].content.msg_body.extras.video === 'video'){
+            // 接收到小视频初始化loading
+            if(payload.messages[j].content.msg_type === 'file' && payload.messages[j].content.msg_body.extras && payload.messages[j].content.msg_body.extras.video){
                 payload.messages[j].content.load = 0;
                 payload.messages[j].content.range = 0;
+            }
+            // 给收到的非小视频文件消息添加hover下载按钮所需要的数据
+            if(payload.messages[j].content.msg_type === 'file' && (!payload.messages[j].content.msg_body.extras || !payload.messages[j].content.msg_body.extras.video)){
+                payload.messages[j].downloadHover = {
+                    tip: '下载文件',
+                    position: {
+                        left: -20,
+                        top: 27
+                    },
+                    show: false
+                }
             }
             let flag = false;    
             // 如果发送人在会话列表里
@@ -938,8 +1005,25 @@ function addMessage(state: ChatStore, payload){
                 }
                 if(groupMsg || singleMsg){
                     let msgs = state.messageList[i].msgs;
-                    if(msgs.length === 0 || (payload.messages[j].ctime_ms - msgs[msgs.length - 1].ctime_ms) / 1000 / 60 > 5){
-                        payload.messages[j].time_show = 'today';
+                    if(msgs.length === 0){
+                        // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
+                        if(state.messageList[i].addGroupOther && state.messageList[i].addGroupOther.length > 0){
+                            if(util.fiveMinutes(state.messageList[i].addGroupOther[0].ctime_ms, payload.messages[j].ctime_ms)){
+                                payload.messages[j].time_show = 'today';
+                            }
+                        }else{
+                            payload.messages[j].time_show = 'today';
+                        }
+                    }
+                    if(msgs.length > 0 && util.fiveMinutes(msgs[msgs.length - 1].ctime_ms, payload.messages[j].ctime_ms)){
+                        // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
+                        if(msgs[msgs.length - 1].addGroupOther && msgs[msgs.length - 1].addGroupOther.length > 0){
+                            if(util.fiveMinutes(msgs[msgs.length - 1].addGroupOther.ctime_ms, payload.messages[j].ctime_ms)){
+                                payload.messages[j].time_show = 'today';
+                            }
+                        }else{
+                            payload.messages[j].time_show = 'today';
+                        }
                     }
                     msgs.push(payload.messages[j]);
                     state.newMessage = payload.messages[j];
@@ -962,7 +1046,7 @@ function addMessage(state: ChatStore, payload){
                     flag = true;                    
                     let item = state.conversation.splice(a,1);
                     state.conversation.unshift(item[0]);
-                    payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].ctime_ms);
+                    payload.messages[j].conversation_time_show = 'today';
                     state.conversation[0].recentMsg = payload.messages[j];
                     return ;                    
                 }
@@ -1008,8 +1092,8 @@ function addMessage(state: ChatStore, payload){
                         unreadNum: 1
                     }
                 }
-                payload.messages[j].conversation_time_show = util.reducerDate(payload.messages[j].ctime_ms);  
-                payload.messages[j].time_show = util.reducerDate(payload.messages[j].ctime_ms);
+                payload.messages[j].conversation_time_show = 'today';  
+                payload.messages[j].time_show = 'today';
                 state.newMessage = msg;
                 state.messageList.push(msg);
                 state.conversation.unshift(conversationItem);
@@ -1074,7 +1158,6 @@ function searchUser(state: ChatStore, payload){
 }
 // 选择搜索的用户、发起单聊
 function selectUserResult(state, payload){
-    console.log(555, payload)
     if(payload.gid){
         payload.key = payload.gid;
     }

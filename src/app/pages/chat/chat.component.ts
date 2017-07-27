@@ -153,10 +153,12 @@ export class ChatComponent implements OnInit {
                         });
                         break;
                     case 8:
-                        that.store$.dispatch({
-                            type: chatAction.createGroupEvent,
-                            payload: data
-                        });
+                        if(data.from_username === ''){
+                            that.store$.dispatch({
+                                type: chatAction.createGroupEvent,
+                                payload: data
+                            });
+                        }
                         break;
                     case 9:
                         if(data.to_usernames[0].username !== global.user){
@@ -187,6 +189,14 @@ export class ChatComponent implements OnInit {
                 console.log(8888, this.eventArr);
                 for(let item of this.eventArr){
                     switch(item.event_type){
+                        case 8:
+                            if(item.from_username === ''){
+                                that.store$.dispatch({
+                                    type: chatAction.createGroupEvent,
+                                    payload: item
+                                });
+                            }
+                            break;
                         case 9:
                             if(item.to_usernames[0].username !== global.user){
                                 that.store$.dispatch({
@@ -424,6 +434,9 @@ export class ChatComponent implements OnInit {
                 if(chatState.currentIsActive){
                     this.scrollBottom = !this.scrollBottom;
                 }
+                break;
+            case chatAction.createGroupSuccessEvent:
+                this.conversationList = chatState.conversation;
                 break;
             default:
 

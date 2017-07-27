@@ -1,6 +1,6 @@
 <div class="modal-shadow" (click)="hideSelect($event)">
     <div class="self-info-container modal-content clearfix">
-        <span class="modal-close" (click)="selfCancel()"></span>
+        <span class="modal-close" (click)="selfClose($event)"></span>
         <div class="self-info-avatar">
             <div *ngIf="!isEdit" class="self-info-show-avatar">
                 <img [src]="selfInfo.avatarUrl" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
@@ -37,7 +37,7 @@
         <p class="modal-btn clearfix">
             <button [hidden]="isEdit" type="button" class="self-info-edit-btn btn-white" (click)="toEdit()">编辑</button>
             <button [hidden]="!isEdit" type="button" class="btn-cancel btn-white float-left" (click)="selfCancel()">取消</button>            
-            <button [hidden]="!isEdit" type="button" class="btn-confirm btn-active float-right" (click)="selfConfirm()">保存</button>
+            <button [hidden]="!isEdit" type="button" [ngClass]="{'loading': saveLoading}" class="btn-confirm btn-active float-right" (click)="selfConfirm()">保存</button>
         </p>
     </div>
 </div>

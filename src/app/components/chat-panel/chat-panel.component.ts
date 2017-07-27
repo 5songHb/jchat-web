@@ -229,7 +229,6 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         }
     }
     private imageViewerShow(src, index){
-        console.log(444, index, this.messageList[this.active.activeIndex].msgs.length, this.msg.length);
         for(let i=0;i<this.imageViewer.result.length;i++){
             if(this.imageViewer.result[i].index === index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)){
                 this.imageViewer.active = Object.assign({}, this.imageViewer.result[i], {});
@@ -326,6 +325,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         this.sendPic.emit(img);
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
+        event.target.value = '';
     }
     private sendFileAction(event){
         const fileData = this.elementRef.nativeElement.querySelector('#sendFile');
@@ -340,6 +340,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         });
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
+        event.target.value = '';
     }
     private msgContentChange(event){
         let active = Object.assign({}, this.active, {}),
@@ -576,6 +577,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         }.bind(this), 100);
     }
     private videoLoad(index){
+        this.msg[index].content.duration = this.elementRef.nativeElement.querySelector('#video' + index).duration.toFixed(0);        
         this.msg[index].content.load = 1;
         clearInterval(this.msg[index].content.timer4);
         this.msg[index].content.range = 0;

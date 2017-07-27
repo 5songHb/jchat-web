@@ -43,6 +43,8 @@ export class ContactComponent implements OnInit {
             case contactAction.getGroupListSuccess:
                 this.groupList = contactState.groupList;
                 break;
+            case chatAction.createGroupSuccessEvent:
+            
             case mainAction.createGroupSuccess:
                 this.groupList = contactState.groupList;
                 this.conversation = contactState.conversation;
