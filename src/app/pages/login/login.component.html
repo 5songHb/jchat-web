@@ -5,11 +5,11 @@
         </h1>
         <div class="login-info">
             <div class="login-username" (click)="inputFocus('loginUsername')" [ngClass]="{'login-tip-wrap': loginTip}">
-                <input autocomplete="off" spellcheck="false" id="loginUsername" class="input-focus" [ngClass]="{'input-error': loginTip}" [(ngModel)]="username" type="text" placeholder="请输入用户名" (keyup)="isButtonAvailableAction('username')" (change)="isButtonAvailableAction()">
+                <input autocomplete="off" spellcheck="false" id="loginUsername" class="input-focus" [ngClass]="{'input-error': loginTip}" [(ngModel)]="username" type="text" [placeholder]="usernamePlaceholderText" (keyup)="isButtonAvailableAction('usernameKeyup')" (change)="isButtonAvailableAction('usernameChange')">
                 <p class="login-tip" *ngIf="loginTip">{{loginTip}}</p>                
             </div>
             <div class="login-pwd" (click)="inputFocus('loginPassword')">
-                <input autocomplete="off" spellcheck="false" id="loginPassword" class="input-focus" [(ngModel)]="password" type="password" placeholder="请输入密码" (keyup.enter)="login()" (keyup)="isButtonAvailableAction('password')" (change)="isButtonAvailableAction()">
+                <input autocomplete="off" spellcheck="false" id="loginPassword" class="input-focus" [(ngModel)]="password" type="password" [placeholder]="passwordPlaceholderText" (keyup.enter)="login()" (keyup)="isButtonAvailableAction('passwordKeyup')" (change)="isButtonAvailableAction('passwordChange')">
             </div>
             <p class="login-remember clearfix">
                 <label for="remember" class="float-left">

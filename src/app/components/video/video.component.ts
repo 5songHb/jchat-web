@@ -10,7 +10,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
     @Input()
         private url;
     @Output()
-        private colseVideo: EventEmitter<any> = new EventEmitter();
+        private closeVideo: EventEmitter<any> = new EventEmitter();
     private state = 'play';
     private video;
     private timer = null;
@@ -28,7 +28,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
     }
     private closeModal(){
-        this.colseVideo.emit();
+        this.closeVideo.emit();
     }
     private play(){
         this.video.play();

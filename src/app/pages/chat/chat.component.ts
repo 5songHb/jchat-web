@@ -927,7 +927,7 @@ export class ChatComponent implements OnInit {
             }
         });
     }
-    private colseVideoEmit(){
+    private closeVideoEmit(){
         this.store$.dispatch({
             type: chatAction.playVideoShow,
             payload: {

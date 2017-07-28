@@ -29,7 +29,7 @@ export class ContactComponent implements OnInit {
     }
     private subscribeStore(){
         this.contactStream$ = this.store$.select((state) => {
-            let contactState = state['contactReducer'];
+            const contactState = state['contactReducer'];
             console.log('contact',contactState);
             this.stateChanged(contactState);
             return state;

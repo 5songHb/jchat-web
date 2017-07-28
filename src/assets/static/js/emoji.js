@@ -16,7 +16,7 @@ window.Emoji = {
 	emoji: function(text) {
 
 		//在第一次调用的时候检查浏览器是否支持emoji符号
-		let isSupportEmoji = false,
+		var isSupportEmoji = false,
 			UA = navigator.userAgent;
 
 		if (UA.match(/Mac\s+OS/i) && !UA.match(/(Chrome|Firefox)/i)) {
@@ -36,7 +36,7 @@ window.Emoji = {
 		} else {
 
 			//判断屏幕分辨率，如果是高清屏的话使用稍大尺寸的表情图片
-			// let pixelRatio = parseFloat(window.devicePixelRatio) || 1;
+			// var pixelRatio = parseFloat(window.devicePixelRatio) || 1;
 			// if (pixelRatio > 1.2) {
 			// 	Emoji.emojiPath = pixelRatio + '2x/';
 			// }
@@ -52,14 +52,14 @@ window.Emoji = {
 	},
 
 	trans:  function(text) {
-		let isElement, el, fontSize;
+		var isElement, el, fontSize;
 		if (text.nodeType) {
 			el = text;
 			fontSize = (el.currentStyle || window.getComputedStyle(el, ''))['fontSize'];
 
 			//IE浏览器下如果css中的font-size单位不是象素的话，需要转换一下
 			if (!/px$/i.test(fontSize)) {
-				let left = el.style.left;
+				var left = el.style.left;
 					el.style.left = '1em';
 
 				fontSize = el.style.pixelLeft;
@@ -88,7 +88,7 @@ window.Emoji = {
 
 	//编码转换
 	_escapeToUtf32: function(str) {
-		let escaped = [],
+		var escaped = [],
 			unicodeCodes = Emoji._convertStringToUnicodeCodePoints(str),
 			i = 0,
 			l = unicodeCodes.length,
@@ -102,15 +102,15 @@ window.Emoji = {
 	},
 
 	_convertStringToUnicodeCodePoints: function(str) {
-		let surrogate1st = 0,
+		var surrogate1st = 0,
 			unicodeCodes = [],
 			i = 0,
 			l = str.length;
 		for (; i < l; i++) {
-			let utf16Code = str.charCodeAt(i);
+			var utf16Code = str.charCodeAt(i);
 			if (surrogate1st != 0) {
 				if (utf16Code >= 0xDC00 && utf16Code <= 0xDFFF) {
-					let surrogate2nd = utf16Code,
+					var surrogate2nd = utf16Code,
 						unicodeCode = (surrogate1st - 0xD800) * (1 << 10) + (1 << 16) + (surrogate2nd - 0xDC00);
 					unicodeCodes.push(unicodeCode);
 				}
@@ -130,13 +130,13 @@ window.Emoji = {
 	 */
 	convert: function(unicode) {
         if(unicode.indexOf("-") > -1) {
-            let parts = [];
-            let s = unicode.split('-');
-            for(let i = 0; i < s.length; i++) {
-                let part = parseInt(s[i], 16);
+            var parts = [];
+            var s = unicode.split('-');
+            for(var i = 0; i < s.length; i++) {
+                var part = parseInt(s[i], 16);
                 if (part >= 0x10000 && part <= 0x10FFFF) {
-                    let hi = Math.floor((part - 0x10000) / 0x400) + 0xD800;
-                    let lo = ((part - 0x10000) % 0x400) + 0xDC00;
+                    var hi = Math.floor((part - 0x10000) / 0x400) + 0xD800;
+                    var lo = ((part - 0x10000) % 0x400) + 0xDC00;
                     part = (String.fromCharCode(hi) + String.fromCharCode(lo));
                 }
                 else {
@@ -147,10 +147,10 @@ window.Emoji = {
             return parts.join('');
         }
         else {
-            let s = parseInt(unicode, 16);
+            var s = parseInt(unicode, 16);
             if (s >= 0x10000 && s <= 0x10FFFF) {
-                let hi = Math.floor((s - 0x10000) / 0x400) + 0xD800;
-                let lo = ((s - 0x10000) % 0x400) + 0xDC00;
+                var hi = Math.floor((s - 0x10000) / 0x400) + 0xD800;
+                var lo = ((s - 0x10000) % 0x400) + 0xDC00;
                 return (String.fromCharCode(hi) + String.fromCharCode(lo));
             }
             else {

@@ -8,11 +8,13 @@ declare let Emoji;
     name: 'emoji'
 })
 export class EmojiPipe implements PipeTransform {
-  transform(text) {
+  transform(text, nbsp) {
     let newText = text.replace(/</g, '&lt;');
     newText = newText.replace(/>/g, '&gt;');
-    newText = newText.replace(/\n/g, '<br>');    
-    newText = newText.replace(/\s/g, '&nbsp;');
+    newText = newText.replace(/\n/g, '<br>');
+    if(nbsp){
+      newText = newText.replace(/\s/g, '&nbsp;');
+    }
     newText = Emoji.emoji(newText);
     return newText;
   }

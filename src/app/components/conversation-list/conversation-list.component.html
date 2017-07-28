@@ -16,7 +16,7 @@
                     <p class="conversation-nickname flex-1" *ngIf="item.nickName && item.type === 3">{{item.nickName}}</p>
                     <p class="conversation-nickname flex-1" *ngIf="item.name && !item.nickName && item.type === 3">{{item.name}}</p>
                     <p class="conversation-nickname flex-1" *ngIf="item.type === 4">{{item.name}}</p>
-                    <p class="conversation-time" *ngIf="item.recentMsg" [ngSwitch]="item.recentMsg.conversation_time_show">
+                    <p class="conversation-time" *ngIf="item.recentMsg" [ngSwitch]="item?.recentMsg.conversation_time_show">
                         <time *ngSwitchCase="'year'">{{item.recentMsg.ctime_ms | time:"yy-MM-dd"}}</time>
                         <time *ngSwitchCase="'month'">{{item.recentMsg.ctime_ms | time:"MM-dd"}}</time>
                         <time *ngSwitchCase="'day'">{{item.recentMsg.ctime_ms | day}}</time>
@@ -25,13 +25,24 @@
                         <time *ngSwitchCase="'today'">{{item.recentMsg.ctime_ms | time:"HH:mm"}}</time>
                     </p>
                 </div>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'text' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span><span [innerHTML]="item.recentMsg.content.msg_body.text | emoji"></span></p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'image' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span>[图片]</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'file' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span>[文件]</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'voice' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span>[语音]</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'location' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span>[地图]</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'video' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}} : </span>[视频]</p>
-                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'groupEvent' && !item.draft"><span>{{item.recentMsg.content.msg_body.text}}</span></p>
+                <p class="conversation-recentMsg" *ngIf="item?.recentMsg?.content?.msg_type && !item.draft" [ngSwitch]="item?.recentMsg?.content?.msg_type">
+                    <span class="float-left" *ngIf="item.recentMsg.msg_type === 4 && item.recentMsg.content.msg_type !== 'groupEvent'">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>
+                    <span *ngSwitchCase="'text'" [innerHTML]="item.recentMsg.content.msg_body.text | emoji: true"></span>
+                    <span *ngSwitchCase="'image'">[图片]</span>
+                    <span *ngIf="item.recentMsg.content.msg_type === 'file' && !item.recentMsg.content.msg_body?.extras?.video">[文件]</span>
+                    <span *ngIf="item.recentMsg.content.msg_type === 'file' && item.recentMsg.content.msg_body?.extras?.video">[视频]</span>
+                    <span *ngSwitchCase="'video'">[视频]</span>                    
+                    <span *ngSwitchCase="'voice'">[语音]</span>
+                    <span *ngSwitchCase="'location'">[地图]</span>
+                    <span *ngSwitchCase="'groupEvent'">{{item.recentMsg.content.msg_body.text}}</span>
+                </p>
+                <!-- <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'text' && !item.draft"><span class="float-left" *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span><span [innerHTML]="item.recentMsg.content.msg_body.text | emoji: true"></span></p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'image' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>[图片]</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'file' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>[文件]</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'voice' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>[语音]</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'location' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>[地图]</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'video' && !item.draft"><span *ngIf="item.recentMsg.msg_type === 4">{{item.recentMsg.content.from_id === global.user ? '我' : (item.recentMsg.content.from_name !== '' ? item.recentMsg.content.from_name : item.recentMsg.content.from_id)}}&nbsp;:&nbsp;</span>[视频]</p>
+                <p class="conversation-recentMsg" *ngIf="item.recentMsg && item.recentMsg.content.msg_type === 'groupEvent' && !item.draft"><span>{{item.recentMsg.content.msg_body.text}}</span></p> -->
                 <p class="conversation-draft" *ngIf="item.draft">[草稿] <span [innerHTML]="item.draft"></span></p>
             </div>
             <span class="conversation-delete" (click)="deleteThis($event, item)">×</span>

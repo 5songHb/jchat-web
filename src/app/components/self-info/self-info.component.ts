@@ -129,7 +129,9 @@ export class SelfInfoComponent implements OnChanges {
                 selfAvatarImg.src = url;
                 this.newAvatar.url = url;
                 this.cameraShadow = false;
-            })
+            }).catch(function () {
+                console.log("Promise Rejected");
+            });
         }
         this.newAvatar.formData = this.util.getFileFormData(selfAvatarInput);
     }

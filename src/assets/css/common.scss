@@ -309,8 +309,9 @@ ul,li,ol{
     padding-right: 20px;
 }
 .conversation-recentMsg img{
+    vertical-align: middle;
     position: relative;
-    top: -2px;
+    top: -1px;
 }
 .chat-panel-msgText-me img{
     vertical-align: middle;
@@ -329,12 +330,12 @@ ul,li,ol{
 }
 /* emoji*/
 .emoji{
-    vertical-align: middle;
     position: relative;
     top: 3px;
 }
 .chat-panel-content-text .emoji, .conversation-draft .emoji{
     top: -1px;
+    vertical-align: middle;
 }
 
 

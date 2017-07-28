@@ -39,25 +39,29 @@ export class Util {
         reader.readAsDataURL(files);
         let img = new Image(),
             promise = new Promise((resolve, reject) => {
-            reader.onload = function(e){
-                img.src = this.result;
-                let that = this;
-                img.onload = function(){
-                    let width = img.naturalWidth;
-                    let height = img.naturalHeight;
-                    resolve({
-                        src: that.result, 
-                        width, 
-                        height
-                    });
+                    reader.onload = function(e){
+                    img.src = this.result;
+                    let that = this;
+                    img.onload = function(){
+                        let width = img.naturalWidth;
+                        let height = img.naturalHeight;
+                        resolve({
+                            src: that.result, 
+                            width, 
+                            height
+                        });
+                    }
                 }
-            }
-        });
+            }).catch(function () {
+                console.log("Promise Rejected");
+            })
         promise.then((value) => {
             callback2(value);
         }, (error) => {
 
-        })
+        }).catch(function () {
+            console.log("Promise Rejected");
+        });
     }
     /**
      * fileReader预览图片url
@@ -78,7 +82,9 @@ export class Util {
             reader.onload = function(e){
                 resolve(this.result);
             }
-        })
+        }).catch(function () {
+            console.log("Promise Rejected");
+        });
     }
     /**
      * contenteditable输入框插入内容（表情、粘贴文本等）

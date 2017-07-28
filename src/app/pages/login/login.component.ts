@@ -23,6 +23,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private util: Util = new Util();
     private emptyPassword = false;
     private loginLoading = false;
+    // 为了解决safari下记住密码时placeholder依然存在的bug
+    private usernamePlaceholderText = '请输入用户名';
+    private passwordPlaceholderText = '请输入密码';
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
@@ -101,12 +104,16 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 that.rememberPassword = password;
                 that.password = password.substring(0, 6);
                 that.loginRemember = true;
-                that.emptyPassword = true;            
+                that.emptyPassword = true;
+                that.usernamePlaceholderText = '';
+                that.passwordPlaceholderText = '';
             }
             if(that.storageService.get('register-username')){
                 that.username = that.storageService.get('register-username');
+                that.usernamePlaceholderText = '';
                 that.storageService.remove('register-username');
                 that.password = '';
+                that.passwordPlaceholderText = '请输入密码';
             }
             console.log('success:' + JSON.stringify(data));
         }).onFail(function(data) {
@@ -150,15 +157,23 @@ export class LoginComponent implements OnInit, AfterViewInit {
             }
         });
         // 当input keyup进行修改时清空提示语
-        if(type){
+        if(type === 'usernameKeyup' || type === 'passwordKeyup'){
             this.store$.dispatch({
                 type: loginAction.emptyTip,
                 payload: type
             });
         }
-        if(type === 'username' && this.emptyPassword){
+        if(type === 'usernameKeyup' && this.emptyPassword){
             this.password = '';
             this.emptyPassword = false;
+            this.passwordPlaceholderText = '请输入密码';
+        }
+        // 解决safari placeholder问题
+        if((type === 'usernameKeyup' || type === 'usernameChange') && this.username === ''){
+            this.usernamePlaceholderText = '请输入用户名';
+        }
+        if((type === 'passwordKeyup' || type === 'passwordChange') && this.password === ''){
+            this.passwordPlaceholderText = '请输入密码';
         }
     }
     public ngOnDestroy (){
@@ -166,9 +181,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
     ngAfterViewInit(){
         if(this.username !== '' && this.password === ''){
-            document.getElementById('loginPassword').focus();
+            this.elementRef.nativeElement.querySelector('#loginPassword').focus();
         }else{
-            document.getElementById('loginUsername').focus();
+            this.elementRef.nativeElement.querySelector('#loginUsername').focus();
         }
     }
     private inputFocus(id){

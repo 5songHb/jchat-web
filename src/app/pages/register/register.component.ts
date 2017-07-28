@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { global, authPayload, StorageService } from '../../services/common';
@@ -32,20 +32,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     constructor(
         private store$: Store<AppStore>,
         private router: Router,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private elementRef: ElementRef
     ) {}
     public ngOnInit() {
         this.JIMInit();
         this.registerStream = this.store$.select((state) => {
-            let registerState = state['registerReducer'];
-            // if(!registerState.isRegisterSuccess){
-            //     this.tip.usernameTip = registerState.usernameTip;
-            //     this.tip.passwordTip = registerState.passwordTip;
-            //     this.isButtonAvailable = registerState.isButtonAvailable;
-            //     this.tip.repeatPasswordTip = registerState.repeatPasswordTip;
-            // }else{
-            //     this.tipModal = registerState.tipModal;
-            // }
+            const registerState = state['registerReducer'];
             switch(registerState.actionType){
                 case registerAction.registerSuccess:
                     this.tipModal = registerState.tipModal;
@@ -62,7 +55,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         });
     }
     ngAfterViewInit(){
-        document.getElementById('registerUsername').focus();
+        this.elementRef.nativeElement.querySelector('#registerUsername').focus();
     }
     private JIMInit(){
         let timestamp = new Date().getTime(),

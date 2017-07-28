@@ -104,9 +104,6 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
     }
     ngOnInit(){
         this.subscribeStore();
-        // if(!this.messageList[this.active.activeIndex].draft){
-        //     this.messageList[this.active.activeIndex].draft = '';
-        // }
         // 禁止火狐下点击发送消息的输入框中的表情进行缩放
         document.designMode = "off";
         document.execCommand('enableObjectResizing', false, 'false');
@@ -280,6 +277,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         this.allPointerToMap(true);
         this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
     }
+    // 粘贴文本
     private pasteMessage(event){
         let clipboardData = event.clipboardData || (<any>window).clipboardData;
         let pastedData = clipboardData.getData('Text');
@@ -290,6 +288,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         this.util.insertAtCursor(this.contentDiv, pastedData, false);
         return false;
     }
+    // 发送文本
     private sendMsgAction(){
         let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
         if(draft){
@@ -480,6 +479,8 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                             that.componentScroll.scrollTo(0, newContentHeight - oldContentHeight);
                             resolve();
                         }, 0);
+                    }).catch(function () {
+                        console.log("Promise Rejected");
                     });
                 }
             }.bind(this), 500);
@@ -577,7 +578,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         }.bind(this), 100);
     }
     private videoLoad(index){
-        this.msg[index].content.duration = this.elementRef.nativeElement.querySelector('#video' + index).duration.toFixed(0);        
+        this.msg[index].content.duration = Math.floor(this.elementRef.nativeElement.querySelector('#video' + index).duration);
         this.msg[index].content.load = 1;
         clearInterval(this.msg[index].content.timer4);
         this.msg[index].content.range = 0;
