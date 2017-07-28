@@ -6,12 +6,11 @@ import { AppStore } from '../../app.store';
 import { chatAction } from '../../pages/chat/actions';
 import { contactAction } from '../../pages/contact/actions';
 import { mainAction } from '../../pages/main/actions';
-import '../../../assets/static/js/emoji.js';
 import { global, emojiConfig, jpushConfig, imgRouter } from '../../services/common';
 import { Util } from '../../services/util';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import{ StorageService } from '../../services/common';
-declare let Emoji;
+import { Emoji } from '../../services/tools';
 let download = require("downloadjs");
 
 @Component({
@@ -127,6 +126,10 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                 this.loadFlag = true;
             }.bind(this),150);
         }
+    }
+    ngAfterViewInit(){
+        this.allPointerToMap(true);
+        this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
     }
     @HostListener('window:click') onClickWindow(){
         this.inputToLast = true;
@@ -273,11 +276,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
             }.bind(this),100);
         }
     }
-    ngAfterViewInit(){
-        this.allPointerToMap(true);
-        this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
-    }
-    // 粘贴文本
+    // 粘贴文本，将文本多余的样式代码去掉
     private pasteMessage(event){
         let clipboardData = event.clipboardData || (<any>window).clipboardData;
         let pastedData = clipboardData.getData('Text');

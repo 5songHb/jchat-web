@@ -121,7 +121,7 @@ export class ChatComponent implements OnInit {
         global.JIM.onEventNotification(function(data) {
             console.log('event', data);
             // 如果是离线业务消息则存在数组里
-            if(data.ctime * 1000 < (new Date).getTime() + 10000){
+            if(data.ctime * 1000 < (new Date).getTime()){
                 that.eventArr.push(data);
                 console.log(4444, that.eventArr);
             }
@@ -408,9 +408,6 @@ export class ChatComponent implements OnInit {
                 break;
             case mainAction.addGroupMemberSuccess:
                 this.groupSetting.memberList = chatState.messageList[chatState.activePerson.activeIndex].groupSetting.memberList;
-                // 为了解决添加新成员后IE假死的现象
-                this.elementRef.nativeElement.querySelector('#searchGroupMember').focus();
-                this.elementRef.nativeElement.querySelector('#searchGroupMember').blur();
                 break;
             case chatAction.changeGroupShieldSuccess:
                 this.conversationList = chatState.conversation;

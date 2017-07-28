@@ -77,6 +77,8 @@ export class SelfInfoComponent implements OnChanges {
                     key: 2,
                     name: '女'
                 }
+                break;
+            default:
         }
     }
     private hideSelect(event){
@@ -129,7 +131,7 @@ export class SelfInfoComponent implements OnChanges {
                 selfAvatarImg.src = url;
                 this.newAvatar.url = url;
                 this.cameraShadow = false;
-            }).catch(function () {
+            }).catch(() => {
                 console.log("Promise Rejected");
             });
         }

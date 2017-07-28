@@ -7,7 +7,7 @@
         <ul>
             <li class="display-flex search-member-search-result" (click)="searchItemAction(item)" *ngFor="let item of searchResult.result">
                 <div>
-                    <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="item.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                    <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="item.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                     <img *ngIf="!item.avatarUrl || item.avatarUrl === ''" style="width: 100%;" src="../../../assets/images/single-avatar.png" alt="">
                 </div>
                 <p class="flex-1">{{item.nickName.indexOf(searchResult.keywords) !== -1 ? item.nickName : (item.username ? item.username : item.name)}}</p>

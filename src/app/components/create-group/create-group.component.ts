@@ -56,17 +56,17 @@ export class CreateGroupComponent implements OnInit {
                     if(result[0].name === global.user){
                         result[0].disabled = true;
                     }
-                    for(let i=0;i<this.selectList.length;i++){
-                        if(Number(result[0].key) === Number(this.selectList[i].key)){
-                            result[0].checked = this.selectList[i].checked;
-                            result[0].disabled = this.selectList[i].disabled;
+                    for(let item of this.selectList){
+                        if(Number(result[0].key) === Number(item.key)){
+                            result[0].checked = item.checked;
+                            result[0].disabled = item.disabled;
                         }
                     }
                     // 如果搜索的是已经在群里的，disabled
                     let filter =this.createGroup.info.filter;
                     if(filter){
-                        for(let i=0;i<filter.length;i++){
-                            if(filter[i].username === mainState.createGroupSearch.info.name){
+                        for(let item of filter){
+                            if(item.username === mainState.createGroupSearch.info.name){
                                 result[0].disabled = true;
                                 break;
                             }
@@ -86,15 +86,15 @@ export class CreateGroupComponent implements OnInit {
     }
     private initData(){
         // 多人会话
-        for(let i=0;i<this.createGroup.list.length;i++){
-            for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                this.createGroup.list[i].data[j].checked = false;
-                this.createGroup.list[i].data[j].disabled = false;
-                this.createGroup.list[i].data[j].show = true;
-                let keyFlag = this.createGroup.info.activeSingle && Number(this.createGroup.info.activeSingle.key) === Number(this.createGroup.list[i].data[j].key);
+        for(let list of this.createGroup.list){
+            for(let member of list.data){
+                member.checked = false;
+                member.disabled = false;
+                member.show = true;
+                let keyFlag = this.createGroup.info.activeSingle && Number(this.createGroup.info.activeSingle.key) === Number(member.key);
                 if(keyFlag){
-                    this.createGroup.list[i].data[j].checked = true;
-                    this.createGroup.list[i].data[j].disabled = true;
+                    member.checked = true;
+                    member.disabled = true;
                     this.createGroup.info.activeSingle.disabled = true;
                     this.createGroup.info.activeSingle.checked = true;
                     this.selectList.push(this.createGroup.info.activeSingle);
@@ -117,18 +117,18 @@ export class CreateGroupComponent implements OnInit {
             }
         }
         // 如果整个letter的成员都不显示，则隐藏字母
-        for(let i=0;i<this.createGroup.list.length;i++){
+        for(let list of this.createGroup.list){
             let flag = false;            
-            for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(this.createGroup.list[i].data[j].show && this.createGroup.list[i].data[j].type === 3){
+            for(let member of list.data){
+                if(member.show && member.type === 3){
                     flag = true;
                     break;
                 }
             }
             if(!flag){
-                this.createGroup.list[i].allFilter = true;
+                list.allFilter = true;
             }else{
-                this.createGroup.list[i].allFilter = false;
+                list.allFilter = false;
             }
         }
     }
@@ -136,13 +136,13 @@ export class CreateGroupComponent implements OnInit {
         this.searchResult.result = [];
         if(value){
             this.searchResult.show = true;
-            for(let i=0;i<this.createGroup.list.length;i++){
-                if(!this.createGroup.list[i].allGroup){
-                    for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                        let nameExist = this.createGroup.list[i].data[j].name && this.createGroup.list[i].data[j].name.indexOf(value) !== -1,
-                            nickNameExist = this.createGroup.list[i].data[j].nickName && this.createGroup.list[i].data[j].nickName.indexOf(value) !== -1;
-                        if((nameExist || nickNameExist) && this.createGroup.list[i].data[j].show && this.createGroup.list[i].data[j].type === 3){
-                            this.searchResult.result.push(this.createGroup.list[i].data[j]);
+            for(let list of this.createGroup.list){
+                if(!list.allGroup){
+                    for(let user of list.data){
+                        let nameExist = user.name && user.name.indexOf(value) !== -1,
+                            nickNameExist = user.nickName && user.nickName.indexOf(value) !== -1;
+                        if((nameExist || nickNameExist) && user.show && user.type === 3){
+                            this.searchResult.result.push(user);
                         }
                     }
                 }
@@ -163,6 +163,7 @@ export class CreateGroupComponent implements OnInit {
             if(Number(item.key) === Number(this.selectList[i].key)){
                 flag = false;
                 this.selectList.splice(i, 1);
+                item.checked = false;
                 break;
             }
         }
@@ -170,17 +171,12 @@ export class CreateGroupComponent implements OnInit {
             item.checked = true;
             this.selectList.push(item);
         }
-        for(let i=0;i<this.createGroup.list.length;i++){
-            if(!this.createGroup.list[i].allGroup){
-                for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                    if(Number(item.key) === Number(this.createGroup.list[i].data[j].key)){
-                        if(this.createGroup.list[i].data[j].type === 3 && this.createGroup.list[i].data[j].checked){
-                            this.createGroup.list[i].data[j].checked = false;
-                            return ;
-                        }else if(this.createGroup.list[i].data[j].type === 3 && !this.createGroup.list[i].data[j].checked){
-                            this.createGroup.list[i].data[j].checked = true;
-                            return ;
-                        }
+        for(let list of this.createGroup.list){
+            if(!list.allGroup){
+                for(let member of list.data){
+                    if(Number(item.key) === Number(member.key) && member.type === 3){
+                        member.checked = item.checked;
+                        return ;
                     }
                 }
             }
@@ -201,9 +197,9 @@ export class CreateGroupComponent implements OnInit {
             this.nameTip = false;
         }
         let memberUsernames = [];
-        for(let i=0;i<this.selectList.length;i++){
+        for(let item of this.selectList){
             memberUsernames.push({
-                username: this.selectList[i].name,
+                username: item.name,
                 appkey: authPayload.appKey
             })
         }
@@ -219,16 +215,16 @@ export class CreateGroupComponent implements OnInit {
             groupInfo.activeGroup = this.createGroup.info.activeGroup;
         }else if(this.createGroup.info.action && this.createGroup.info.action === 'many'){
             groupInfo.groupName = this.createGroup.info.selfInfo.nickname || this.createGroup.info.selfInfo.username;
-            for(let i=0;i<this.selectList.length && i<5;i++){
+            for(let item of this.selectList){
                 let name;
-                if(this.selectList[i].nickName && this.selectList[i].nickName !== ''){
-                    name = this.selectList[i].nickName;
-                }else if(this.selectList[i].nickname && this.selectList[i].nickname !== ''){
-                    name = this.selectList[i].nickname;
-                }else if(this.selectList[i].username && this.selectList[i].username !== ''){
-                    name = this.selectList[i].username;
-                }else if(this.selectList[i].name && this.selectList[i].name !== ''){
-                    name = this.selectList[i].name;
+                if(item.nickName && item.nickName !== ''){
+                    name = item.nickName;
+                }else if(item.nickname && item.nickname !== ''){
+                    name = item.nickname;
+                }else if(item.username && item.username !== ''){
+                    name = item.username;
+                }else if(item.name && item.name !== ''){
+                    name = item.name;
                 }
                 groupInfo.groupName += '、' + name;
             }
@@ -242,12 +238,7 @@ export class CreateGroupComponent implements OnInit {
     }
     private selectItem(event, user){
         if(!event.target.checked){
-            for(let i=0;i<this.selectList.length;i++){
-                if(Number(this.selectList[i].key) === Number(user.key)){
-                    this.selectList.splice(i, 1);
-                    break;
-                }
-            }
+            this.deleteItem(user);
         }else{
             if(user.key){
                 user.uid = user.key;
@@ -258,28 +249,32 @@ export class CreateGroupComponent implements OnInit {
             user.flag = 0;
             this.selectList.push(user);
         }
-        for(let i=0;i<this.createGroup.list.length;i++){
-            for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(Number(this.createGroup.list[i].data[j].key) === Number(user.key)){
-                    this.createGroup.list[i].data[j].checked = event.target.checked;
+        for(let list of this.createGroup.list){
+            for(let member of list.data){
+                if(Number(member.key) === Number(user.key)){
+                    member.checked = event.target.checked;
                     return ;
                 }
             }
         }
     }
     private cancelSelect(user){
+        this.deleteItem(user);
+        for(let list of this.createGroup.list){
+            for(let member of list.data){
+                if(Number(member.key) === Number(user.key)){
+                    member.checked = false;
+                    return ;
+                }
+            }
+        }
+    }
+    // 删除已选元素操作
+    private deleteItem(user){
         for(let i=0;i<this.selectList.length;i++){
             if(Number(this.selectList[i].key) === Number(user.key)){
                 this.selectList.splice(i, 1);
                 break;
-            }
-        }
-        for(let i=0;i<this.createGroup.list.length;i++){
-            for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                if(Number(this.createGroup.list[i].data[j].key) === Number(user.key)){
-                    this.createGroup.list[i].data[j].checked = false;
-                    return ;
-                }
             }
         }
     }

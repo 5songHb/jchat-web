@@ -2,21 +2,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { ImageViewerComponent } from './image-viewer.component';
-import { SanitizePipeModule } from '../../pipes';
+import { SanitizePipe } from './sanitize.pipe';
 
 @NgModule({
   declarations: [
-    ImageViewerComponent
+    SanitizePipe
   ],
   imports: [
     CommonModule,
-    FormsModule,
-    SanitizePipeModule
+    FormsModule
   ],
   exports: [
-      ImageViewerComponent
+      SanitizePipe
   ],
   providers: []
 })
-export class ImageViewerModule {}
+export class SanitizePipeModule {}

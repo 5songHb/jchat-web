@@ -37,7 +37,7 @@ export class ModifyPasswordComponent implements OnInit {
             'old_pwd' : this.oldPassword,
             'new_pwd' : this.newPassword,
             'is_md5' : false
-        })
+        });
     }
     private cancelModify(){
         this.oldPassword = '';

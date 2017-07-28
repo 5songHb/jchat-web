@@ -1,4 +1,4 @@
-// init配置
+// JIM init配置
 let randomStr = '404',
     appKey = '4f7aef34fb361292c566a1cd',
     masterkey = '054d6103823a726fc12d0466';

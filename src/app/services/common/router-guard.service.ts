@@ -18,22 +18,16 @@ export class RouterGuard implements CanActivate {
         private storageService: StorageService
     ) {}
     canActivate(): boolean | Promise<boolean> {
+        // 如果是从登陆界面过来的就不执行以下代码
         if(window.location.href.match(/\/login$/g)){
             return true;
         }
-        let that = this;
-        // 判断是否登陆，前者是刷新时登录，后者是关闭窗口五分钟内打开窗口登录
-        let leaveLogin = this.storageService.get(md5('afterFiveMinutes-username'), true) && this.storageService.get(md5('afterFiveMinutes-password'));
-        // 测试一下兼容性
-        // if(refrashLogin){
-        //     this.username = window.sessionStorage.getItem(md5('login-persistence-username'));
-        //     this.password = window.sessionStorage.getItem(md5('login-persistence-password'));
-        // }else 
+        const that = this;
+        // 不是从登陆界面过来的，刷新时或者是关闭窗口五分钟内重新打开则自动登录
+        const leaveLogin = this.storageService.get(md5('afterFiveMinutes-username'), true) && this.storageService.get(md5('afterFiveMinutes-password'));
         if(leaveLogin){
             this.username = this.storageService.get(md5('afterFiveMinutes-username'), true);
             this.password = this.storageService.get(md5('afterFiveMinutes-password'), true);
-        }
-        if(leaveLogin){
             return new Promise<boolean>((resolve, reject) => {
                 that.JIMInit(resolve);
             });
@@ -43,7 +37,7 @@ export class RouterGuard implements CanActivate {
         }
     }
     private JIMInit(resolve){
-        let that = this,
+        const that = this,
         timestamp = new Date().getTime(),
         signature = this.util.createSignature(timestamp);
         global.JIM.init({
@@ -62,7 +56,7 @@ export class RouterGuard implements CanActivate {
         })
     }
     private autoLogin(resolve){
-        let that = this;
+        const that = this;
         global.JIM.login({
             'username' : this.username,
             'password' : this.password,

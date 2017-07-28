@@ -13,7 +13,6 @@ import { registerReducer } from './pages/register/reducers';
 import { RegisterEffect } from './pages/register/effects';
 import { mainReducer } from './pages/main/reducers/';
 import { MainEffect } from './pages/main/effects';
-// import { ChatPanelEffect } from './pages/main/effects';
 
 import { chatReducer } from './pages/chat/reducers/';
 import { ChatEffect } from './pages/chat/effects';
@@ -21,7 +20,6 @@ import { ChatEffect } from './pages/chat/effects';
 import { contactReducer } from './pages/contact/reducers';
 import { ContactEffect } from './pages/contact/effects';
 
-// import { LoginService } from './services/request/login';
 import { RouterGuard } from './services/common';
 import { TipModalModule } from './components/tip-modal';
 
@@ -46,14 +44,12 @@ import '../assets/css/common.scss';
         EffectsModule.run(ContactEffect),
         TipModalModule
         // StoreDevtoolsModule.instrumentOnlyWithExtension(),
-        
     ],
     declarations: [
         AppComponent
     ],
     bootstrap: [AppComponent],
     providers: [
-        // LoginService
         RouterGuard,
         StorageService
     ]

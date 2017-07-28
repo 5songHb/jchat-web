@@ -20,8 +20,8 @@ export class LinkmanListComponent implements OnInit, DoCheck {
     public ngOnInit() {
     }
     ngDoCheck(){
-        for(let i=0;i<this.conversation.length;i++){
-            if(this.conversation[i].data.length > 0){
+        for(let item of this.conversation){
+            if(item.data.length > 0){
                 this.isEmpty = true;
                 break;
             }

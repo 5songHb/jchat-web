@@ -38,12 +38,14 @@ export class OtherInfoComponent implements OnInit, OnChanges, DoCheck {
                 break;
             case 2:
                 this.otherInfo.info.gender = '女';
+                break;
+            default:
         }
     }
     ngDoCheck(){
         if(this.otherInfo.black && this.otherInfo.info){
-            for(let i=0;i<this.otherInfo.black.length;i++){
-                if(this.otherInfo.black[i].username === this.otherInfo.info.username){
+            for(let item of this.otherInfo.black){
+                if(item.username === this.otherInfo.info.username){
                     this.otherInfo.info.black = 1;
                     break;
                 }

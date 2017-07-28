@@ -3,10 +3,10 @@
         <span class="modal-close" (click)="selfClose($event)"></span>
         <div class="self-info-avatar">
             <div *ngIf="!isEdit" class="self-info-show-avatar">
-                <img [src]="selfInfo.avatarUrl" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
+                <img [src]="selfInfo.avatarUrl | sanitize: 'url'" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
             </div>
             <label *ngIf="isEdit" for="selfAvatarInput" [ngClass]="{'camera-shadow': cameraShadow}">
-                <img id="selfAvatarImg" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                <img id="selfAvatarImg" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
             </label>
             <input spellcheck="false" (change)="selfAvatarChange()" type="file" id="selfAvatarInput" style="display:none;">
             <p class="self-info-avatar-username">{{selfInfo.nickname ? selfInfo.nickname : selfInfo.username}}</p>

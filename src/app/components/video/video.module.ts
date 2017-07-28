@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
 import { VideoComponent } from './video.component';
-import { VideoTimePipeModule } from '../../pipes';
+import { VideoTimePipeModule, SanitizePipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -12,7 +12,8 @@ import { VideoTimePipeModule } from '../../pipes';
   imports: [
     CommonModule,
     FormsModule,
-    VideoTimePipeModule
+    VideoTimePipeModule,
+    SanitizePipeModule
   ],
   exports: [
       VideoComponent

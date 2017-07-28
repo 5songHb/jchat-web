@@ -22,8 +22,8 @@ export class GroupListComponent implements OnInit, DoCheck {
         }
     }
     ngDoCheck(){
-        for(let i=0;i<this.groupList.length;i++){
-            if(this.groupList[i].data.length > 0){
+        for(let item of this.groupList){
+            if(item.data.length > 0){
                 this.isEmpty = true;
                 break;
             }

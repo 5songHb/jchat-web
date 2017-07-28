@@ -3,7 +3,7 @@
         <span class="modal-close" (click)="otherClose($event)"></span>
         <div class="other-info-avatar">
             <div class="other-info-show-avatar">
-                <img (load)="avatarLoad($event)" [src]="otherInfo.info.avatarUrl" (error)="avatarErrorIcon($event)" alt="">
+                <img (load)="avatarLoad($event)" [src]="otherInfo.info.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
             </div>
             <div class="other-info-avatar-username">
                 {{otherInfo.info.nickname ? otherInfo.info.nickname : otherInfo.info.username}}

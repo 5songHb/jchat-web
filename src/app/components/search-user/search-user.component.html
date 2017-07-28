@@ -15,7 +15,7 @@
         <ul class="search-user-single" *ngIf="searchUserResult.result.singleArr.length > 0" [ngStyle]="{'max-height': singleHeight}">
             <li class="display-flex" *ngFor="let item of searchUserResult.result.singleArr" [title]="item.name.indexOf(searchKeyword) != -1 ? item.name: item.nickName" (click)="selectSearchItem(item)">
                 <div class="search-user-avatar-container">
-                    <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="item.avatarUrl" alt="" (error)="avatarErrorIcon($event)">
+                    <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="item.avatarUrl | sanitize: 'url'" alt="" (error)="avatarErrorIcon($event)">
                     <img *ngIf="!item.avatarUrl || item.avatarUrl === ''" style="width: 100%;" src="../../../assets/images/single-avatar.png" alt="">
                 </div>
                 <span class="search-user-name flex-1">{{item.name.indexOf(searchKeyword) != -1 ? item.name: item.nickName}}</span>

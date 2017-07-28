@@ -9,7 +9,7 @@ import { SwitchModule } from '../switch';
 import { HoverEventModule } from '../../directives';
 import { HoverTipModule } from '../hover-tip';
 import { SearchMemberModule } from '../search-member';
-import { EllipsisPipeModule } from '../../pipes';
+import { EllipsisPipeModule, SanitizePipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -23,7 +23,8 @@ import { EllipsisPipeModule } from '../../pipes';
     HoverEventModule,
     HoverTipModule,
     SearchMemberModule,
-    EllipsisPipeModule
+    EllipsisPipeModule,
+    SanitizePipeModule
   ],
   exports: [
       GroupSettingComponent

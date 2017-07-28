@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-declare let Emoji;
-
+import { Emoji } from '../services/tools';
 /**
  * 将原始表情转化成unicode编码，并正则替换<>\n\s
  */

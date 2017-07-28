@@ -15,6 +15,7 @@ export class TipModalComponent implements OnInit {
 
     }
     ngOnInit() {
+        // 自动消失
         if(this.info && this.info.success){
             setTimeout(function(){
                 this.modalTipEmit.emit();

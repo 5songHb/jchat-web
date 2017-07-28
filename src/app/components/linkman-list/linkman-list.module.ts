@@ -5,6 +5,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
 
 import { LinkmanListComponent } from './linkman-list.component';
+import { SanitizePipeModule } from '../../pipes';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { LinkmanListComponent } from './linkman-list.component';
   imports: [
     CommonModule,
     FormsModule,
-    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG)
+    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG),
+    SanitizePipeModule
   ],
   exports: [
       LinkmanListComponent

@@ -31,7 +31,7 @@
                 <ul>
                     <li class="clearfix display-flex" *ngFor="let item of groupSetting.memberList">
                         <div class="group-setting-avatar" (click)="watchInfoAction(item.username)">
-                            <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" [src]="item.avatarUrl" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
+                            <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" [src]="item.avatarUrl | sanitize: 'url'" (load)="avatarLoad($event)" (error)="avatarErrorIcon($event)" alt="">
                             <img *ngIf="!item.avatarUrl || item.avatarUrl === ''" src="../../../assets/images/single-avatar.png" style="width: 100%;" alt="">                      
                         </div>
                         <span class="flex-1" *ngIf="item.nickName">{{item.nickName}}</span>

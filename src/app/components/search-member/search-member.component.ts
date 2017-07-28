@@ -21,7 +21,6 @@ export class SearchMemberComponent implements OnInit {
         private searchKeyup: EventEmitter<any> = new EventEmitter();
     @Output()
         private changeChecked: EventEmitter<any> = new EventEmitter();
-    // private searchResult.keywords = '';
     private fileDom;
     constructor(
         private elementRef: ElementRef

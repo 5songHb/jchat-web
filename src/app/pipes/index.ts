@@ -7,3 +7,4 @@ export * from './floor.module';
 export * from './badge.module';
 export * from './fileType.module';
 export * from './fileSize.module';
+export * from './sanitize.module';

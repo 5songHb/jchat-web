@@ -7,10 +7,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class EllipsisPipe implements PipeTransform {
   transform(str: string, num: number): string {
-    if(str.length > num){
-        return str.substr(0, num) + '...';
-    }else{
-        return str;
-    }
+      return str.length > num ? str.substr(0, num) + '...' : str;
   }
 }

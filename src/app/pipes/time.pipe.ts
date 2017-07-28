@@ -1,15 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
 /**
- * 将毫秒数转化固定的日期格式，为了解决angular2原生的date管道在IE下的兼容问题
+ * 将毫秒数转化固定的日期格式，为了解决angular2原生的date管道在IE11下的兼容问题
  */
 @Pipe({
     name: 'time'
 })
 export class TimePipe implements PipeTransform {
   transform(time, str: string): string {
-    // yy-MM-dd HH:mm
     let t = new Date(time),
-				y = this.change(t.getFullYear()),
+				y = t.getFullYear(),
 				mo = this.change(t.getMonth() + 1),
 				d = this.change(t.getDate()),
 				h = this.change(t.getHours()),
@@ -17,7 +16,8 @@ export class TimePipe implements PipeTransform {
 				s = this.change(t.getSeconds()),
         newTime = '',
         arr = str.split(' ');
-		    str = str.trim();        
+				str = str.trim();
+				// yy-MM-dd HH:mm
 		    if(arr.length === 2){
 		      let arr2 = arr[0].split('-');
 		      if(arr2.length === 3){
@@ -31,7 +31,8 @@ export class TimePipe implements PipeTransform {
 		      }else if(arr3.length === 2){
 		      	newTime += (h + ':' + mi);
 		      }
-		      return(newTime);
+					return(newTime);
+				// HH:mm
 		    }else if(arr.length === 1){
 					if(arr[0].match(/:/g)){
 						let arr2 = arr[0].split(':');
@@ -54,10 +55,6 @@ export class TimePipe implements PipeTransform {
 		    }
   }
   change(num){
-    if(num < 10){
-      return '0' + num;
-    }else{
-      return num.toString();
-    }
+		return num < 10 ? '0' + num : num.toString();
   }
 }

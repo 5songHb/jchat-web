@@ -80,7 +80,7 @@ export class GroupSettingComponent implements OnInit, DoCheck {
     }
     ngDoCheck(){
         // 修改群描述时，调整群成员列表的位置
-        let header = this.elementRef.nativeElement.querySelector('#groupSettingHeader');          
+        const header = this.elementRef.nativeElement.querySelector('#groupSettingHeader');          
         if(header){
             this.listTop = header.offsetHeight;
         }
@@ -99,11 +99,11 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         if(value){
             this.searchResult.show = true;
             let result = [];
-            for(let i=0;i<this.groupSetting.memberList.length;i++){
-                let nickNameExist = this.groupSetting.memberList[i].nickName.indexOf(value) !== -1,
-                    usernameExist = this.groupSetting.memberList[i].username.indexOf(value) !== -1;
+            for(let member of this.groupSetting.memberList){
+                let nickNameExist = member.nickName.indexOf(value) !== -1,
+                    usernameExist = member.username.indexOf(value) !== -1;
                 if(nickNameExist || usernameExist){
-                    result.push(this.groupSetting.memberList[i]);
+                    result.push(member);
                 }
             }
             this.searchResult.result = result;
@@ -138,21 +138,12 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         this.modifyGroupNameShow = false;
     }
     private changeGroupShieldEmit(){
-        console.log(666, this.groupSetting)
         this.store$.dispatch({
             type: chatAction.changeGroupShield,
             payload: this.groupSetting.active
         })
     }
     private searchItemEmit(item){
-        // for(let i=0;i<this.groupSetting.memberList.length;i++){
-        //     if(item.uid === this.groupSetting.memberList[i].uid){
-        //         this.directiveScroll.scrollTo(0, 50 * i);
-        //         this.searchResult.result = [];
-        //         this.searchResult.show = false;
-        //         break;
-        //     }
-        // }
         if(item.username === global.user){
             this.watchSelfInfo.emit();
         }else{

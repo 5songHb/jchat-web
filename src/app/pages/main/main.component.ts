@@ -233,9 +233,6 @@ export class MainComponent implements OnInit, OnDestroy {
             case mainAction.emptySingleChatTip:
                 this.createSingleChat.info = mainState.createSingleChat.info;;
                 break;
-            // case mainAction.createSingleChatError:
-            //     this.createSingleChat.info = mainState.createSingleChat.info;
-            //     break;
             case mainAction.blackMenuSuccess:
                 this.blackMenu = mainState.blackMenu;
                 break;

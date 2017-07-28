@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class StorageService {
     constructor(){}
 
-    public set (key: string, data: string, useCookie?: boolean, time?:any, path?:any) {
+    public set (key: string, data: string, useCookie ?: boolean, time ?: any, path ?: any) {
         if ( localStorage && !useCookie ) {
             try {
                 localStorage.setItem(key, data);
@@ -18,16 +18,16 @@ export class StorageService {
         if(time){
             exp.setTime(exp.getTime() + time);
         }else{
-            exp.setTime(exp.getTime() + 23.9*60*60*1000);
+            exp.setTime(exp.getTime() + 23.9 * 60 * 60 * 1000);
         }
         if(path){
-            document.cookie = key+"="+ data + ";expires=" + exp.toUTCString()+";path="+path;
+            document.cookie = key + "=" + data + ";expires=" + exp.toUTCString() + ";path=" + path;
             return null;
         }
-        document.cookie = key+"="+ data + ";expires=" + exp.toUTCString();
+        document.cookie = key + "=" + data + ";expires=" + exp.toUTCString();
     }
 
-    public get (key: string, useCookie?: boolean) {
+    public get (key: string, useCookie ?: boolean) {
         if ( localStorage && !useCookie ) {
             let value = localStorage.getItem(key);
             if ( value ) {
@@ -43,7 +43,7 @@ export class StorageService {
         return null;
     }
 
-    public remove (key: string, useCookie?: boolean, path?:any) {
+    public remove (key: string, useCookie ?: boolean, path ?: any) {
         if ( localStorage && !useCookie ) {
             let value = localStorage.getItem(key);
             if ( value ) {
@@ -56,7 +56,7 @@ export class StorageService {
         exp.setTime(exp.getTime() - 1);
         let value = this.get(key);
         if(path){
-            document.cookie = key + '=' + value + ';expires=' + exp.toUTCString()+";path="+path;
+            document.cookie = key + '=' + value + ';expires=' + exp.toUTCString()+";path=" + path;
         }else{
             document.cookie = key + '=' + value + ';expires=' + exp.toUTCString();
         }

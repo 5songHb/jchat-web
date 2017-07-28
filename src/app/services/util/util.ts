@@ -52,14 +52,14 @@ export class Util {
                         });
                     }
                 }
-            }).catch(function () {
+            }).catch(() => {
                 console.log("Promise Rejected");
             })
         promise.then((value) => {
             callback2(value);
         }, (error) => {
 
-        }).catch(function () {
+        }).catch(() => {
             console.log("Promise Rejected");
         });
     }
@@ -82,7 +82,7 @@ export class Util {
             reader.onload = function(e){
                 resolve(this.result);
             }
-        }).catch(function () {
+        }).catch(() => {
             console.log("Promise Rejected");
         });
     }
@@ -303,22 +303,23 @@ export class Util {
             nowTime = now.getTime(),
             todayTime = nowHour * 60 * 1000 * 60 + nowMinute * 1000 * 60 + nowSecond * 1000,
             gapDate = (nowTime - todayTime - msgTime) / 1000 / 60 / 60 / 24;
-            
+        let showTime = '';
         if(msgYear !== nowYear){
-            return 'year';                                
+            showTime = 'year';                                
         }else if(gapDate > 6){
-            return 'month';
+            showTime = 'month';
         }else if(gapDate <= 6 && gapDate > 2){
-            return 'day';
+            showTime = 'day';
         }else if(gapDate <= 2 && gapDate > 1){
-            return 'the day before';
+            showTime = 'the day before';
         }else if(gapDate <= 1 && gapDate > 0){
-            return 'yesterday';
+            showTime = 'yesterday';
         }else if(gapDate <= 0){
-            return 'today';
+            showTime = 'today';
         }else{
-            return '';
+            showTime = '';
         }
+        return showTime;
     }
     /**
      * 判断两个时间间隔是否超过5分钟
@@ -330,9 +331,8 @@ export class Util {
         const gap = newTime - oldTime;
         if(gap / 1000 / 60 > 5){
             return true;
-        }else{
-            return false;
         }
+        return false;
     }
     /**
      * 生成JIM初始化的签名

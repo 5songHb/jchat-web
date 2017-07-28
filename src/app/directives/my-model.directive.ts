@@ -21,7 +21,7 @@ export class myModelDirective implements OnInit{
         if(this.myModel && this.myModel.draft)
             this.myModel.draft = this.el.nativeElement.innerHTML;
     }
-    @HostListener('keyup') onkeyup() {
+    @HostListener('keyup') onKeyup() {
         if(this.myModel && this.myModel.draft)
             this.myModel.draft = this.el.nativeElement.innerHTML;
     }

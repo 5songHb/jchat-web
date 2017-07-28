@@ -509,7 +509,7 @@ export class ChatEffect {
         .switchMap((text) => {
             let that = this,
             groupMessageObj = global.JIM.sendGroupMsg(text.groupMsg)
-            .onSuccess(function(data,msgs) {
+            .onSuccess(function(data, msgs) {
                 that.store$.dispatch({
                     type: chatAction.sendMsgComplete,
                     payload: {
@@ -746,6 +746,9 @@ export class ChatEffect {
                     });
                     return ;
                 }
+                if(data.user_info.avatar === ''){
+                    return ;
+                }
                 global.JIM.getResource({'media_id': data.user_info.avatar})
                 .onSuccess(function(urlInfo){
                     data.user_info = Object.assign({}, data.user_info, {'avatarUrl': urlInfo.url});
@@ -954,7 +957,7 @@ export class ChatEffect {
                         global.JIM.getUserInfo({
                             'username' : eventData.to_usernames[i].username
                         }).onSuccess(function(user) {
-                            eventData.to_usernames.key = user.uid;
+                            eventData.to_usernames[i].key = user.uid;
                                 if(count === eventData.to_usernames.length){
                                     that.store$.dispatch({
                                         type: chatAction.updateGroupMembersEvent,
@@ -965,7 +968,7 @@ export class ChatEffect {
                                 }
                             global.JIM.getResource({'media_id' : user.user_info.avatar})
                             .onSuccess(function(urlInfo){
-                                eventData.to_usernames.avatarUrl = urlInfo.url;
+                                eventData.to_usernames[i].avatarUrl = urlInfo.url;
                                 count ++;
                                 if(count === eventData.to_usernames.length){
                                     that.store$.dispatch({

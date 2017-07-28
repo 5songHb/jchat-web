@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, ElementRef, OnDestroy } from '@angular/core';
 
 @Component({
     selector: 'video-component',
@@ -6,7 +6,7 @@ import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDe
     styleUrls: ['./video.component.scss']
 })
 
-export class VideoComponent implements OnInit, AfterViewInit {
+export class VideoComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input()
         private url;
     @Output()
@@ -16,7 +16,8 @@ export class VideoComponent implements OnInit, AfterViewInit {
     private timer = null;
     private currentTime = 0;
     constructor(
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private elementRef: ElementRef
     ) {
 
     }
@@ -24,7 +25,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
         
     }
     public ngAfterViewInit(){
-        this.video = (document.getElementById('videoTag') as HTMLVideoElement);
+        this.video = this.elementRef.nativeElement.querySelector('#videoTag');
         this.cdr.detectChanges();
     }
     private closeModal(){
@@ -53,5 +54,8 @@ export class VideoComponent implements OnInit, AfterViewInit {
         this.timer = setInterval(function(){
             this.currentTime = this.video.currentTime;
         }.bind(this), 100);
+    }
+    ngOnDestroy(){
+        clearInterval(this.timer);
     }
 }

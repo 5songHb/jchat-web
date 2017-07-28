@@ -7,7 +7,17 @@ import { RouterModule } from '@angular/router';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
 import { ChatPanelComponent } from './chat-panel.component';
-import { DayPipeModule, EmojiPipeModule, EllipsisPipeModule, TimePipeModule, FloorPipeModule, FileTypePipeModule, FileSizePipeModule, VideoTimePipeModule } from '../../pipes';
+import {
+  DayPipeModule,
+  EmojiPipeModule,
+  EllipsisPipeModule,
+  TimePipeModule,
+  FloorPipeModule,
+  FileTypePipeModule,
+  FileSizePipeModule,
+  VideoTimePipeModule,
+  SanitizePipeModule
+} from '../../pipes';
 
 import { myModelDirective } from '../../directives';
 import { EmojiModule } from '../emoji';
@@ -39,7 +49,8 @@ import{ StorageService } from '../../services/common';
     FloorPipeModule,
     FileTypePipeModule,
     FileSizePipeModule,
-    VideoTimePipeModule
+    VideoTimePipeModule,
+    SanitizePipeModule
   ],
   exports: [
       ChatPanelComponent

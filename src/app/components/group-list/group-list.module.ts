@@ -5,7 +5,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from '../../services/common';
 
 import { GroupListComponent } from './group-list.component';
-
+import { SanitizePipeModule } from '../../pipes';
 @NgModule({
   declarations: [
     GroupListComponent
@@ -13,7 +13,8 @@ import { GroupListComponent } from './group-list.component';
   imports: [
     CommonModule,
     FormsModule,
-    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG)
+    PerfectScrollbarModule.forRoot(PERFECT_SCROLLBAR_CONFIG),
+    SanitizePipeModule
   ],
   exports: [
       GroupListComponent

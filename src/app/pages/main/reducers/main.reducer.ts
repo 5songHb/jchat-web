@@ -87,13 +87,6 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
         case mainAction.emptySingleChatTip:
             state.createSingleChat.info = payload.info;
             break;
-        // 创建单聊失败或关闭单聊
-        // case mainAction.createSingleChatError:
-        //     if(payload.show){
-        //         state.createSingleChat.show = payload.show;
-        //     }
-        //     state.createSingleChat.info = payload.info;
-        //     break;
             // 创建群聊搜索联系人
         case mainAction.createGroupSearchComplete:
             state.createGroupSearch.info = payload;
@@ -120,9 +113,9 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     return state;
 };
 function delSingleBlackLoading(state, payload, loadingValue) {
-    for(let i=0; i<state.blackMenu.menu.length;i++) {
-        if (state.blackMenu.menu[i].username === payload.username) {
-            state.blackMenu.menu[i].loading = loadingValue;
+    for(let black of state.blackMenu.menu) {
+        if (black.username === payload.username) {
+            black.loading = loadingValue;
             break;
         }
     }

@@ -274,8 +274,6 @@ export class MainEffect {
                         return {type: '[main] modify password useless'};
                     });
     });
-    
-    
     // 创建单聊
     @Effect()
     private createSingleChatAction$: Observable<Action> = this.actions$
@@ -416,10 +414,10 @@ export class MainEffect {
                     });
                     return ;
                 }
-                for(let i=0;i<data.black_list.length;i++){
-                    global.JIM.getResource({'media_id' : data.black_list[i].avatar})
+                for(let black of data.black_list){
+                    global.JIM.getResource({'media_id' : black.avatar})
                     .onSuccess(function(urlInfo){
-                        data.black_list[i].avatarUrl = urlInfo.url;
+                        black.avatarUrl = urlInfo.url;
                         that.store$.dispatch({
                             type: mainAction.blackMenuSuccess,
                             payload: {
