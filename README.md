@@ -21,11 +21,11 @@ JChat 同时具备好友模式和无好友模式：
 
 目前已覆盖 [Android](https://github.com/jpush/jchat-android) 、 [iOS](https://github.com/jpush/jchat-swift) 和 web 平台，开发者可参照 JChat 快速打造自己的 APP，提高开发效率。
 
-![image](Images/1.gif)
+![jiguang](./images/webjchat.gif)
 
 ### 应用截图
 
-![image](Images/2.jpg)
+![jiguang](./images/webjchat2.png)
 
 ### 环境配置
 
