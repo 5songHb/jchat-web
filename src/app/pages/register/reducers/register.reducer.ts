@@ -11,7 +11,8 @@ const registerInit = {
         show: false,
         info: {}
     }
-}
+};
+
 export const registerReducer = (state: RegisterStore = registerInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
@@ -33,7 +34,7 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
             state.passwordTip = payload;
             break;
         case registerAction.isButtonAvailableAction:
-            isButtonAvailable(state,payload);
+            isButtonAvailable(state, payload);
             break;
         case registerAction.repeatPasswordTip:
             state.repeatPasswordTip = payload;
@@ -53,7 +54,7 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
             };
             break;
         case registerAction.emptyTip:
-            switch(payload){
+            switch (payload) {
                 case 'username':
                     state.usernameTip = '';
                     break;
@@ -63,16 +64,18 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
                 case 'repeatPassword':
                     state.repeatPasswordTip = '';
                     break;
+                default:
             }
             break;
         default:
     }
     return state;
 };
-function isButtonAvailable(state, payload){
-    if(payload.username.length > 0 && payload.password.length > 0 && payload.repeatPassword.length > 0){
+function isButtonAvailable(state, payload) {
+    if (payload.username.length > 0 &&
+        payload.password.length > 0 && payload.repeatPassword.length > 0) {
         state.isButtonAvailable = true;
-    }else{
+    } else {
         state.isButtonAvailable = false;
     }
 }

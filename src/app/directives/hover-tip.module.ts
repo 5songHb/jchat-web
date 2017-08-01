@@ -2,18 +2,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { hoverEventDirective } from './hover-tip.directive';
+import { HoverEventDirective } from './hover-tip.directive';
 
 @NgModule({
   declarations: [
-    hoverEventDirective
+    HoverEventDirective
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-      hoverEventDirective
+      HoverEventDirective
   ],
   providers: []
 })

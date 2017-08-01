@@ -1,4 +1,4 @@
-export interface MainStore{
+export interface MainStore {
     mainLoading: boolean;
     selfInfo: {
         info: {
@@ -25,7 +25,7 @@ export interface MainStore{
     tipModal: object;
     createSingleChat: {
         show: boolean,
-        info :string
+        info: string
     };
     blackMenu: {
         menu: Array<any>;
@@ -41,5 +41,5 @@ export interface MainStore{
             title: string,
             tip: string
         }
-    }
+    };
 }

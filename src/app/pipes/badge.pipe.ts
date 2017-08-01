@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'badge'
 })
 export class BadgePipe implements PipeTransform {
-  transform(num) {
+  public transform(num) {
     return num > 99 ? '99+' : num;
   }
 }

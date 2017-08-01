@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { global, authPayload, StorageService } from '../../services/common';
@@ -8,10 +8,10 @@ import { Util } from '../../services/util';
 
 @Component({
     selector: 'app-register',
-    styleUrls:['./register.component.scss'],
+    styleUrls: ['./register.component.scss'],
     templateUrl: './register.component.html'
 })
-export class RegisterComponent implements OnInit, AfterViewInit {
+export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
     private util: Util = new Util();
     private info = {
         username: '',
@@ -22,13 +22,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         usernameTip: '',
         passwordTip: '',
         repeatPasswordTip: ''
-    }
+    };
     private registerStream;
     private isButtonAvailable = false;
     private tipModal = {
         show: false,
         info: {}
-    }
+    };
     constructor(
         private store$: Store<AppStore>,
         private router: Router,
@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         this.JIMInit();
         this.registerStream = this.store$.select((state) => {
             const registerState = state['registerReducer'];
-            switch(registerState.actionType){
+            switch (registerState.actionType) {
                 case registerAction.registerSuccess:
                     this.tipModal = registerState.tipModal;
                     break;
@@ -47,36 +47,43 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                     this.tip.usernameTip = registerState.usernameTip;
                     this.tip.passwordTip = registerState.passwordTip;
                     this.isButtonAvailable = registerState.isButtonAvailable;
-                    this.tip.repeatPasswordTip = registerState.repeatPasswordTip;             
+                    this.tip.repeatPasswordTip = registerState.repeatPasswordTip;
             }
             return state;
         }).subscribe((state) => {
-            
+            // pass
         });
     }
-    ngAfterViewInit(){
+    public ngAfterViewInit() {
         this.elementRef.nativeElement.querySelector('#registerUsername').focus();
     }
-    private JIMInit(){
-        let timestamp = new Date().getTime(),
-            signature = this.util.createSignature(timestamp);
+    public ngOnDestroy() {
+        this.store$.dispatch({
+            type: registerAction.initState,
+            payload: null
+        });
+        this.registerStream.unsubscribe();
+    }
+    private JIMInit() {
+        let timestamp = new Date().getTime();
+        let signature = this.util.createSignature(timestamp);
         global.JIM.init({
-            "appkey": authPayload.appKey,
-            "random_str": authPayload.randomStr,
-            "signature": signature,
-            "timestamp": timestamp,
-            "flag": authPayload.flag
-        }).onSuccess(function(data) {
+            appkey: authPayload.appKey,
+            random_str: authPayload.randomStr,
+            signature,
+            timestamp,
+            flag: authPayload.flag
+        }).onSuccess((data) => {
             console.log('success:' + JSON.stringify(data));
-        }).onFail(function(data) {
-            console.log('error:' + JSON.stringify(data))
-        }).onTimeout(function(data) {
+        }).onFail((data) => {
+            console.log('error:' + JSON.stringify(data));
+        }).onTimeout((data) => {
             console.log(data);
         });
     }
-    private register(){
+    private register() {
         this.store$.dispatch({
-            type: registerAction.register, 
+            type: registerAction.register,
             payload: {
                 username: this.info.username,
                 password: this.info.password,
@@ -85,7 +92,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             }
         });
     }
-    private isButtonAvailableAction(type){
+    private isButtonAvailableAction(type) {
         this.store$.dispatch({
             type: registerAction.isButtonAvailableAction,
             payload: {
@@ -100,32 +107,25 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             payload: type
         });
     }
-    private usernameBlur(){
+    private usernameBlur() {
         this.store$.dispatch({
-            type: registerAction.isUsernameAvailableAction, 
+            type: registerAction.isUsernameAvailableAction,
             payload: {
                 username: this.info.username
             }
         });
     }
-    private passwordBlur(){
+    private passwordBlur() {
         this.store$.dispatch({
-            type: registerAction.password, 
+            type: registerAction.password,
             payload: {
                 password: this.info.password
             }
         });
     }
-    private modalTipEmit(){
+    private modalTipEmit() {
         this.tipModal.show = false;
         this.storageService.set('register-username', this.info.username);
         this.router.navigate(['/login']);
-    }
-    public ngOnDestroy (){
-        this.store$.dispatch({
-            type: registerAction.initState,
-            payload: null
-        });
-        this.registerStream.unsubscribe();
     }
 }

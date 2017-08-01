@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter,
+    HostListener, ElementRef } from '@angular/core';
 
 import { Util } from '../../services/util';
 import { imgRouter } from '../../services/common';
@@ -11,7 +12,7 @@ import { imgRouter } from '../../services/common';
 
 export class EmojiComponent implements OnInit {
     @Input()
-        emojiInfo;
+        private emojiInfo;
     @Output()
         private jpushEmojiSelect: EventEmitter<any> = new EventEmitter();
     private util = new Util();
@@ -23,24 +24,24 @@ export class EmojiComponent implements OnInit {
     ) {
 
     }
-    ngOnInit() {
-        
+    public ngOnInit() {
+        // pass
     }
-    @HostListener('window:click') onClick(){
-        if(this.emojiInfo.show === true){
+    @HostListener('window:click') private onClick() {
+        if (this.emojiInfo.show === true) {
             this.emojiInfo.show = false;
         }
     }
-    private stopPagation(event){
+    private stopPagation(event) {
         event.stopPropagation();
     }
-    private emojiSelectAction(idName){
-        let contentId = document.getElementById(this.emojiInfo.contentId),
-            insertHtml = this.elementRef.nativeElement.querySelector('#' + idName).innerHTML;
+    private emojiSelectAction(idName) {
+        let contentId = document.getElementById(this.emojiInfo.contentId);
+        let insertHtml = this.elementRef.nativeElement.querySelector('#' + idName).innerHTML;
         this.util.insertAtCursor(contentId, insertHtml, false);
         this.emojiInfo.show = false;
     }
-    private changeTab(event, index){
+    private changeTab(event, index) {
         this.tab = index;
     }
 }

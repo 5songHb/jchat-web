@@ -210,7 +210,6 @@
                             </div>
                             <!-- 表情 -->
                             <div *ngIf="i.content.msg_body.extras && i.content.msg_body.extras.kLargeEmoticon === 'kLargeEmoticon'" class="float-right">
-                                <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
                                 <div class="float-left">
                                     <img style="cursor: default" class="chat-panel-message-img" [src]="i.content.msg_body.media_url | sanitize: 'url'" alt="">
                                 </div>

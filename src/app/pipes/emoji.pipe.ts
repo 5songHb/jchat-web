@@ -7,11 +7,11 @@ import { Emoji } from '../services/tools';
     name: 'emoji'
 })
 export class EmojiPipe implements PipeTransform {
-  transform(text, nbsp) {
+  public transform(text, nbsp) {
     let newText = text.replace(/</g, '&lt;');
     newText = newText.replace(/>/g, '&gt;');
     newText = newText.replace(/\n/g, '<br>');
-    if(nbsp){
+    if (nbsp) {
       newText = newText.replace(/\s/g, '&nbsp;');
     }
     newText = Emoji.emoji(newText);

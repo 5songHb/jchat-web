@@ -6,23 +6,23 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'videoTime'
 })
 export class VideoTimePipe implements PipeTransform {
-  transform(time): string {
+  public transform(time): string {
     let newTime;
     time = Math.floor(time);
-    if(time < 10){
+    if (time < 10) {
         newTime = '00:0' + time;
-    }else if(time >= 10 && time < 60){
+    } else if (time >= 10 && time < 60) {
         newTime = '00:' + time;
-    }else if(time >= 60 && time < 3600){
-        let minute = Math.floor(time / 60),
-            second = Math.round(time % 60);
-        if(minute >= 10 && second >= 10){
+    } else if (time >= 60 && time < 3600) {
+        let minute = Math.floor(time / 60);
+        let second = Math.round(time % 60);
+        if (minute >= 10 && second >= 10) {
             newTime = minute + ':' + second;
-        }else if(minute >= 10 && second < 10){
+        } else if (minute >= 10 && second < 10) {
             newTime = minute + ':0' + second;
-        }else if(minute < 10 && second >= 10){
+        } else if (minute < 10 && second >= 10) {
             newTime = '0' + minute + ':' + second;
-        }else if(minute < 10 && second < 10){
+        } else if (minute < 10 && second < 10) {
             newTime = '0' + minute + ':0' + second;
         }
     }

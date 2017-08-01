@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-
 @Component({
     selector: 'switch-component',
     templateUrl: './switch.component.html',
@@ -14,12 +13,12 @@ export class SwitchComponent implements OnInit {
         private changeSwitch: EventEmitter<any> = new EventEmitter();
     constructor(
     ) {
-
+        // pass
     }
     public ngOnInit() {
-        
+        // pass
     }
-    private changeSwitchAction(){
+    private changeSwitchAction() {
         this.changeSwitch.emit();
     }
 }

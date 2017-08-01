@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-
 import { MAIN_ROUTER } from './main.router';
 import { MainComponent } from './main.component';
 import { ConversationListModule } from '../../components/conversation-list';

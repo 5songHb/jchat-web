@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { VideoTimePipe } from './video-time.pipe';
+import { VideoTimePipe } from './videoTime.pipe';
 
 @NgModule({
   declarations: [

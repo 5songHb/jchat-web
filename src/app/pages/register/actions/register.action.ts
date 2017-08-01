@@ -10,4 +10,4 @@ export const registerAction = {
     repeatPasswordTip: '[register] repeat password tip',
     initState: '[register] init state',
     emptyTip: '[register] empty tip'
-}
+};

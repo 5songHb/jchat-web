@@ -125,17 +125,18 @@ export class MainComponent implements OnInit, OnDestroy {
             title: '',
             tip: ''
         }
-    }
+    };
     constructor(
         private store$: Store<AppStore>,
         private storageService: StorageService,
         private router: Router
-    ){}
-    public ngOnInit() {
+    ) {
         this.store$.dispatch({
             type: mainAction.init,
             payload: null
         });
+    }
+    public ngOnInit() {
         let that = this;
         this.subscribeStore();
         this.store$.dispatch({
@@ -143,12 +144,19 @@ export class MainComponent implements OnInit, OnDestroy {
             payload: null
         });
     }
-    @HostListener('window:click') onClickWindow(){
+    public ngOnDestroy() {
+        this.mainStream$.unsubscribe();
+        this.store$.dispatch({
+            type: mainAction.logoutAction,
+            payload: null
+        });
+    }
+    @HostListener('window:click') private onClickWindow() {
         this.settingMenu.show = false;
         this.chatMenu.show = false;
     }
     // 关闭窗口时存cookie，五分钟之内进入页面还可以免登陆
-    @HostListener('window:beforeunload') onBeforeunloadWindow(){
+    @HostListener('window:beforeunload') private onBeforeunloadWindow() {
         let time = 5 * 60 * 1000;
         this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, time);
         this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, time);
@@ -156,24 +164,26 @@ export class MainComponent implements OnInit, OnDestroy {
     private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private subscribeStore(){
+    private subscribeStore() {
         this.mainStream$ = this.store$.select((state) => {
-            let mainState = state['mainReducer'],
-                contactState = state['contactReducer'];
-            console.log('main',mainState);
+            const mainState = state['mainReducer'];
+            const contactState = state['contactReducer'];
+            console.log('main', mainState);
             this.stateChanged(mainState, contactState);
             return state;
-        }).subscribe((state) => {});
+        }).subscribe((state) => {
+            // pass
+        });
     }
-    private stateChanged(mainState, contactState){
-        console.log('main',mainState.actionType);
-        switch(mainState.actionType){
+    private stateChanged(mainState, contactState) {
+        console.log('main', mainState.actionType);
+        switch (mainState.actionType) {
             case contactAction.selectContactItem:
                 this.listTab = mainState.listTab;
                 break;
             case mainAction.showSelfInfo:
-                console.log(5555, this.self)
-                if(mainState.selfInfo.info){
+                console.log(5555, this.self);
+                if (mainState.selfInfo.info) {
                     this.self.info = mainState.selfInfo.info;
                 }
                 this.self.show = mainState.selfInfo.show;
@@ -191,7 +201,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 break;
             case mainAction.modifyPasswordShow:
                 this.isModifyPasswordShow = mainState.modifyPasswordShow.show;
-                if(mainState.modifyPasswordShow.repeatLogin !== ''){
+                if (mainState.modifyPasswordShow.repeatLogin !== '') {
                     global.password = mainState.modifyPasswordShow.repeatLogin;
                     let time = 5 * 60 * 1000;
                     this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, time);
@@ -203,7 +213,7 @@ export class MainComponent implements OnInit, OnDestroy {
                             password: global.password,
                             md5: true
                         }
-                    })
+                    });
                 }
                 break;
             case chatAction.searchUserSuccess:
@@ -216,11 +226,11 @@ export class MainComponent implements OnInit, OnDestroy {
             case mainAction.hideModalTip:
 
             case mainAction.showModalTip:
-            
+
             case mainAction.addBlackListSuccess:
 
             case mainAction.deleteMemberSuccess:
-            
+
             case mainAction.exitGroupSuccess:
                 this.tipModal = mainState.tipModal;
                 break;
@@ -231,7 +241,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.listTab = mainState.listTab;
                 break;
             case mainAction.emptySingleChatTip:
-                this.createSingleChat.info = mainState.createSingleChat.info;;
+                this.createSingleChat.info = mainState.createSingleChat.info;
                 break;
             case mainAction.blackMenuSuccess:
                 this.blackMenu = mainState.blackMenu;
@@ -252,63 +262,56 @@ export class MainComponent implements OnInit, OnDestroy {
 
         }
     }
-    ngOnDestroy(){
-        this.mainStream$.unsubscribe();
+    private changeListTab(index) {
         this.store$.dispatch({
-            type: mainAction.logoutAction, 
-            payload: null
-        });
-    }
-    private changeListTab(index){
-        this.store$.dispatch({
-            type: mainAction.changeListTab, 
+            type: mainAction.changeListTab,
             payload: index
         });
     }
-    private getSelfInfo(event){
+    private getSelfInfo(event) {
         this.store$.dispatch({
-            type: mainAction.showSelfInfo, 
+            type: mainAction.showSelfInfo,
             payload: {
                 show: true
             }
         });
     }
-    private selfInfoEmit(newInfo){
-        if(!newInfo){
+    private selfInfoEmit(newInfo) {
+        if (!newInfo) {
             this.store$.dispatch({
-                type: mainAction.showSelfInfo, 
+                type: mainAction.showSelfInfo,
                 payload: {
                     show: false
                 }
             });
         }
-        if(newInfo && newInfo.info){
+        if (newInfo && newInfo.info) {
             this.store$.dispatch({
-                type: mainAction.updateSelfInfo, 
+                type: mainAction.updateSelfInfo,
                 payload: newInfo.info
             });
         }
-        if(newInfo && newInfo.avatar.url){
+        if (newInfo && newInfo.avatar.url) {
             this.store$.dispatch({
-                type: mainAction.updateSelfAvatar, 
+                type: mainAction.updateSelfAvatar,
                 payload: newInfo.avatar
             });
         }
     }
-    private createGroupEmit(info){
-        if(info && info.add){
+    private createGroupEmit(info) {
+        if (info && info.add) {
             this.store$.dispatch({
-                type: mainAction.addGroupMember, 
+                type: mainAction.addGroupMember,
                 payload: info
             });
-        }else if(info && !info.add){
+        } else if (info && !info.add) {
             this.store$.dispatch({
-                type: mainAction.createGroup, 
+                type: mainAction.createGroup,
                 payload: info
             });
-        }else{
+        } else {
             this.store$.dispatch({
-                type: mainAction.createGroupShow, 
+                type: mainAction.createGroupShow,
                 payload: {
                     show: false,
                     info: {}
@@ -316,15 +319,15 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
-    private modifyPasswordEmit(info){
-        if(info){
+    private modifyPasswordEmit(info) {
+        if (info) {
             this.store$.dispatch({
-                type: mainAction.modifyPassword, 
+                type: mainAction.modifyPassword,
                 payload: info
             });
-        }else{
+        } else {
             this.store$.dispatch({
-                type: mainAction.modifyPasswordShow, 
+                type: mainAction.modifyPasswordShow,
                 payload: {
                     repeatLogin: '',
                     show: false
@@ -333,15 +336,15 @@ export class MainComponent implements OnInit, OnDestroy {
         }
     }
     // 搜索keyup事件
-    private searchUserEmit(searchInfo){
+    private searchUserEmit(searchInfo) {
         this.store$.dispatch({
             type: mainAction.searchUser,
             payload: searchInfo
         });
     }
     // 点击搜索结果
-    private selectUserResultEmit(item){
-        if(item.gid){
+    private selectUserResultEmit(item) {
+        if (item.gid) {
             item.group = true;
             item.type = 4;
             item.key = item.gid;
@@ -352,12 +355,12 @@ export class MainComponent implements OnInit, OnDestroy {
         });
     }
     // 点击创建单聊模态框确定取消按钮
-    private createSingleChatEmit(singleName){
+    private createSingleChatEmit(singleName) {
         this.createSingleChat = {
             show: true,
             info: ''
         };
-        if(singleName === ''){
+        if (singleName === '') {
             this.store$.dispatch({
                 type: mainAction.createSingleChatShow,
                 payload: {
@@ -368,9 +371,9 @@ export class MainComponent implements OnInit, OnDestroy {
             return ;
         }
         // 点击确定
-        if(singleName === global.user){
+        if (singleName === global.user) {
             this.store$.dispatch({
-                type: mainAction.showSelfInfo, 
+                type: mainAction.showSelfInfo,
                 payload: {
                     show: true
                 }
@@ -382,13 +385,13 @@ export class MainComponent implements OnInit, OnDestroy {
                     info: ''
                 }
             });
-        }else if(singleName){
+        } else if (singleName) {
             this.store$.dispatch({
                 type: mainAction.createSingleChatAction,
                 payload: singleName
             });
         // 点击取消
-        }else{
+        } else {
             this.store$.dispatch({
                 type: mainAction.createSingleChatShow,
                 payload: {
@@ -398,7 +401,7 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
-    private emptySingleChatTipEmit(){
+    private emptySingleChatTipEmit() {
         this.store$.dispatch({
             type: mainAction.emptySingleChatTip,
             payload: {
@@ -407,7 +410,7 @@ export class MainComponent implements OnInit, OnDestroy {
         });
     }
     // 点击黑名单模态框确定按钮
-    private blackMenuConfirmEmit(){
+    private blackMenuConfirmEmit() {
         this.store$.dispatch({
             type: mainAction.hideBlackMenu,
             payload: {
@@ -416,19 +419,19 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
     }
-    private delSingleBlackEmit(user){
+    private delSingleBlackEmit(user) {
         this.store$.dispatch({
             type: mainAction.delSingleBlack,
             payload: user
         });
     }
-    private modalTipEmit(info){
+    private modalTipEmit(info) {
         // 模态框点击确定按钮
-        if(info){
-            switch(info.actionType){
+        if (info) {
+            switch (info.actionType) {
                 case '[main] logout show':
                     this.store$.dispatch({
-                        type: mainAction.logoutAction, 
+                        type: mainAction.logoutAction,
                         payload: null
                     });
                     break;
@@ -463,7 +466,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     });
             }
         // 模态框点击取消按钮
-        }else{
+        } else {
             this.store$.dispatch({
                 type: mainAction.hideModalTip,
                 payload: {
@@ -473,17 +476,17 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
-    private chatMenuShow(event){
+    private chatMenuShow(event) {
         event.stopPropagation();
         this.settingMenu.show = false;
-        if(this.chatMenu.show === true){
+        if (this.chatMenu.show === true) {
             this.chatMenu.show = false;
-        }else{
+        } else {
             this.chatMenu.show = true;
         }
     }
-    private selectChatMenuItemEmit(item){
-        if(item.key === 0){
+    private selectChatMenuItemEmit(item) {
+        if (item.key === 0) {
             this.store$.dispatch({
                 type: mainAction.createSingleChatShow,
                 payload: {
@@ -491,9 +494,9 @@ export class MainComponent implements OnInit, OnDestroy {
                     info: ''
                 }
             });
-        }else if(item.key === 1){
+        }else if (item.key === 1) {
             this.store$.dispatch({
-                type: mainAction.createGroupShow, 
+                type: mainAction.createGroupShow,
                 payload: {
                     show: true,
                     info: {}
@@ -502,20 +505,20 @@ export class MainComponent implements OnInit, OnDestroy {
         }
         this.chatMenu.show = false;
     }
-    private settingMenuShow(event){
+    private settingMenuShow(event) {
         event.stopPropagation();
         this.chatMenu.show = false;
-        if(this.settingMenu.show === true){
+        if (this.settingMenu.show === true) {
             this.settingMenu.show = false;
-        }else{
+        } else {
             this.settingMenu.show = true;
         }
     }
-    private selectSettingItemEmit(item){
-        switch(item.key){
+    private selectSettingItemEmit(item) {
+        switch (item.key) {
             case 0 :
                 this.store$.dispatch({
-                    type: mainAction.modifyPasswordShow, 
+                    type: mainAction.modifyPasswordShow,
                     payload: {
                         repeatLogin: '',
                         show: true
@@ -535,30 +538,31 @@ export class MainComponent implements OnInit, OnDestroy {
                     payload: {
                         show: true,
                         info: {
-                            title: '退出',          //模态框标题
-                            tip: '确定要退出web jchat吗？',   //模态框内容
-                            actionType: '[main] logout show'//哪种操作，点击确定时可以执行对应操作
-                            // success: 1 / 2               //成功的提示框/失败的提示框，会自动消失
+                            title: '退出',          // 模态框标题
+                            tip: '确定要退出web jchat吗？',   // 模态框内容
+                            actionType: '[main] logout show'// 哪种操作，点击确定时可以执行对应操作
+                            // success: 1 / 2               // 成功的提示框/失败的提示框，会自动消失
                         }
                     }
                 });
                 break;
+            default:
         }
         this.settingMenu.show = false;
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }
     }
     // 被其他设备登录踢
-    private logoutKickEmit(info){
+    private logoutKickEmit(info) {
         // 重新登录
-        if(info){
+        if (info) {
             this.store$.dispatch({
                 type: mainAction.login,
                 payload: {
@@ -569,11 +573,11 @@ export class MainComponent implements OnInit, OnDestroy {
                 }
             });
         // 去登录页面
-        }else{
+        } else {
             this.router.navigate(['/login']);
         }
     }
-    private selectIsNotImageEmit(){
+    private selectIsNotImageEmit() {
         this.store$.dispatch({
             type: mainAction.showModalTip,
             payload: {

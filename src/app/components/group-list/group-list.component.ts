@@ -14,25 +14,25 @@ export class GroupListComponent implements OnInit, DoCheck {
         private selectGroupItemEmit: EventEmitter<any> = new EventEmitter();
     private isEmpty = false;
     constructor() {
-
+        // pass
     }
     public ngOnInit() {
-        if(!this.groupList){
+        if (!this.groupList) {
             this.groupList = [];
         }
     }
-    ngDoCheck(){
-        for(let item of this.groupList){
-            if(item.data.length > 0){
+    public ngDoCheck() {
+        for (let item of this.groupList) {
+            if (item.data.length > 0) {
                 this.isEmpty = true;
                 break;
             }
         }
     }
-    private selectGroupItem(item){
+    private selectGroupItem(item) {
         this.selectGroupItemEmit.emit(item);
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
 }

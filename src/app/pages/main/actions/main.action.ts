@@ -22,7 +22,6 @@ export const mainAction = {
     createSingleChatAction: '[main] create single chat action',
     createSingleChatSuccess: '[main] create single chat success',
     emptySingleChatTip: '[main] empty single chat tip',
-    // createSingleChatError: '[main] create single chat error',
     blackMenu: '[main] black menu',
     blackMenuSuccess: '[main] black menu success',
     delSingleBlack: '[main] delete single black',
@@ -38,4 +37,4 @@ export const mainAction = {
     login: '[main] login',
     logoutKickShow: '[main] logout kick show',
     init: '[main] init'
-}
+};

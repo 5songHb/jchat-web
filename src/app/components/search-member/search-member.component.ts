@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter,
+    AfterViewInit, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -8,7 +9,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     styleUrls: ['./search-member.component.scss']
 })
 
-export class SearchMemberComponent implements OnInit {
+export class SearchMemberComponent implements OnInit, AfterViewInit {
     @Input()
         private searchResult;
     @Output()
@@ -28,45 +29,48 @@ export class SearchMemberComponent implements OnInit {
 
      }
     public ngOnInit() {
-        
+        // pass
     }
-    private stopPropagation(event){
-        event.stopPropagation();
-    }
-    public ngAfterViewInit(){
+    public ngAfterViewInit() {
         this.fileDom = this.elementRef.nativeElement.querySelector('#' + this.searchResult.id);
-        Observable.fromEvent(this.fileDom, "keyup")
+        Observable.fromEvent(this.fileDom, 'keyup')
             .debounceTime(200)
-            .subscribe((event:any) => {
-                if(event.keyCode !== 13)
+            .subscribe((event: any) => {
+                if (event.keyCode !== 13) {
                     this.searchKeyup.emit(event.target.value);
+                }
             });
     }
-    private avatarErrorIcon(event){
+    private stopPropagation(event) {
+        event.stopPropagation();
+    }
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private searchItemAction(item){
-        if(!this.searchResult.checkbox)
+    private searchItemAction(item) {
+        if (!this.searchResult.checkbox) {
             this.searchResult.keywords = '';
+        }
         this.searchItem.emit(item);
     }
-    private clearInputAction(){
+    private clearInputAction() {
         this.fileDom.focus();
         this.searchResult.keywords = '';
         this.clearInput.emit();
     }
-    private searchBtnAction(){
-        if(this.searchResult.keywords.length > 0 && this.searchResult.checkbox)
+    private searchBtnAction() {
+        if (this.searchResult.keywords.length > 0 && this.searchResult.checkbox) {
             this.searchBtn.emit(this.searchResult.keywords);
+        }
     }
-    private changeCheckedAction(input, item){
+    private changeCheckedAction(input, item) {
         this.changeChecked.emit(item);
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

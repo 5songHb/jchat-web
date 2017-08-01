@@ -3,4 +3,4 @@ export let global = {
     JIM: null,
     user: '',
     password: ''
-}
+};

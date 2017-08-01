@@ -12,12 +12,12 @@ export class MenuComponent implements OnInit {
     @Output()
         private selectMenuItem: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
      }
     public ngOnInit() {
-
+        // pass
     }
-    private selectMenuItemAction(item){
+    private selectMenuItemAction(item) {
         this.selectMenuItem.emit(item);
     }
 }

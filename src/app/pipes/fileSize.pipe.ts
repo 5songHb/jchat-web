@@ -6,11 +6,11 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'fileSize'
 })
 export class FileSizePipe implements PipeTransform {
-  transform(size : number) {
+  public transform(size: number) {
     let newSize = '';
-    if(size > 1024 * 1024){
+    if (size > 1024 * 1024) {
         newSize = (size / (1024 * 1024)).toFixed(2) + 'M';
-    }else{
+    } else {
         let sizeNum = (size / 1024).toFixed(2);
         // 小于0.01KB的文件显示0.01KB
         newSize = (Number(sizeNum) >= 0.01 ? sizeNum : 0.01) + 'KB';

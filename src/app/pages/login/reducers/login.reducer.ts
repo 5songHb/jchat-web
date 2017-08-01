@@ -10,9 +10,10 @@ const loginInit = {
         password: ''
     },
     loginRemember: false
-}
+};
+
 export const loginReducer = (state: LoginStore = loginInit, {type, payload}) => {
-    if(type){
+    if (type) {
         state.actionType = type;
     }
     switch (type) {
@@ -23,14 +24,14 @@ export const loginReducer = (state: LoginStore = loginInit, {type, payload}) => 
             state.loginTip = '';
             state.userInfo.username = payload.username;
             state.userInfo.password = payload.password;
-            state.loginRemember = payload.loginRemember
+            state.loginRemember = payload.loginRemember;
             break;
         case loginAction.loginFailed:
             state.isLoginSuccess = false;
             state.loginTip = '用户名或密码错误';
             break;
         case loginAction.isButtonAvailableAction:
-            isButtonAvailable(state,payload);
+            isButtonAvailable(state, payload);
             break;
         case loginAction.emptyTip:
             state.loginTip = '';
@@ -39,10 +40,10 @@ export const loginReducer = (state: LoginStore = loginInit, {type, payload}) => 
     }
     return state;
 };
-function isButtonAvailable(state, payload){
-    if(payload.password.length > 0 && payload.username.length > 0){
+function isButtonAvailable(state, payload) {
+    if (payload.password.length > 0 && payload.username.length > 0) {
         state.isButtonAvailable = true;
-    }else{
+    } else {
         state.isButtonAvailable = false;
     }
 }

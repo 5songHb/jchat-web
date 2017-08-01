@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition, animate, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition,
+        animate, HostListener, ElementRef, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
@@ -16,7 +17,7 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
     ]
 })
 
-export class SearchUserComponent implements OnInit {
+export class SearchUserComponent implements OnInit, OnChanges {
     private searchKeyword;
     private searchInputIsShow = true;
     private inputAnimate = 'out';
@@ -26,7 +27,7 @@ export class SearchUserComponent implements OnInit {
     private groupHeight = '200px';
     private fileDom;
     @Input()
-        searchUserResult;
+        private searchUserResult;
     @Output()
         private searchUser: EventEmitter<any> = new EventEmitter();
     @Output()
@@ -37,38 +38,38 @@ export class SearchUserComponent implements OnInit {
 
     }
     public ngOnInit() {
-        this.fileDom = this.elementRef.nativeElement.querySelector("#searchInput");
-        Observable.fromEvent(this.fileDom, "keyup")
+        this.fileDom = this.elementRef.nativeElement.querySelector('#searchInput');
+        Observable.fromEvent(this.fileDom, 'keyup')
             .debounceTime(300)
-            .subscribe((event:any) => {
+            .subscribe((event: any) => {
                 this.searchUser.emit(event.target.value);
             });
     }
-    ngOnChanges(){
-        if(!this.searchUserResult.isSearch){
+    public ngOnChanges() {
+        if (!this.searchUserResult.isSearch) {
             this.searchKeyword = '';
         }
     }
-    @HostListener('window:click') onClickWindow(){
+    @HostListener('window:click') private onClickWindow() {
         this.searchKeyword = '';
         this.searchUser.emit(this.searchKeyword);
         this.inputAnimate = 'out';
         this.searchInputIsShow = true;
     }
-    private singleShowAll(){
-        if(this.singleShowText === '显示全部'){
+    private singleShowAll() {
+        if (this.singleShowText === '显示全部') {
             this.singleShowText = '收起';
             this.singleHeight = 'none';
-        }else{
+        } else {
             this.singleShowText = '显示全部';
             this.singleHeight = '200px';
         }
     }
-    private groupShowAll(){
-        if(this.groupShowText === '显示全部'){
+    private groupShowAll() {
+        if (this.groupShowText === '显示全部') {
             this.groupShowText = '收起';
             this.groupHeight = 'none';
-        }else{
+        } else {
             this.groupShowText = '显示全部';
             this.groupHeight = '200px';
         }
@@ -76,29 +77,29 @@ export class SearchUserComponent implements OnInit {
     private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private clearInput(){
+    private clearInput() {
         this.searchKeyword = '';
         this.searchUser.emit(this.searchKeyword);
         this.fileDom.focus();
     }
-    private selectSearchItem(item){
+    private selectSearchItem(item) {
         this.selectUserResult.emit(item);
     }
-    private showSearchInput(){
+    private showSearchInput() {
         this.searchInputIsShow = false;
         this.inputAnimate = 'in';
-        setTimeout(function(){
+        setTimeout(() => {
             this.fileDom.focus();
-        }.bind(this),200);
+        }, 200);
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

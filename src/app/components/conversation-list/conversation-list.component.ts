@@ -21,25 +21,26 @@ export class ConversationListComponent implements OnInit {
     private global = global;
     private groupAvatar = groupAvatar;
     constructor() {
-
+        // pass
     }
     public ngOnInit() {
+        // pass
     }
-    private selectTarget(item){
+    private selectTarget(item) {
         this.changeActive.emit(item);
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private deleteThis(event, item){
+    private deleteThis(event, item) {
         event.stopPropagation();
         this.deleteConversationItem.emit(item);
     }
-    private avatarLoad(event, item){
-        if(event.target.naturalHeight >= event.target.naturalWidth){
+    private avatarLoad(event, item) {
+        if (event.target.naturalHeight >= event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

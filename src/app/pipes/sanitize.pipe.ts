@@ -9,13 +9,13 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class SanitizePipe implements PipeTransform {
   constructor(
-    private _sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer
   ) { }
-  transform(value: string, type: string) {
-    if(type === 'html'){
-      return this._sanitizer.bypassSecurityTrustHtml(value);
-    }else if(type === 'url'){
-      return this._sanitizer.bypassSecurityTrustUrl(value);
+  public transform(value: string, type: string) {
+    if (type === 'html') {
+      return this.sanitizer.bypassSecurityTrustHtml(value);
+    } else if (type === 'url') {
+      return this.sanitizer.bypassSecurityTrustUrl(value);
     }
   }
 }

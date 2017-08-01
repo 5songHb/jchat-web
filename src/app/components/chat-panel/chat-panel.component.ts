@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter,ViewChild, OnInit,
-        OnChanges, AfterViewInit, HostListener, ElementRef, SimpleChanges } from '@angular/core';
+        OnChanges, AfterViewInit, OnDestroy, HostListener,
+        ElementRef, SimpleChanges } from '@angular/core';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { Store } from '@ngrx/store';
 import { AppStore } from '../../app.store';
@@ -11,7 +12,7 @@ import { Util } from '../../services/util';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import{ StorageService } from '../../services/common';
 import { Emoji } from '../../services/tools';
-let download = require("downloadjs");
+let download = require('downloadjs');
 
 @Component({
     selector: 'chat-panel-component',
@@ -19,9 +20,9 @@ let download = require("downloadjs");
     styleUrls: ['./chat-panel.component.scss']
 })
 
-export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
+export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy{
     private util: Util = new Util();
-    @ViewChild(PerfectScrollbarComponent) componentScroll;
+    @ViewChild(PerfectScrollbarComponent) private componentScroll;
     @Input()
         private messageList;
     @Input()
@@ -91,7 +92,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
             index: -1
         },
         show: false,
-    }
+    };
     private voiceState = [];
     private loadFlag = true;
     constructor(
@@ -101,73 +102,77 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
     ) {
 
     }
-    ngOnInit(){
+    public ngOnInit() {
         this.subscribeStore();
         // 禁止火狐下点击发送消息的输入框中的表情进行缩放
-        document.designMode = "off";
+        document.designMode = 'off';
         document.execCommand('enableObjectResizing', false, 'false');
     }
-    ngOnChanges(changes: SimpleChanges){
-        if(!this.messageList || this.messageList.length === 0){
+    public ngOnChanges(changes: SimpleChanges) {
+        if (!this.messageList || this.messageList.length === 0) {
             this.messageList = [{
                 draft: ''
             }];
         }
-        if(!this.active.activeIndex){
+        if (!this.active.activeIndex) {
             this.active.activeIndex = 0;
         }
-        if(changes.scrollBottom){
+        // 消息面板滚动条向下滚动
+        if (changes.scrollBottom) {
             this.loadFlag = false;
-            setTimeout(function(){
+            setTimeout(() => {
                 this.componentScroll.update();
                 this.componentScroll.scrollToBottom();
                 this.contentDiv.focus();
                 this.util.focusLast(this.contentDiv);
                 this.loadFlag = true;
-            }.bind(this),150);
+            }, 150);
         }
     }
-    ngAfterViewInit(){
+    public ngAfterViewInit() {
         this.allPointerToMap(true);
-        this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');        
+        this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');
     }
-    @HostListener('window:click') onClickWindow(){
+    public ngOnDestroy() {
+        this.chatStream$.unsubscribe();
+    }
+    @HostListener('window:click') private onClickWindow() {
         this.inputToLast = true;
         this.inputNoBlur = true;
     }
-    private subscribeStore(){
+    private subscribeStore() {
         this.chatStream$ = this.store$.select((state) => {
             const chatState = state['chatReducer'];
             this.stateChanged(chatState);
             return state;
         }).subscribe((state) => {
-            
+            // pass
         });
     }
-    private stateChanged(chatState){
-        console.log('chat-panel',chatState.actionType);
-        switch(chatState.actionType){
+    private stateChanged(chatState) {
+        console.log('chat-panel', chatState.actionType);
+        switch (chatState.actionType) {
             case chatAction.receiveMessageSuccess:
                 this.messageList = chatState.messageList;
-                if(chatState.activePerson.activeIndex >= 0 && chatState.newMessageIsActive){
+                if (chatState.activePerson.activeIndex >= 0 && chatState.newMessageIsActive) {
                     let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                    if(msg.length > 20){
+                    if (msg.length > 20) {
                         this.msg = msg.slice(msg.length - this.msg.length);
-                    }else{
+                    } else {
                         this.msg = msg;
                     }
                 }
-                // 经纬度转换成地图                              
+                // 经纬度转换成地图
                 this.pointerToMap(chatState);
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
                 let message = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(message && message.length > 20){
+                if (message && message.length > 20) {
                     this.msg = message.slice(message.length - 20);
-                }else if(message && message.length <= 20){
-                    this.msg = message;                
+                } else if (message && message.length <= 20) {
+                    this.msg = message;
                 }
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
@@ -185,16 +190,16 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
 
                 // 发送群组图片消息
             case chatAction.sendGroupPic:
-                
+
                 // 发送单聊文件消息
             case chatAction.sendSingleFile:
 
                 // 发送群组文件消息
             case chatAction.sendGroupFile:
                 let msgs = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(msgs.length > 20){
+                if (msgs.length > 20) {
                     this.msg = msgs.slice(msgs.length - this.msg.length);
-                }else{
+                } else {
                     this.msg = msgs;
                 }
                 this.imageViewer.result = chatState.imageViewer;
@@ -210,27 +215,30 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
                 let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if(msg && msg.length > 20){
+                if (msg && msg.length > 20) {
                     this.msg = msg.slice(msg.length - 20);
-                }else if(msg && msg.length <= 20){
+                } else if (msg && msg.length <= 20) {
                     this.msg = msg;
                 }
                 this.allPointerToMap(true);
                 this.imageViewer.result = chatState.imageViewer;
                 break;
             case chatAction.getAllMessageSuccess:
-                if(chatState.imageViewer !== []){
+                if (chatState.imageViewer !== []) {
                     this.imageViewer.result = chatState.imageViewer;
                 }
                 break;
             case chatAction.addGroupMembersEventSuccess:
                 this.messageList = chatState.messageList;
                 break;
+            default:
         }
     }
-    private imageViewerShow(src, index){
-        for(let i=0;i<this.imageViewer.result.length;i++){
-            if(this.imageViewer.result[i].index === index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)){
+    // 图片预览
+    private imageViewerShow(src, index) {
+        for (let i = 0; i < this.imageViewer.result.length; i++) {
+            if (this.imageViewer.result[i].index ===
+                index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)) {
                 this.imageViewer.active = Object.assign({}, this.imageViewer.result[i], {});
                 this.imageViewer.active.index = i;
                 break;
@@ -238,22 +246,23 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         }
         this.imageViewer.show = true;
     }
-    private allPointerToMap(timeout: boolean, index ?: number){
+    // 切换会话人渲染地图
+    private allPointerToMap(timeout: boolean, index ?: number) {
         const num = index ? index : this.msg.length;
-        for(let i=0;i<num;i++){
-            if(this.msg[i].content.msg_type === 'location'){
-                if(timeout){
+        for (let i = 0 ; i < num; i++) {
+            if (this.msg[i].content.msg_type === 'location') {
+                if (timeout) {
                     const that = this;
-                    (function(i){
+                    ((indexNum) => {
                         setTimeout(() => {
                             that.util.theLocation({
-                                id: 'allmap' + i,
-                                longitude: that.msg[i].content.msg_body.longitude,
-                                latitude: that.msg[i].content.msg_body.latitude
+                                id: 'allmap' + indexNum,
+                                longitude: that.msg[indexNum].content.msg_body.longitude,
+                                latitude: that.msg[indexNum].content.msg_body.latitude
                             });
                         }, 0);
                     })(i);
-                }else{
+                } else {
                     this.util.theLocation({
                         id: 'allmap' + i,
                         longitude: this.msg[i].content.msg_body.longitude,
@@ -263,48 +272,51 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
             }
         }
     }
-    private pointerToMap(chatState){
-        const single = (Number(this.active.key) === Number(chatState.newMessage.from_uid) && chatState.newMessage.msg_type === 3),
-            group = (Number(this.active.key) === Number(chatState.newMessage.from_gid) && chatState.newMessage.msg_type === 4);
-        if(chatState.newMessage.content.msg_type === 'location' && (single || group)){
-            setTimeout(function(){
+    // 接收到地图消息渲染地图
+    private pointerToMap(chatState) {
+        const single = (Number(this.active.key) === Number(chatState.newMessage.from_uid)
+            && chatState.newMessage.msg_type === 3);
+        let group = (Number(this.active.key) === Number(chatState.newMessage.from_gid)
+            && chatState.newMessage.msg_type === 4);
+        if (chatState.newMessage.content.msg_type === 'location' && (single || group)) {
+            setTimeout(() => {
                 this.util.theLocation({
                     id: 'allmap' + (this.msg.length - 1).toString(),
                     longitude: chatState.newMessage.content.msg_body.longitude,
                     latitude: chatState.newMessage.content.msg_body.latitude
                 });
-            }.bind(this),100);
+            }, 100);
         }
     }
     // 粘贴文本，将文本多余的样式代码去掉
-    private pasteMessage(event){
-        let clipboardData = event.clipboardData || (<any>window).clipboardData;
+    private pasteMessage(event) {
+        let clipboardData = event.clipboardData || (<any> window).clipboardData;
         let pastedData = clipboardData.getData('Text');
         pastedData = pastedData.replace(/</g, '&lt;');
         pastedData = pastedData.replace(/>/g, '&gt;');
         pastedData = pastedData.replace(/\n/g, '<br>');
-        pastedData = pastedData.replace(/ /g, '&nbsp;'); 
+        pastedData = pastedData.replace(/ /g, '&nbsp;');
         this.util.insertAtCursor(this.contentDiv, pastedData, false);
         return false;
     }
     // 发送文本
-    private sendMsgAction(){
+    private sendMsgAction() {
         let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
-        if(draft){
-            draft = draft.replace(/^(<br>){1,}$/g,'');
-            draft = draft.replace(/&nbsp;/g,' ');
+        if (draft) {
+            draft = draft.replace(/^(<br>){1,}$/g, '');
+            draft = draft.replace(/&nbsp;/g, ' ');
             draft = draft.replace(/<br>/g, '\n');
             const imgReg = new RegExp(`<img.+?${imgRouter}.{1,}?\.png".*?>`, 'g');
-            if(draft.match(imgReg)){
+            if (draft.match(imgReg)) {
                 let arr = draft.match(imgReg);
-                for(let i=0;i<arr.length;i++){
-                    let str = arr[i].split(`src="${imgRouter}`)[1],
-                        str2 = str.split('.png"')[0];
-                    draft = draft.replace(arr[i], Emoji.convert(str2));
+                for (let item of arr) {
+                    let str = item.split(`src="${imgRouter}`)[1];
+                    let str2 = str.split('.png"')[0];
+                    draft = draft.replace(item, Emoji.convert(str2));
                 }
             }
-            draft = draft.replace(new RegExp('&lt;','g'),'<');
-            draft = draft.replace(new RegExp('&gt;','g'),'>');
+            draft = draft.replace(new RegExp('&lt;', 'g'), '<');
+            draft = draft.replace(new RegExp('&gt;', 'g'), '>');
             this.sendMsg.emit({
                 content: draft
             });
@@ -313,10 +325,11 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
             this.contentDiv.innerHTML = '';
         }
     }
-    private sendPicAction(event){
+    // 发送图片
+    private sendPicAction(event) {
         const pic = this.elementRef.nativeElement.querySelector('#sendPic');
         // 为了防止首次选择了文件，第二次选择文件的时候点击取消按钮时触发change事件的报错
-        if(!pic.files[0]){
+        if (!pic.files[0]) {
             return;
         }
         let img = this.util.getFileFormData(pic);
@@ -325,10 +338,11 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         this.util.focusLast(this.contentDiv);
         event.target.value = '';
     }
-    private sendFileAction(event){
+    // 发送文件
+    private sendFileAction(event) {
         const fileData = this.elementRef.nativeElement.querySelector('#sendFile');
         // 为了防止首次选择了文件，第二次选择文件的时候点击取消按钮时触发change事件的报错
-        if(!fileData.files[0]){
+        if (!fileData.files[0]) {
             return;
         }
         let file = this.util.getFileFormData(fileData);
@@ -340,103 +354,106 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
         this.util.focusLast(this.contentDiv);
         event.target.value = '';
     }
-    private msgContentChange(event){
-        let active = Object.assign({}, this.active, {}),
-            value = event.target.innerHTML;
+    private msgContentChange(event) {
+        let active = Object.assign({}, this.active, {});
+        let value = event.target.innerHTML;
         value = value.replace(/^<br>?/, '');
         // 防止点击发送的时候或者点击emoji的时候触发保存草稿
-        setTimeout(function(){
-            if(this.inputNoBlur){
-                if(this.flag === true){
+        setTimeout(() => {
+            if (this.inputNoBlur) {
+                if (this.flag === true) {
                     value = '';
                     this.flag = false;
                 }
                 this.saveDraft.emit([value, active]);
             }
-        }.bind(this), 200);
+        }, 200);
     }
-    private msgContentFocus(){
+    private msgContentFocus() {
         this.flag = false;
     }
-    private watchOtherInfo(fromId){
+    private watchOtherInfo(fromId) {
         this.otherInfo.emit({
             username: fromId
         });
     }
-    private watchSelfInfo(){
+    private watchSelfInfo() {
         this.selfInfoEmit.emit();
     }
-    private groupSettingAction(event){
+    private groupSettingAction(event) {
         event.stopPropagation();
         this.groupSetting.emit();
     }
-    private showEmojiPanel(event){
+    private showEmojiPanel(event) {
         this.inputNoBlur = false;
         event.stopPropagation();
         this.contentDiv.focus();
-        if(this.inputToLast){
+        if (this.inputToLast) {
             this.util.focusLast(this.contentDiv);
         }
         this.emojiInfo.content = this.messageList[this.active.activeIndex];
-        if(this.emojiInfo.show === true){
+        if (this.emojiInfo.show === true) {
             this.emojiInfo.show = false;
-            setTimeout(function(){
+            setTimeout(() => {
                 this.inputNoBlur = true;
-            }.bind(this), 200);
-        }else{
-            this.emojiInfo.show = true;   
+            }, 200);
+        } else {
+            this.emojiInfo.show = true;
         }
     }
-    private msgContentClick(){
+    private msgContentClick() {
         this.inputToLast = false;
     }
     // ctrl + enter换行，enter发送消息
-    private preKeydown(event){
-        if(event.keyCode === 13 && event.ctrlKey){
-            const contentId = this.elementRef.nativeElement.querySelector('#' + this.emojiInfo.contentId);
+    private preKeydown(event) {
+        if (event.keyCode === 13 && event.ctrlKey) {
+            const contentId =
+                this.elementRef.nativeElement.querySelector('#' + this.emojiInfo.contentId);
             let insertHtml = '<br>';
-            if(window.getSelection){
+            if (window.getSelection) {
                 let next = window.getSelection().focusNode.nextSibling;
-                do{
-                    if(!next || next.nodeValue || "BR" == (next as HTMLElement).tagName)
-                    break;
-                }while(next = next.nextSibling);
+                do {
+                    if (!next || next.nodeValue || 'BR' === (next as HTMLElement).tagName) {
+                        break;
+                    }
+                } while (next = next.nextSibling);
                 next || (insertHtml += insertHtml);
-                if(next && next.nodeName === '#text' && insertHtml !== '<br><br>' && event.target.innerHTML && !event.target.innerHTML.match(/<br>$/ig)){
+                if (next && next.nodeName === '#text' && insertHtml !== '<br><br>' &&
+                    event.target.innerHTML && !event.target.innerHTML.match(/<br>$/ig)) {
                     insertHtml += insertHtml;
                 }
-                if(!event.target.innerHTML){
+                if (!event.target.innerHTML) {
                     insertHtml += insertHtml;
                 }
             }
             this.util.insertAtCursor(contentId, insertHtml, false);
-        }else if(event.keyCode === 13){
+        }else if (event.keyCode === 13) {
             this.sendMsgAction();
             event.preventDefault();
         }
     }
     // 消息发送失败后点击重发消息
-    private repeatSendMsgAction(item){
+    private repeatSendMsgAction(item) {
         item.success = 1;
         item.repeatSend = true;
         this.sendMsg.emit(item);
     }
-    private repeatSendPicAction(item){
+    private repeatSendPicAction(item) {
         item.success = 1;
         item.repeatSend = true;
         this.sendPic.emit(item);
     }
-    private repeatSendFileAction(item){
+    private repeatSendFileAction(item) {
         item.success = 1;
         item.repeatSend = true;
         this.sendFile.emit(item);
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    // 加载更多消息
-    private scrollTopEvent(){
-        if(!this.loadFlag){
+    // 向上滚动加载更多消息
+    private scrollTopEvent() {
+        if (!this.loadFlag) {
             return;
         }
         /**
@@ -444,57 +461,59 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
          * value    1           2           3
          * state 更多消息   正在加载消息  没有更多了
          */
-        if(this.loadingFlag === 1 && this.msg.length >= 20){
+        if (this.loadingFlag === 1 && this.msg.length >= 20) {
             this.loadingFlag = 2;
-            const oldContentHeight = this.componentScroll.contentHeight,
-                activeKey = this.active.key;
-            setTimeout(function(){
-                if(activeKey !== this.active.key || !this.messageList[this.active.activeIndex])
+            const oldContentHeight = this.componentScroll.contentHeight;
+            const activeKey = this.active.key;
+            setTimeout(() => {
+                if (activeKey !== this.active.key || !this.messageList[this.active.activeIndex]) {
                     return;
+                }
                 this.componentScroll.update();
                 this.componentScroll.scrollTo(0, 10);
                 let msgs = this.messageList[this.active.activeIndex].msgs;
-                if(msgs.length === this.msg.length){
+                if (msgs.length === this.msg.length) {
                     this.loadingFlag = 3;
-                }else{
+                } else {
                     const oldLength = this.msg.length;
-                    if(msgs.length < 20 * ++ this.loadingCount){
+                    if (msgs.length < 20 * ++ this.loadingCount) {
                         this.msg = msgs;
-                        setTimeout(function(){
+                        setTimeout(() => {
                             this.loadingFlag = 3;
-                        }.bind(this), 0);
-                    }else{
+                        }, 0);
+                    } else {
                         this.msg = msgs.slice(msgs.length - 20 * this.loadingCount ++ );
-                        setTimeout(function(){
+                        setTimeout(() => {
                             this.loadingFlag = 1;
-                        }.bind(this), 0);
+                        }, 0);
                     }
                     const newLength = this.msg.length;
-                    this.allPointerToMap(newLength - oldLength);
+                    this.allPointerToMap(true, newLength - oldLength);
                     const that = this;
                     return new Promise ((resolve, reject) => {
-                        setTimeout(function(){
+                        setTimeout(() => {
                             const newContentHeight = that.componentScroll.contentHeight;
                             that.componentScroll.scrollTo(0, newContentHeight - oldContentHeight);
                             resolve();
                         }, 0);
-                    }).catch(function () {
-                        console.log("Promise Rejected");
+                    }).catch(() => {
+                        console.log('Promise Rejected');
                     });
                 }
-            }.bind(this), 500);
+            }, 500);
         }
     }
-    private addGroupAction(){
+    private addGroupAction() {
         this.addGroup.emit();
     }
-    private contentFocus(event){
+    private contentFocus(event) {
         event.stopPropagation();
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
         this.emojiInfo.show = false;
     }
-    private playVoice(index){
+    // 播放语音
+    private playVoice(index) {
         const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         if (audio.paused) {
             this.clearTimer(index);
@@ -503,31 +522,33 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                 single: false,
                 double: false,
                 max: true
-            }
-            this.msg[index].content.timer1 = setInterval(function(){
+            };
+            this.msg[index].content.timer1 = setInterval(() => {
                 this.msg[index].content.playing.double = true;
-            }.bind(this), 300);
-            this.msg[index].content.timer2 = setInterval(function(){
+            }, 300);
+            this.msg[index].content.timer2 = setInterval(() => {
                 this.msg[index].content.playing.single = true;
-            }.bind(this), 600);
-            this.msg[index].content.timer3 = setInterval(function(){
+            }, 600);
+            this.msg[index].content.timer3 = setInterval(() => {
                 this.msg[index].content.playing = {
                     single: false,
                     double: false,
                     max: true
-                }
-            }.bind(this), 900);
+                };
+            }, 900);
             // 如果是未读
-            if(!this.msg[index].content.havePlay){
+            if (!this.msg[index].content.havePlay) {
                 let voiceState = {
                     key: this.active.key,
                     msgId: this.msg[index].msg_id
-                }
+                };
                 this.voiceState.push(voiceState);
                 this.msg[index].content.havePlay = true;
-                this.storageService.set('voiceState' + global.user, JSON.stringify(this.voiceState));
+                const key = 'voiceState' + global.user;
+                const value = JSON.stringify(this.voiceState);
+                this.storageService.set(key, value);
             }
-        }else{
+        } else {
             audio.pause();
             clearInterval(this.msg[index].content.timer1);
             clearInterval(this.msg[index].content.timer2);
@@ -536,12 +557,14 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                 single: true,
                 double: true,
                 max: true
-            }
+            };
         }
     }
-    private clearTimer(index){
-        for(let i=0;i<this.msg.length;i++){
-            if(this.msg[i].content.msg_type === 'voice' && this.msg[i].content.timer1 && i !== index){
+    // 清除语音定时器
+    private clearTimer(index) {
+        for (let i = 0; i < this.msg.length; i++) {
+            if (this.msg[i].content.msg_type === 'voice' &&
+                this.msg[i].content.timer1 && i !== index) {
                 clearInterval(this.msg[i].content.timer1);
                 clearInterval(this.msg[i].content.timer2);
                 clearInterval(this.msg[i].content.timer3);
@@ -552,11 +575,12 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
                     single: true,
                     double: true,
                     max: true
-                }
+                };
             }
         }
     }
-    private voiceEnded(index){
+    // 语音播放完成
+    private voiceEnded(index) {
         const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         clearInterval(this.msg[index].content.timer1);
         clearInterval(this.msg[index].content.timer2);
@@ -565,39 +589,43 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges{
             single: true,
             double: true,
             max: true
-        }
+        };
         audio.currentTime = 0;
         audio.pause();
     }
-    private videoLoadStart(index){
-        this.msg[index].content.timer4 = setInterval(function(){
-            if(this.msg[index].content.range < 90){
+    // 视频开始加载
+    private videoLoadStart(index) {
+        this.msg[index].content.timer4 = setInterval(() => {
+            if (this.msg[index].content.range < 90) {
                 this.msg[index].content.range ++;
             }
-        }.bind(this), 100);
+        }, 100);
     }
-    private videoLoad(index){
-        this.msg[index].content.duration = Math.floor(this.elementRef.nativeElement.querySelector('#video' + index).duration);
+    // 视频加载完成
+    private videoLoad(index) {
+        this.msg[index].content.duration =
+            Math.floor(this.elementRef.nativeElement.querySelector('#video' + index).duration);
         this.msg[index].content.load = 1;
         clearInterval(this.msg[index].content.timer4);
         this.msg[index].content.range = 0;
     }
-    private playVideo(url){
+    private playVideo(url) {
         this.videoPlay.emit(url);
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight >= event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight >= event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private fileDownload(url){
+    private fileDownload(url) {
+        // 为了兼容火狐下a链接下载，引入downloadjs
         download(url);
     }
 }

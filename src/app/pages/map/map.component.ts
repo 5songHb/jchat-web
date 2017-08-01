@@ -12,15 +12,15 @@ export class MapComponent implements OnInit {
     private errorTipShow = false;
     constructor(
         private activatedRoute: ActivatedRoute
-    ){}
+    ) {}
     public ngOnInit() {
         let pointer = this.activatedRoute.snapshot.params.pointer;
         let arr = pointer.split('&');
         arr[0] = Number(arr[0]);
         arr[1] = Number(arr[1]);
-        if(Number.isNaN(arr[0]) || Number.isNaN(arr[1])){
+        if (Number.isNaN(arr[0]) || Number.isNaN(arr[1])) {
             this.errorTipShow = true;
-        }else{
+        } else {
             this.util.theLocation({
                 id: 'mapContainer',
                 longitude: arr[0],

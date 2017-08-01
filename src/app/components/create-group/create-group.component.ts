@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import { global, authPayload } from '../../services/common';
 import { Observable } from 'rxjs';
@@ -12,10 +12,10 @@ import { mainAction } from '../../pages/main/actions';
     styleUrls: ['./create-group.component.scss']
 })
 
-export class CreateGroupComponent implements OnInit {
+export class CreateGroupComponent implements OnInit, OnDestroy {
     private groupName = '';
     private global = global;
-    private mainStream$;
+    private createGroupStream$;
     @Input()
         private createGroup;
     @Output()
@@ -40,59 +40,68 @@ export class CreateGroupComponent implements OnInit {
     }
     public ngOnInit() {
        this.initData();
-       this.mainStream$ = this.store$.select((state) => {
+       this.createGroupStream$ = this.store$.select((state) => {
             let mainState = state['mainReducer'];
             this.stateChanged(mainState);
             return state;
-        }).subscribe((state) => {});
+        }).subscribe((state) => {
+            // pass
+        });
     }
-    private stateChanged(mainState){
-        switch(mainState.actionType){
+    public ngOnDestroy() {
+        this.createGroupStream$.unsubscribe();
+    }
+    private stateChanged(mainState) {
+        switch (mainState.actionType) {
             case  mainAction.createGroupSearchComplete:
                 this.searchResult.show = true;
-                if(mainState.createGroupSearch.info){
+                if (mainState.createGroupSearch.info) {
                     let result = [];
                     result.push(mainState.createGroupSearch.info);
-                    if(result[0].name === global.user){
+                    // 如果搜索自己，disabled
+                    if (result[0].name === global.user) {
                         result[0].disabled = true;
                     }
-                    for(let item of this.selectList){
-                        if(Number(result[0].key) === Number(item.key)){
+                    // 如果搜索的结果有已经disabled的、checked的
+                    for (let item of this.selectList) {
+                        if (Number(result[0].key) === Number(item.key)) {
                             result[0].checked = item.checked;
                             result[0].disabled = item.disabled;
                         }
                     }
                     // 如果搜索的是已经在群里的，disabled
-                    let filter =this.createGroup.info.filter;
-                    if(filter){
-                        for(let item of filter){
-                            if(item.username === mainState.createGroupSearch.info.name){
+                    let filter = this.createGroup.info.filter;
+                    if (filter) {
+                        for (let item of filter) {
+                            if (item.username === mainState.createGroupSearch.info.name) {
                                 result[0].disabled = true;
                                 break;
                             }
                         }
                     }
                     this.searchResult.result = result;
-                }else{
+                } else {
                     this.searchResult.result = [];
                 }
                 break;
+            default:
         }
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
         this.searchResult.show = false;
         this.searchResult.keywords = '';
     }
-    private initData(){
+    private initData() {
         // 多人会话
-        for(let list of this.createGroup.list){
-            for(let member of list.data){
+        for (let list of this.createGroup.list) {
+            for (let member of list.data) {
                 member.checked = false;
                 member.disabled = false;
                 member.show = true;
-                let keyFlag = this.createGroup.info.activeSingle && Number(this.createGroup.info.activeSingle.key) === Number(member.key);
-                if(keyFlag){
+                let keyFlag = this.createGroup.info.activeSingle &&
+                    Number(this.createGroup.info.activeSingle.key) === Number(member.key);
+                if (keyFlag) {
                     member.checked = true;
                     member.disabled = true;
                     this.createGroup.info.activeSingle.disabled = true;
@@ -102,13 +111,18 @@ export class CreateGroupComponent implements OnInit {
            }
        }
         // 添加群成员
-        if(this.createGroup.info.filter){
+        if (this.createGroup.info.filter) {
             for(let i=0;i<this.createGroup.list.length;i++){
                 for(let j=0;j<this.createGroup.list[i].data.length;j++){
                     for(let a=0;a<this.createGroup.info.filter.length;a++){
-                        let keyFlag = Number(this.createGroup.info.filter[a].uid) === Number(this.createGroup.list[i].data[j].key) || Number(this.createGroup.info.filter[a].key) === Number(this.createGroup.list[i].data[j].key);
-                        let nameFlag = this.createGroup.info.filter[a].username === this.createGroup.list[i].data[j].name && this.createGroup.list[i].data[j].type === 3;
-                        if(keyFlag || nameFlag){
+                        let keyFlag = Number(this.createGroup.info.filter[a].uid) ===
+                            Number(this.createGroup.list[i].data[j].key)
+                            || Number(this.createGroup.info.filter[a].key) ===
+                            Number(this.createGroup.list[i].data[j].key);
+                        let nameFlag = this.createGroup.info.filter[a].username ===
+                            this.createGroup.list[i].data[j].name
+                            && this.createGroup.list[i].data[j].type === 3;
+                        if (keyFlag || nameFlag) {
                             this.createGroup.list[i].data[j].show = false;
                             break;
                         }
@@ -117,64 +131,64 @@ export class CreateGroupComponent implements OnInit {
             }
         }
         // 如果整个letter的成员都不显示，则隐藏字母
-        for(let list of this.createGroup.list){
-            let flag = false;            
-            for(let member of list.data){
-                if(member.show && member.type === 3){
+        for (let list of this.createGroup.list) {
+            let flag = false;
+            for (let member of list.data) {
+                if (member.show && member.type === 3) {
                     flag = true;
                     break;
                 }
             }
-            if(!flag){
+            if (!flag) {
                 list.allFilter = true;
-            }else{
+            } else {
                 list.allFilter = false;
             }
         }
     }
-    private searchKeyupEmit(value){
+    private searchKeyupEmit(value) {
         this.searchResult.result = [];
-        if(value){
+        if (value) {
             this.searchResult.show = true;
-            for(let list of this.createGroup.list){
-                if(!list.allGroup){
-                    for(let user of list.data){
-                        let nameExist = user.name && user.name.indexOf(value) !== -1,
-                            nickNameExist = user.nickName && user.nickName.indexOf(value) !== -1;
-                        if((nameExist || nickNameExist) && user.show && user.type === 3){
+            for (let list of this.createGroup.list) {
+                if (!list.allGroup) {
+                    for (let user of list.data) {
+                        let nameExist = user.name && user.name.indexOf(value) !== -1;
+                        let nickNameExist = user.nickName && user.nickName.indexOf(value) !== -1;
+                        if ((nameExist || nickNameExist) && user.show && user.type === 3) {
                             this.searchResult.result.push(user);
                         }
                     }
                 }
             }
-        }else{
+        } else {
             this.searchResult.show = false;
         }
     }
-    private searchBtnEmit(keywords){
+    private searchBtnEmit(keywords) {
         this.store$.dispatch({
             type: mainAction.createGroupSearchAction,
             payload: keywords
         });
     }
-    private changeCheckedEmit(item){
+    private changeCheckedEmit(item) {
         let flag = true;
-        for(let i=0;i<this.selectList.length;i++){
-            if(Number(item.key) === Number(this.selectList[i].key)){
+        for (let i = 0; i < this.selectList.length; i++) {
+            if (Number(item.key) === Number(this.selectList[i].key)) {
                 flag = false;
                 this.selectList.splice(i, 1);
                 item.checked = false;
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             item.checked = true;
             this.selectList.push(item);
         }
-        for(let list of this.createGroup.list){
-            if(!list.allGroup){
-                for(let member of list.data){
-                    if(Number(item.key) === Number(member.key) && member.type === 3){
+        for (let list of this.createGroup.list) {
+            if (!list.allGroup) {
+                for (let member of list.data) {
+                    if (Number(item.key) === Number(member.key) && member.type === 3) {
                         member.checked = item.checked;
                         return ;
                     }
@@ -182,48 +196,49 @@ export class CreateGroupComponent implements OnInit {
             }
         }
     }
-    private clearInputEmit(){
+    private clearInputEmit() {
         this.searchResult.show = false;
         this.searchResult.result = [];
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private confirmCreateGroup(){
-        if(!this.createGroup.info.action && this.groupName.length === 0){
+    private confirmCreateGroup() {
+        if (!this.createGroup.info.action && this.groupName.length === 0) {
             this.nameTip = true;
             return ;
-        }else{
+        } else {
             this.nameTip = false;
         }
         let memberUsernames = [];
-        for(let item of this.selectList){
+        for (let item of this.selectList) {
             memberUsernames.push({
                 username: item.name,
                 appkey: authPayload.appKey
-            })
+            });
         }
-        let groupInfo:any = {
+        let groupInfo: any = {
             groupName: this.groupName,
             groupDescription: '',
             memberUsernames,
-            detailMember:this.selectList,
+            detailMember: this.selectList,
             add: false
-        }
-        if(this.createGroup.info.action && this.createGroup.info.action === 'add'){
+        };
+        if (this.createGroup.info.action && this.createGroup.info.action === 'add') {
             groupInfo.add = true;
             groupInfo.activeGroup = this.createGroup.info.activeGroup;
-        }else if(this.createGroup.info.action && this.createGroup.info.action === 'many'){
-            groupInfo.groupName = this.createGroup.info.selfInfo.nickname || this.createGroup.info.selfInfo.username;
-            for(let item of this.selectList){
+        }else if (this.createGroup.info.action && this.createGroup.info.action === 'many') {
+            groupInfo.groupName = this.createGroup.info.selfInfo.nickname ||
+                this.createGroup.info.selfInfo.username;
+            for (let item of this.selectList){
                 let name;
-                if(item.nickName && item.nickName !== ''){
+                if (item.nickName && item.nickName !== '') {
                     name = item.nickName;
-                }else if(item.nickname && item.nickname !== ''){
+                }else if (item.nickname && item.nickname !== '') {
                     name = item.nickname;
-                }else if(item.username && item.username !== ''){
+                }else if (item.username && item.username !== '') {
                     name = item.username;
-                }else if(item.name && item.name !== ''){
+                }else if (item.name && item.name !== '') {
                     name = item.name;
                 }
                 groupInfo.groupName += '、' + name;
@@ -232,37 +247,37 @@ export class CreateGroupComponent implements OnInit {
         }
         this.isCreateGroup.emit(groupInfo);
     }
-    private cancelCreateGroup(event){
+    private cancelCreateGroup(event) {
         event.stopPropagation();
         this.isCreateGroup.emit();
     }
-    private selectItem(event, user){
-        if(!event.target.checked){
+    private selectItem(event, user) {
+        if (!event.target.checked) {
             this.deleteItem(user);
-        }else{
-            if(user.key){
+        } else {
+            if (user.key) {
                 user.uid = user.key;
             }
-            if(user.name){
+            if (user.name) {
                 user.username = user.name;
             }
             user.flag = 0;
             this.selectList.push(user);
         }
-        for(let list of this.createGroup.list){
-            for(let member of list.data){
-                if(Number(member.key) === Number(user.key)){
+        for (let list of this.createGroup.list) {
+            for (let member of list.data) {
+                if (Number(member.key) === Number(user.key)) {
                     member.checked = event.target.checked;
                     return ;
                 }
             }
         }
     }
-    private cancelSelect(user){
+    private cancelSelect(user) {
         this.deleteItem(user);
-        for(let list of this.createGroup.list){
-            for(let member of list.data){
-                if(Number(member.key) === Number(user.key)){
+        for (let list of this.createGroup.list) {
+            for (let member of list.data) {
+                if (Number(member.key) === Number(user.key)) {
                     member.checked = false;
                     return ;
                 }
@@ -270,24 +285,24 @@ export class CreateGroupComponent implements OnInit {
         }
     }
     // 删除已选元素操作
-    private deleteItem(user){
-        for(let i=0;i<this.selectList.length;i++){
-            if(Number(this.selectList[i].key) === Number(user.key)){
+    private deleteItem(user) {
+        for (let i = 0; i < this.selectList.length; i++) {
+            if (Number(this.selectList[i].key) === Number(user.key)) {
                 this.selectList.splice(i, 1);
                 break;
             }
         }
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }
     }
-    private emptyTip(){
+    private emptyTip() {
         this.nameTip = false;
     }
 }

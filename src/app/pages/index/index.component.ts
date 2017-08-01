@@ -15,16 +15,16 @@ export class AppComponent implements OnInit, OnDestroy {
     private tipModal = {
         show: false,
         info: {}
-    }
+    };
     constructor(
         private store$: Store<any>
-    ){}
-    ngOnInit(){
+    ) {}
+    public ngOnInit() {
         // 创建JIM 对象
         global.JIM = new JMessage({debug: true});
         this.indexStream$ = this.store$.select((state) => {
             let indexState = state['indexReducer'];
-            switch(indexState.actionType){
+            switch (indexState.actionType) {
                 case indexAction.errorApiTip:
                     console.log('errorAipTip', indexState.errorApiTip);
                     this.errorApiTip(indexState.errorApiTip);
@@ -32,14 +32,17 @@ export class AppComponent implements OnInit, OnDestroy {
                 case indexAction.tipModal:
                     this.tipModal = indexState.tipModal;
                     break;
+                default:
             }
             return state;
-        }).subscribe((state) => {});
+        }).subscribe((state) => {
+            // pass
+        });
     }
-    ngOnDestroy(){
+    public ngOnDestroy() {
         this.indexStream$.unsubscribe();
     }
-    private modalTipEmit(){
+    private modalTipEmit() {
         this.store$.dispatch({
             type: indexAction.tipModal,
             payload: {
@@ -48,9 +51,9 @@ export class AppComponent implements OnInit, OnDestroy {
             }
         });
     }
-    private errorApiTip(errorMsg){
+    private errorApiTip(errorMsg) {
         let tip = '';
-        switch(errorMsg.code){
+        switch (errorMsg.code) {
             case 880001:
                 tip = '未知错误码';
                 break;

@@ -1,6 +1,6 @@
 import { mainAction } from '../actions';
 import { MainStore } from '../stores/main.store';
-import { mainInit, init } from '../model';
+import { mainInit } from '../model';
 import { contactAction } from '../../contact/actions';
 import { chatAction } from '../../chat/actions';
 
@@ -8,7 +8,7 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
         case mainAction.init:
-            state = init;
+            state = Object.assign({}, mainInit, {});
             break;
             // 成功获取个人信息
         case mainAction.showSelfInfo:
@@ -62,13 +62,13 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             break;
             // 提示框
         case mainAction.showModalTip:
-            
+
         case mainAction.hideModalTip:
 
         case mainAction.addBlackListSuccess:
-            
+
         case mainAction.exitGroupSuccess:
-        
+
         case mainAction.deleteMemberSuccess:
             state.tipModal = payload;
             break;
@@ -113,7 +113,7 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     return state;
 };
 function delSingleBlackLoading(state, payload, loadingValue) {
-    for(let black of state.blackMenu.menu) {
+    for (let black of state.blackMenu.menu) {
         if (black.username === payload.username) {
             black.loading = loadingValue;
             break;

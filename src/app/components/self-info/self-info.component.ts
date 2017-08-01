@@ -26,10 +26,10 @@ export class SelfInfoComponent implements OnChanges {
         list: [{
             key: 1,
             name: '男'
-        },{
+        }, {
             key: 2,
             name: '女'
-        },{
+        }, {
             key: 0,
             name: '保密'
         }],
@@ -51,100 +51,100 @@ export class SelfInfoComponent implements OnChanges {
     constructor(
         private elementRef: ElementRef
     ) {}
-    public ngOnChanges(){
+    public ngOnChanges() {
         this.newInfo.signature = this.selfInfo.signature;
         this.newInfo.nickname = this.selfInfo.nickname;
         this.newInfo.gender = this.selfInfo.gender;
         this.newInfo.region = this.selfInfo.region;
-        switch(this.selfInfo.gender){
+        switch (this.selfInfo.gender) {
             case 0 :
                 this.selfInfo.gender = '保密';
                 this.sexList.active = {
                     key: 0,
                     name: '保密'
-                }
+                };
                 break;
             case 1 :
                 this.selfInfo.gender = '男';
                 this.sexList.active = {
                     key: 1,
                     name: '男'
-                }
+                };
                 break;
             case 2:
                 this.selfInfo.gender = '女';
                 this.sexList.active = {
                     key: 2,
                     name: '女'
-                }
+                };
                 break;
             default:
         }
     }
-    private hideSelect(event){
+    private hideSelect(event) {
         event.stopPropagation();
         this.sexList.show = false;
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private selfCancel(){
+    private selfCancel() {
         this.isEdit = false;
     }
-    private selfClose(event){
+    private selfClose(event) {
         event.stopPropagation();
         this.isShow.emit();
     }
-    private signatureChange(event){
+    private signatureChange(event) {
         this.newInfo.signature = event.target.value;
     }
-    private nicknameChange(event){
+    private nicknameChange(event) {
         this.newInfo.nickname = event.target.value;
     }
-    private regionChange(event){
+    private regionChange(event) {
         this.newInfo.region = event.target.value;
     }
-    private selfConfirm(){
+    private selfConfirm() {
         let newInfo = {
-            info: Object.assign({},this.newInfo,{gender: this.sexList.active.key}),
+            info: Object.assign({}, this.newInfo, {gender: this.sexList.active.key}),
             avatar: this.newAvatar
         };
         this.saveLoading = true;
         this.isShow.emit(newInfo);
-        setTimeout(function(){
+        setTimeout(() => {
             this.saveLoading = false;
-            this.isEdit = false;            
-        }.bind(this), 800);
+            this.isEdit = false;
+        }, 800);
     }
-    private selfAvatarChange(){
-        const selfAvatarImg = this.elementRef.nativeElement.querySelector('#selfAvatarImg'),
-                selfAvatarInput = this.elementRef.nativeElement.querySelector('#selfAvatarInput'),
-                that = this;
-        if(!selfAvatarInput.files[0]){
+    private selfAvatarChange() {
+        const selfAvatarImg = this.elementRef.nativeElement.querySelector('#selfAvatarImg');
+        const selfAvatarInput = this.elementRef.nativeElement.querySelector('#selfAvatarInput');
+        const that = this;
+        if (!selfAvatarInput.files[0]) {
             return;
         }
         let imgFile = this.util.fileReader(selfAvatarInput, () => {
             that.selectIsNotImage.emit();
         });
-        if(imgFile){
+        if (imgFile) {
             imgFile.then((url: string) => {
                 selfAvatarImg.src = url;
                 this.newAvatar.url = url;
                 this.cameraShadow = false;
             }).catch(() => {
-                console.log("Promise Rejected");
+                console.log('Promise Rejected');
             });
         }
         this.newAvatar.formData = this.util.getFileFormData(selfAvatarInput);
     }
-    private toEdit(){
+    private toEdit() {
         this.isEdit = true;
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight >= event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight >= event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        }else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

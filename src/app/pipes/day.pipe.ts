@@ -6,10 +6,10 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'day'
 })
 export class DayPipe implements PipeTransform {
-  transform(time): string {
-    let day = new Date(time).getDay(),
-        dayText = '';
-    switch(day){
+  public transform(time): string {
+    let day = (new Date(time)).getDay();
+    let dayText = '';
+    switch (day) {
         case 1:
             dayText = '星期一';
             break;

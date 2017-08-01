@@ -12,19 +12,19 @@ export class LogoutKickComponent implements OnInit {
     @Output()
         private modalTipEmit: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
     }
-    ngOnInit() {
-        
+    public ngOnInit() {
+        // pass
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private modalTip(event, info){
+    private modalTip(event, info) {
         event.stopPropagation();
-        if(info){
+        if (info) {
             this.modalTipEmit.emit(info);
-        }else{
+        } else {
             this.modalTipEmit.emit();
         }
     }

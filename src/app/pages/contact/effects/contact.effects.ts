@@ -13,11 +13,6 @@ import { contactAction } from '../actions';
 @Injectable()
 
 export class ContactEffect {
-    constructor(
-        private actions$: Actions,
-        private store$: Store<AppStore>,
-        private router: Router
-    ){}
     // 获取群组列表
     @Effect()
     private getGroupList$: Observable<Action> = this.actions$
@@ -26,49 +21,49 @@ export class ContactEffect {
         .switchMap(() => {
             let that = this;
             let groupListObj = global.JIM.getGroups()
-            .onSuccess(function(data) {
-                let groupList = data.group_list,
-                    flag = false;
+            .onSuccess((data) => {
+                let groupList = data.group_list;
+                let flag = false;
                 // 解决移动端有些群聊没有用户名的问题
-                for(let i=0;i<groupList.length;i++){
-                    if(!groupList[i].name || groupList[i].name === ''){
+                for (let group of groupList) {
+                    if (!group.name || group.name === '') {
                         flag = true;
-                        global.JIM.getGroupMembers({'gid': groupList[i].gid})
-                        .onSuccess(function(member) {
-                            let memberList = member.member_list,
-                                name = '';
-                            for(let j=0;j<memberList.length && j < 5;j++){
+                        global.JIM.getGroupMembers({gid: group.gid})
+                        .onSuccess((member) => {
+                            let memberList = member.member_list;
+                            let name = '';
+                            for (let j = 0; j < memberList.length && j < 5; j++) {
                                 name = name + memberList[j].username;
                                 let length = memberList.length < 5 ? memberList.length : 5;
-                                if(j < length - 1){
+                                if (j < length - 1) {
                                     name += '、';
                                 }
                             }
-                            groupList[i].name = name.substr(0, 20);
+                            group.name = name.substr(0, 20);
                             that.store$.dispatch({
-                                type: contactAction.getGroupListSuccess, 
+                                type: contactAction.getGroupListSuccess,
                                 payload: groupList
                             });
-                        }).onFail(function(error) {
+                        }).onFail((error) => {
                             that.store$.dispatch({
                                 type: indexAction.errorApiTip,
                                 payload: error
                             });
-                            groupList[i].name = '#群名获取失败';
+                            group.name = '#群名获取失败';
                             that.store$.dispatch({
-                                type: contactAction.getGroupListSuccess, 
+                                type: contactAction.getGroupListSuccess,
                                 payload: groupList
                             });
                         });
                     }
                 }
-                if(!flag){
+                if (!flag) {
                     that.store$.dispatch({
-                        type: contactAction.getGroupListSuccess, 
+                        type: contactAction.getGroupListSuccess,
                         payload: groupList
                     });
                 }
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -79,5 +74,10 @@ export class ContactEffect {
                     .map(() => {
                         return {type: '[main] get group list useless'};
                     });
-        })
+        });
+    constructor(
+        private actions$: Actions,
+        private store$: Store<AppStore>,
+        private router: Router
+    ) {}
 }

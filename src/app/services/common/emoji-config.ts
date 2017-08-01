@@ -28,7 +28,8 @@ export const emojiConfig = [
         imgNum: 6,
         // text: '闭嘴',
         unicode: '😘'
-    },{
+    },
+    {
         imgNum: 7,
         // text: '睡',
         unicode: '😚'
@@ -92,7 +93,8 @@ export const emojiConfig = [
         imgNum: 19,
         // text: '傲慢',
         unicode: '😭'
-    },{
+    },
+    {
         imgNum: 20,
         // text: '饥饿',
         unicode: '😪'
@@ -156,7 +158,8 @@ export const emojiConfig = [
         imgNum: 32,
         // text: '再见',
         unicode: '😏'
-    },{
+    },
+    {
         imgNum: 33,
         // text: '擦汗',
         unicode: '👦'
@@ -240,7 +243,8 @@ export const emojiConfig = [
         imgNum: 49,
         // text: '西瓜',
         unicode: '🙏'
-    },{
+    },
+    {
         imgNum: 50,
         // text: '啤酒',
         unicode: '👏'
@@ -319,7 +323,8 @@ export const emojiConfig = [
         imgNum: 65,
         // text: '足球',
         unicode: '☁️'
-    },{
+    },
+    {
         imgNum: 66,
         // text: '瓢虫',
         unicode: '⚡️'
@@ -398,7 +403,8 @@ export const emojiConfig = [
         imgNum: 81,
         // text: 'NO',
         unicode: '✖️'
-    },{
+    },
+    {
         imgNum: 82,
         // text: 'OK',
         unicode: '➕'
@@ -518,7 +524,7 @@ export const emojiConfig = [
         // text: '左太极',
         unicode: '➡️'
     }
-]
+];
 export const jpushConfig = [
     {
         imgNum: 1,
@@ -551,7 +557,8 @@ export const jpushConfig = [
     {
         imgNum: 8,
         text: ''
-    },{
+    },
+    {
         imgNum: 9,
         text: ''
     },
@@ -615,4 +622,4 @@ export const jpushConfig = [
         imgNum: 24,
         text: ''
     }
-]
+];

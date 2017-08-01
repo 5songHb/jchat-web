@@ -5,24 +5,28 @@ import { Directive, ElementRef, Input, OnInit, HostListener, OnChanges } from '@
 
 @Directive({ selector: '[myModel]' })
 
-export class myModelDirective implements OnInit{
+export class MyModelDirective implements OnInit, OnChanges {
     @Input()
         private myModel;
     constructor(private el: ElementRef) {
-       
+    //    pass
     }
-    ngOnChanges(){
-        this.el.nativeElement.innerHTML = (this.myModel && this.myModel.draft) ? this.myModel.draft : '';
+    public ngOnChanges() {
+        this.el.nativeElement.innerHTML =
+        (this.myModel && this.myModel.draft) ? this.myModel.draft : '';
     }
-    ngOnInit(){
-        this.el.nativeElement.innerHTML = (this.myModel && this.myModel.draft) ? this.myModel.draft : '';
+    public ngOnInit() {
+        this.el.nativeElement.innerHTML =
+        (this.myModel && this.myModel.draft) ? this.myModel.draft : '';
     }
-    @HostListener('blur') onBlur() {
-        if(this.myModel && this.myModel.draft)
+    @HostListener('blur') private onBlur() {
+        if (this.myModel && this.myModel.draft) {
             this.myModel.draft = this.el.nativeElement.innerHTML;
+        }
     }
-    @HostListener('keyup') onKeyup() {
-        if(this.myModel && this.myModel.draft)
+    @HostListener('keyup') private onKeyup() {
+        if (this.myModel && this.myModel.draft) {
             this.myModel.draft = this.el.nativeElement.innerHTML;
+        }
     }
 }

@@ -5,19 +5,19 @@ import { Directive, ElementRef, Input, OnInit, HostListener, OnChanges } from '@
  */
 @Directive({ selector: '[hoverEvent]' })
 
-export class hoverEventDirective implements OnInit{
+export class HoverEventDirective implements OnInit {
     @Input()
         private hoverEvent;
     constructor(private el: ElementRef) {
-       
+    //    pass
     }
-    ngOnInit(){
-        
+    public ngOnInit() {
+        // pass
     }
-    @HostListener('mouseenter') onMouseenter() {
+    @HostListener('mouseenter') private onMouseenter() {
         this.hoverEvent.show = true;
     }
-    @HostListener('mouseleave') onMouseleave() {
+    @HostListener('mouseleave') private onMouseleave() {
         this.hoverEvent.show = false;
     }
 }

@@ -11,12 +11,12 @@ export class ContactListComponent implements OnInit {
     @Output()
         private changeTab: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
     }
     public ngOnInit() {
-
+        // pass
     }
-    private changeList(index){
+    private changeList(index) {
         this.listIndex = index;
         this.changeTab.emit(index);
     }

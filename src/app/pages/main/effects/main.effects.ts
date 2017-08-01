@@ -17,53 +17,48 @@ let util = new Util();
 @Injectable()
 
 export class MainEffect {
-    constructor(
-        private actions$: Actions,
-        private store$: Store<AppStore>,
-        private router: Router
-    ) {}
     // 获取个人信息
     @Effect ()
     private getSelfInfo$: Observable<Action> = this.actions$
         .ofType(mainAction.getSelfInfo)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this,
-            usrInfoObj = global.JIM.getUserInfo({
-                'username' : global.user
-            }).onSuccess(function(data) {
-                if(!data.user_info.avatar || data.user_info.avatar === ''){
+            const that = this;
+            let usrInfoObj = global.JIM.getUserInfo({
+                username: global.user
+            }).onSuccess((data) => {
+                if (!data.user_info.avatar || data.user_info.avatar === '') {
                     data.user_info.avatarUrl = '';
                     that.store$.dispatch({
-                        type: mainAction.showSelfInfo, 
+                        type: mainAction.showSelfInfo,
                         payload: {
                             info: data.user_info,
                             show: false
                         }
-                    }); 
+                    });
                     return;
                 }
-                global.JIM.getResource({'media_id' : data.user_info.avatar})
-                .onSuccess(function(urlInfo){
+                global.JIM.getResource({media_id: data.user_info.avatar})
+                .onSuccess((urlInfo) => {
                     data.user_info.avatarUrl = urlInfo.url;
                     that.store$.dispatch({
-                        type: mainAction.showSelfInfo, 
+                        type: mainAction.showSelfInfo,
                         payload: {
                             info: data.user_info,
                             show: false
                         }
-                    }); 
-                }).onFail(function(error){
+                    });
+                }).onFail((error) => {
                     data.user_info.avatarUrl = '';
                     that.store$.dispatch({
-                        type: mainAction.showSelfInfo, 
+                        type: mainAction.showSelfInfo,
                         payload: {
                             info: data.user_info,
                             show: false
                         }
                     });
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -74,7 +69,7 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] get selfInfo useless'};
                     });
-    })
+    });
     // 退出登录
     @Effect()
     private logoutAction$: Observable<Action> = this.actions$
@@ -87,16 +82,16 @@ export class MainEffect {
                         this.router.navigate(['/login']);
                         return {type: '[main] login out useless'};
                     });
-        })
-    // 更新个人信息  
+        });
+    // 更新个人信息
     @Effect()
     private updateSelfInfo$: Observable<Action> = this.actions$
         .ofType(mainAction.updateSelfInfo)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this,
-            updateSelfInfo = global.JIM.updateSelfInfo(info)
-                .onSuccess(function(data) {
+            const that = this;
+            let updateSelfInfo = global.JIM.updateSelfInfo(info)
+                .onSuccess((data) => {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
                         payload: {
@@ -104,7 +99,7 @@ export class MainEffect {
                             show: true
                         }
                     });
-                }).onFail(function(error) {
+                }).onFail((error) => {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
                         payload: error
@@ -114,16 +109,16 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] update self info useless'};
                     });
-        })
-    // 更新个人头像信息  
+        });
+    // 更新个人头像信息
     @Effect()
     private updateSelfAvatar$: Observable<Action> = this.actions$
         .ofType(mainAction.updateSelfAvatar)
         .map(toPayload)
         .switchMap((avatar) => {
-            let that = this,
-            updateSelfAvatar = global.JIM.updateSelfAvatar({'avatar': avatar.formData})
-                .onSuccess(function(data) {
+            const that = this;
+            let updateSelfAvatar = global.JIM.updateSelfAvatar({avatar: avatar.formData})
+                .onSuccess((data) => {
                     that.store$.dispatch({
                         type: mainAction.showSelfInfo,
                         payload: {
@@ -131,7 +126,7 @@ export class MainEffect {
                             show: true
                         }
                     });
-                }).onFail(function(error) {
+                }).onFail((error) => {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
                         payload: error
@@ -141,19 +136,19 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] update self info useless'};
                     });
-        })
+        });
     // 创建群聊
     @Effect()
     private createGroup$: Observable<Action> = this.actions$
         .ofType(mainAction.createGroup)
         .map(toPayload)
         .switchMap((groupInfo) => {
-            let that = this,
-            createGroupObj = global.JIM.createGroup({
-                'group_name' :  groupInfo.groupName,
-                'group_description' : groupInfo.groupDescription
-            }).onSuccess(function(data) {
-                data.ctime = moment().format("YYYY-MM-DD HH:mm:ss");
+            const that = this;
+            let createGroupObj = global.JIM.createGroup({
+                group_name:  groupInfo.groupName,
+                group_description: groupInfo.groupDescription
+            }).onSuccess((data) => {
+                data.ctime = moment().format('YYYY-MM-DD HH:mm:ss');
                 let groupObj = {
                     appkey: authPayload.appKey,
                     ctime: data.ctime,
@@ -163,33 +158,31 @@ export class MainEffect {
                     name: data.group_name,
                     group: true,
                     type: 4
-                }
+                };
                 // 如果有其他成员
-                if(groupInfo.memberUsernames.length > 0){
+                if (groupInfo.memberUsernames.length > 0) {
                     global.JIM.addGroupMembers({
-                        'gid': data.gid,
-                        'member_usernames': groupInfo.memberUsernames
-                    }).onSuccess(function(data) {
+                        gid: data.gid,
+                        member_usernames: groupInfo.memberUsernames
+                    }).onSuccess((members) => {
                         that.store$.dispatch({
                             type: mainAction.createGroupSuccess,
                             payload: groupObj
                         });
-                        console.log('success:' + JSON.stringify(data));
-                    }).onFail(function(error) {
+                    }).onFail((error) => {
                         that.store$.dispatch({
                             type: indexAction.errorApiTip,
                             payload: error
                         });
-                        console.log('error:' + JSON.stringify(error))
+                        console.log('error:' + JSON.stringify(error));
                     });
-                }else{
+                } else {
                     that.store$.dispatch({
-                        type: mainAction.createGroupSuccess, 
+                        type: mainAction.createGroupSuccess,
                         payload: groupObj
                     });
                 }
-                
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -200,50 +193,50 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] create group useless'};
                     });
-    })
+    });
     // 添加群聊成员
     @Effect()
     private addGroupMember$: Observable<Action> = this.actions$
         .ofType(mainAction.addGroupMember)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this,
-            addGroupMemberObj = global.JIM.addGroupMembers({
-                'gid': info.activeGroup.key,
-                'member_usernames': info.memberUsernames
-            }).onSuccess(function(data) {
+            const that = this;
+            let addGroupMemberObj = global.JIM.addGroupMembers({
+                gid: info.activeGroup.key,
+                member_usernames: info.memberUsernames
+            }).onSuccess((data) => {
                 that.store$.dispatch({
-                    type: mainAction.addGroupMemberSuccess, 
+                    type: mainAction.addGroupMemberSuccess,
                     payload: info.detailMember
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error))
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(addGroupMemberObj)
                     .map(() => {
                         return {type: '[main] add group members useless'};
                     });
-    })
+    });
     // 修改密码
     @Effect()
     private modifyPassword$: Observable<Action> = this.actions$
         .ofType(mainAction.modifyPassword)
         .map(toPayload)
         .switchMap((passwordInfo) => {
-            let that = this,
-            passwordInfoObj = global.JIM.updateSelfPwd({
+            const that = this;
+            let passwordInfoObj = global.JIM.updateSelfPwd({
                 'old_pwd' : md5(passwordInfo.old_pwd),
                 'new_pwd': md5(passwordInfo.new_pwd),
                 'is_md5' : true
             })
-            .onSuccess(function(data) {
+            .onSuccess((data) => {
                 global.JIM.loginOut();
                 that.store$.dispatch({
-                    type: mainAction.modifyPasswordShow, 
+                    type: mainAction.modifyPasswordShow,
                     payload: {
                         repeatLogin: md5(passwordInfo.new_pwd),
                         show: false
@@ -260,9 +253,9 @@ export class MainEffect {
                             success: 1// 1 代表成功 2代表失败
                         }
                     }
-                })
+                });
                 console.log(data);
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -280,43 +273,43 @@ export class MainEffect {
         .ofType(mainAction.createSingleChatAction)
         .map(toPayload)
         .switchMap((singleName) => {
-            let that = this,
-            createSingleChatObj = global.JIM.getUserInfo({
-                'username' : singleName
-            }).onSuccess(function(data) {
-                let user = data.user_info,
-                    item = {
-                        avatar: user.avatar,
-                        key: user.key || user.uid,
-                        mtime: user.mtime,
-                        name: user.username,
-                        nickName: user.nickname,
-                        username: user.username,
-                        nickname: user.nickname,
-                        type: 3,
-                        signature: user.signature,
-                        gender: user.gender,
-                        region: user.region,
-                        avatarUrl: ''
-                    }
-                if(item.avatar){
-                    global.JIM.getResource({'media_id' : data.user_info.avatar})
-                    .onSuccess(function(urlInfo){
+            const that = this;
+            let createSingleChatObj = global.JIM.getUserInfo({
+                username: singleName
+            }).onSuccess((data) => {
+                let user = data.user_info;
+                let item = {
+                    avatar: user.avatar,
+                    key: user.key || user.uid,
+                    mtime: user.mtime,
+                    name: user.username,
+                    nickName: user.nickname,
+                    username: user.username,
+                    nickname: user.nickname,
+                    type: 3,
+                    signature: user.signature,
+                    gender: user.gender,
+                    region: user.region,
+                    avatarUrl: ''
+                };
+                if (item.avatar) {
+                    global.JIM.getResource({media_id: data.user_info.avatar})
+                    .onSuccess((urlInfo) => {
                         item.avatarUrl = urlInfo.url;
                         that.store$.dispatch({
                             type: mainAction.createSingleChatSuccess,
                             payload: item
                         });
-                    }).onFail(function(error){
-                        
+                    }).onFail((error) => {
+                        // pass
                     });
                 }
                 that.store$.dispatch({
                     type: mainAction.createSingleChatSuccess,
                     payload: item
                 });
-            }).onFail(function(error) {
-                if(error.code == 882002){
+            }).onFail((error) => {
+                if (error.code === 882002) {
                     that.store$.dispatch({
                         type: mainAction.createSingleChatShow,
                         payload: {
@@ -324,7 +317,7 @@ export class MainEffect {
                             info: '用户不存在'
                         }
                     });
-                }else{
+                } else {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
                         payload: error
@@ -336,54 +329,54 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] create single chat action useless'};
                     });
-    })
+    });
     // 创建群聊搜索联系人
     @Effect()
     private createGroupSearchAction$: Observable<Action> = this.actions$
         .ofType(mainAction.createGroupSearchAction)
         .map(toPayload)
         .switchMap((keywords) => {
-            let that = this,
-            createGroupSearchObj = global.JIM.getUserInfo({
-                'username' : keywords
-            }).onSuccess(function(data) {
-                let user = data.user_info,
-                    item = {
-                        avatar: "",
-                        avatarUrl: "",
-                        key: user.key || user.uid,
-                        mtime: user.mtime,
-                        name: user.username,
-                        nickName: user.nickname,
-                        type: 3
-                    }
-                if(user.avatar !== ""){
-                    global.JIM.getResource({'media_id' : user.avatar})
-                    .onSuccess(function(urlInfo){
+            const that = this;
+            let createGroupSearchObj = global.JIM.getUserInfo({
+                username: keywords
+            }).onSuccess((data) => {
+                let user = data.user_info;
+                let item = {
+                    avatar: '',
+                    avatarUrl: '',
+                    key: user.key || user.uid,
+                    mtime: user.mtime,
+                    name: user.username,
+                    nickName: user.nickname,
+                    type: 3
+                };
+                if (user.avatar !== '') {
+                    global.JIM.getResource({media_id: user.avatar})
+                    .onSuccess((urlInfo) => {
                         item.avatarUrl = urlInfo.url;
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
                             payload: item
                         });
-                    }).onFail(function(error){
+                    }).onFail((error) => {
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
                             payload: null
                         });
                     });
-                }else{
+                } else {
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: item
                     });
                 }
-            }).onFail(function(error) {
-                if(error.code === 882002){
+            }).onFail((error) => {
+                if (error.code === 882002) {
                     that.store$.dispatch({
                         type: mainAction.createGroupSearchComplete,
                         payload: null
                     });
-                }else{
+                } else {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
                         payload: error
@@ -394,17 +387,17 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] create group search action useless'};
                     });
-    })
+    });
     // 获取黑名单列表
     @Effect()
     private blackMenuShow$: Observable<Action> = this.actions$
         .ofType(mainAction.blackMenu)
         .map(toPayload)
         .switchMap(() => {
-            let that = this,
-            blackMenuObj = global.JIM.getBlacks()
-            .onSuccess(function(data) {
-                if(data.black_list.length === 0){
+            const that = this;
+            let blackMenuObj = global.JIM.getBlacks()
+            .onSuccess((data) => {
+                if (data.black_list.length === 0) {
                     that.store$.dispatch({
                         type: mainAction.blackMenuSuccess,
                         payload: {
@@ -414,9 +407,9 @@ export class MainEffect {
                     });
                     return ;
                 }
-                for(let black of data.black_list){
-                    global.JIM.getResource({'media_id' : black.avatar})
-                    .onSuccess(function(urlInfo){
+                for (let black of data.black_list) {
+                    global.JIM.getResource({media_id: black.avatar})
+                    .onSuccess((urlInfo) => {
                         black.avatarUrl = urlInfo.url;
                         that.store$.dispatch({
                             type: mainAction.blackMenuSuccess,
@@ -425,7 +418,7 @@ export class MainEffect {
                                 menu: data.black_list
                             }
                         });
-                    }).onFail(function(error){
+                    }).onFail((error) => {
                         that.store$.dispatch({
                             type: mainAction.blackMenuSuccess,
                             payload: {
@@ -435,7 +428,7 @@ export class MainEffect {
                         });
                     });
                 }
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -446,25 +439,25 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] black menu show useless'};
                     });
-    })
+    });
     // 移出黑名单列表
     @Effect()
     private delSingleBlack$: Observable<Action> = this.actions$
         .ofType(mainAction.delSingleBlack)
         .map(toPayload)
         .switchMap((user) => {
-            let that = this,
-            delSingleBlackObj = global.JIM.delSingleBlacks({
-                'member_usernames':[{
-                    'username': user.username,
-                    'appkey': authPayload.appKey
+            const that = this;
+            let delSingleBlackObj = global.JIM.delSingleBlacks({
+                member_usernames: [{
+                    username: user.username,
+                    appkey: authPayload.appKey
                 }]
-            }).onSuccess(function(data) {
+            }).onSuccess((data) => {
                 that.store$.dispatch({
                     type: mainAction.delSingleBlackSuccess,
                     payload: user
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -475,20 +468,20 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] delete single black useless'};
                     });
-    })
+    });
     // 加入黑名单
     @Effect()
     private addBlackListAction$: Observable<Action> = this.actions$
         .ofType(mainAction.addBlackListAction)
         .map(toPayload)
         .switchMap((active) => {
-            let that = this,
-            addBlackListObj = global.JIM.addSingleBlacks({
-                'member_usernames':[{
-                    'username': active.name || active.username,
-                    'appkey': authPayload.appKey
+            const that = this;
+            let addBlackListObj = global.JIM.addSingleBlacks({
+                member_usernames: [{
+                    username: active.name || active.username,
+                    appkey: authPayload.appKey
                 }]
-            }).onSuccess(function(data) {
+            }).onSuccess((data) => {
                 that.store$.dispatch({
                     type: mainAction.addBlackListSuccess,
                     payload: {
@@ -503,7 +496,7 @@ export class MainEffect {
                     }
                 });
                 console.log('success:' + JSON.stringify(data));
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -514,23 +507,23 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] add black list useless'};
                     });
-    })
+    });
     // 退出群聊
     @Effect()
     private exitGroupAction$: Observable<Action> = this.actions$
         .ofType(mainAction.exitGroupAction)
         .map(toPayload)
         .filter((data) => {
-            if(!data){
+            if (!data) {
                 return false;
             }else {
                 return data;
             }
         })
         .switchMap((gid) => {
-            let that = this,
-            exitGroupObj = global.JIM.exitGroup({'gid': gid})
-            .onSuccess(function(data) {
+            const that = this;
+            let exitGroupObj = global.JIM.exitGroup({gid})
+            .onSuccess((data) => {
                 that.store$.dispatch({
                     type: mainAction.exitGroupSuccess,
                     payload: {
@@ -546,31 +539,31 @@ export class MainEffect {
                         }
                     }
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error))
+                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(exitGroupObj)
                     .map(() => {
                         return {type: '[main] exit group useless'};
                     });
-    })
+    });
     // 删除群聊成员
     @Effect()
     private deleteMemberAction$: Observable<Action> = this.actions$
         .ofType(mainAction.deleteMemberAction)
         .map(toPayload)
         .switchMap((info) => {
-            let that = this,
-            deleteMember = global.JIM.delGroupMembers({
-                'gid': info.group.key,
-                'member_usernames': [
-                    {'username': info.deleteItem.username}
+            const that = this;
+            let deleteMember = global.JIM.delGroupMembers({
+                gid: info.group.key,
+                member_usernames: [
+                    {username: info.deleteItem.username}
                 ]
-            }).onSuccess(function(data) {
+            }).onSuccess((data) => {
                 that.store$.dispatch({
                     type: mainAction.deleteMemberSuccess,
                     payload: {
@@ -585,7 +578,7 @@ export class MainEffect {
                         group: info.group
                     }
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
@@ -595,51 +588,52 @@ export class MainEffect {
                     .map(() => {
                         return {type: '[main] delete group member useless'};
                     });
-    })
+    });
     // 退出登录后重新登录
     @Effect()
     private login$: Observable<Action> = this.actions$
         .ofType(mainAction.login)
         .map(toPayload)
         .switchMap((val) => {
-            let that = this,
-            timestamp = new Date().getTime(),
-            signature = util.createSignature(timestamp),
-            loginObj = global.JIM.init({
-                "appkey": authPayload.appKey,
-                "random_str": authPayload.randomStr,
-                "signature": signature,
-                "timestamp": timestamp,
-                "flag": authPayload.flag
-            }).onSuccess(function(data) {
+            let that = this;
+            let timestamp = new Date().getTime();
+            let signature = util.createSignature(timestamp);
+            let loginObj = global.JIM.init({
+                appkey: authPayload.appKey,
+                random_str: authPayload.randomStr,
+                signature,
+                timestamp,
+                flag: authPayload.flag
+            }).onSuccess((data) => {
                 global.JIM.login({
-                    'username': val.username,
-                    'password': val.password,
-                    'is_md5': val.md5
+                    username: val.username,
+                    password: val.password,
+                    is_md5: val.md5
                 })
-                .onSuccess(function(data) {
-                    if(val.reload){
+                .onSuccess((login) => {
+                    if (val.reload) {
                         window.location.reload();
                     }
-                }).onFail(function(error) {
+                }).onFail((error) => {
                     that.store$.dispatch({
                         type: indexAction.errorApiTip,
                         payload: error
                     });
-                }).onTimeout(function(data) {
-                    console.log('timeout:' + JSON.stringify(data));
                 });
-            }).onFail(function(error) {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: indexAction.errorApiTip,
                     payload: error
                 });
-            }).onTimeout(function(data) {
-                console.log(data)
-            })
+            });
             return Observable.of(loginObj)
                     .map(() => {
                         return {type: '[main] login useless'};
                     });
-    })
+    });
+    constructor(
+        private actions$: Actions,
+        private store$: Store<AppStore>,
+        private router: Router
+    ) {}
 }

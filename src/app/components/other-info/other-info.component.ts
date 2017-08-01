@@ -26,10 +26,13 @@ export class OtherInfoComponent implements OnInit, OnChanges, DoCheck {
         show: false
     };
     constructor() {
-
+        // pass
     }
-    ngOnChanges(){
-        switch(this.otherInfo.info.gender){
+    public ngOnInit() {
+        // pass
+    }
+    public ngOnChanges() {
+        switch (this.otherInfo.info.gender) {
             case 0 :
                 this.otherInfo.info.gender = '保密';
                 break;
@@ -42,26 +45,23 @@ export class OtherInfoComponent implements OnInit, OnChanges, DoCheck {
             default:
         }
     }
-    ngDoCheck(){
-        if(this.otherInfo.black && this.otherInfo.info){
-            for(let item of this.otherInfo.black){
-                if(item.username === this.otherInfo.info.username){
+    public ngDoCheck() {
+        if (this.otherInfo.black && this.otherInfo.info) {
+            for (let item of this.otherInfo.black){
+                if (item.username === this.otherInfo.info.username) {
                     this.otherInfo.info.black = 1;
                     break;
                 }
             }
         }
     }
-    public ngOnInit() {
-        
-    }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private sendMsgBtn(){
+    private sendMsgBtn() {
         let user = {
             avatar: this.otherInfo.info.avatar,
             avatarUrl: this.otherInfo.info.avatarUrl,
@@ -70,25 +70,25 @@ export class OtherInfoComponent implements OnInit, OnChanges, DoCheck {
             name: this.otherInfo.info.username,
             nickName: this.otherInfo.info.nickname,
             type: 3
-        }
+        };
         this.isShow.emit(user);
     }
-    private otherClose(event){
+    private otherClose(event) {
         event.stopPropagation();
         this.isShow.emit(false);
     }
-    private addBlack(){
-        if(this.otherInfo.info.black === 1){
+    private addBlack() {
+        if (this.otherInfo.info.black === 1) {
             this.alreadyBlack.emit();
-        }else{
-            this.addBlackList.emit(this.otherInfo.info);            
+        } else {
+            this.addBlackList.emit(this.otherInfo.info);
         }
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

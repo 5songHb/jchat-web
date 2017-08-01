@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener, ElementRef, DoCheck } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild,
+    HostListener, ElementRef, DoCheck } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
@@ -15,8 +16,8 @@ const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 })
 
 export class GroupSettingComponent implements OnInit, DoCheck {
-    @ViewChild(PerfectScrollbarComponent) componentScroll;
-    @ViewChild(PerfectScrollbarDirective) directiveScroll;
+    @ViewChild(PerfectScrollbarComponent) private componentScroll;
+    @ViewChild(PerfectScrollbarDirective) private directiveScroll;
 
     @Input()
         private groupSetting;
@@ -65,88 +66,89 @@ export class GroupSettingComponent implements OnInit, DoCheck {
 
     }
     public ngOnInit() {
+        // pass
     }
-    private stopPropagation(event){
+    public ngDoCheck() {
+        // 修改群描述时，调整群成员列表的位置
+        const header = this.elementRef.nativeElement.querySelector('#groupSettingHeader');
+        if (header) {
+            this.listTop = header.offsetHeight;
+        }
+        if (this.groupSetting.show) {
+            this.settingAnimate = 'in';
+        } else {
+            this.settingAnimate = 'void';
+        }
+    }
+    private stopPropagation(event) {
         event.stopPropagation();
         this.searchResult.show = false;
         this.searchResult.keywords = '';
     }
-    @HostListener('window:click') onWindowClick(){
+    @HostListener('window:click') private onWindowClick() {
         this.groupSetting.show = false;
         this.settingAnimate = 'void';
         this.searchResult.result = [];
         this.searchResult.show = false;
         this.elementRef.nativeElement.querySelector('#' + this.searchResult.id).value = '';
     }
-    ngDoCheck(){
-        // 修改群描述时，调整群成员列表的位置
-        const header = this.elementRef.nativeElement.querySelector('#groupSettingHeader');          
-        if(header){
-            this.listTop = header.offsetHeight;
-        }
-        if(this.groupSetting.show){
-            this.settingAnimate = 'in';
-        }else{
-            this.settingAnimate = 'void';
-        }
-    }
-    private clearInputEmit(){
+    private clearInputEmit() {
         this.searchResult.result = [];
         this.searchResult.show = false;
     }
-    private seachKeyupEmit(value){
+    private seachKeyupEmit(value) {
         this.searchResult.result = [];
-        if(value){
+        if (value) {
             this.searchResult.show = true;
             let result = [];
-            for(let member of this.groupSetting.memberList){
-                let nickNameExist = member.nickName.indexOf(value) !== -1,
-                    usernameExist = member.username.indexOf(value) !== -1;
-                if(nickNameExist || usernameExist){
+            for (let member of this.groupSetting.memberList) {
+                let nickNameExist = member.nickName.indexOf(value) !== -1;
+                let usernameExist = member.username.indexOf(value) !== -1;
+                if (nickNameExist || usernameExist) {
                     result.push(member);
                 }
             }
             this.searchResult.result = result;
-        }else{
+        } else {
             this.searchResult.show = false;
         }
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private addMemberAction(){
+    private addMemberAction() {
         this.addMember.emit();
     }
-    private closeGroupSettingAction(){
+    private closeGroupSettingAction() {
         this.settingAnimate = 'void';
         this.closeGroupSetting.emit();
     }
-    private exitGroupAction(){
+    private exitGroupAction() {
         this.exitGroup.emit(this.groupSetting.groupInfo);
     }
-    private modifyGroupDescriptionAction(){
+    private modifyGroupDescriptionAction() {
         this.modifyGroupDescription.emit();
     }
-    private modifyGroupNameAction(){
+    private modifyGroupNameAction() {
         this.modifyGroupNameShow = true;
-        setTimeout(function(){
+        setTimeout(() => {
             this.elementRef.nativeElement.querySelector('#groupSettingNameInput').focus();
-        }.bind(this), 0)
+        }, 0);
     }
-    private modifyGroupNameBlur(event){
+    private modifyGroupNameBlur(event) {
         this.modifyGroupName.emit(event.target.value);
         this.modifyGroupNameShow = false;
     }
-    private changeGroupShieldEmit(){
+    private changeGroupShieldEmit() {
         this.store$.dispatch({
             type: chatAction.changeGroupShield,
             payload: this.groupSetting.active
-        })
+        });
     }
-    private searchItemEmit(item){
-        if(item.username === global.user){
+    private searchItemEmit(item) {
+        if (item.username === global.user) {
             this.watchSelfInfo.emit();
-        }else{
+        } else {
             this.watchOtherInfo.emit({
                 username: item.username
             });
@@ -154,23 +156,23 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         this.searchResult.result = [];
         this.searchResult.show = false;
     }
-    private watchInfoAction(username){
-        if(username === global.user){
+    private watchInfoAction(username) {
+        if (username === global.user) {
             this.watchSelfInfo.emit();
-        }else{
+        } else {
             this.watchOtherInfo.emit({
-                username: username
+                username
             });
         }
     }
-    private deleteMemberAction(item){
+    private deleteMemberAction(item) {
         this.deleteMember.emit(item);
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight > event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight > event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

@@ -16,25 +16,25 @@ export class BlackMenuComponent implements OnInit {
     @Output()
         private delSingleBlack: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
      }
     public ngOnInit() {
-
+        // pass
     }
-    private blockMenuEmit(){
+    private blockMenuEmit() {
         this.blockMenuConfirm.emit();
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private delSingleBlackAction(item){
+    private delSingleBlackAction(item) {
         this.delSingleBlack.emit(item);
     }
-    private avatarLoad(event){
-        if(event.target.offsetHeight > event.target.offsetWidth){
+    private avatarLoad(event) {
+        if (event.target.offsetHeight > event.target.offsetWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

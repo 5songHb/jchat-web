@@ -6,24 +6,29 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'fileType'
 })
 export class FileTypePipe implements PipeTransform {
-  transform(ext) {
-    if(ext === ''){
+  public transform(ext) {
+    if (ext === '') {
         return 'other';
     }
-    const audio = ['wav', 'mp3', 'wma', 'midi'],
-          document = ['ppt', 'pptx', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'wps'],
-          video = ['mp4', 'mov', 'rm', 'rmvb', 'wmv', 'avi', '3gp', 'mkv'],
-          image = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];
+    const audio = ['wav', 'mp3', 'wma', 'midi'];
+    const document = ['ppt', 'pptx', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'wps'];
+    const video = ['mp4', 'mov', 'rm', 'rmvb', 'wmv', 'avi', '3gp', 'mkv'];
+    const image = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];
     let newType = '';
-    if(audio.indexOf(ext) !== -1){
+    if (audio.indexOf(ext) !== -1) {
+        // 音频
         newType = 'audio';
-    }else if(document.indexOf(ext) !== -1){
+    } else if (document.indexOf(ext) !== -1) {
+        // 文档
         newType = 'document';
-    }else if(video.indexOf(ext) !== -1){
+    } else if (video.indexOf(ext) !== -1) {
+        // 视频
         newType = 'video';
-    }else if(image.indexOf(ext) !== -1){
+    } else if (image.indexOf(ext) !== -1) {
+        // 图片
         newType = 'image';
-    }else{
+    } else {
+        // 其他
         newType = 'other';
     }
     return newType;

@@ -12,24 +12,24 @@ export class TipModalComponent implements OnInit {
     @Output()
         private modalTipEmit: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
     }
-    ngOnInit() {
+    public ngOnInit() {
         // 自动消失
-        if(this.info && this.info.success){
-            setTimeout(function(){
+        if (this.info && this.info.success) {
+            setTimeout(() => {
                 this.modalTipEmit.emit();
-            }.bind(this), 1500);
+            }, 1500);
         }
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private modalTip(event, info){
+    private modalTip(event, info) {
         event.stopPropagation();
-        if(info){
+        if (info) {
             this.modalTipEmit.emit(info);
-        }else{
+        } else {
             this.modalTipEmit.emit();
         }
     }

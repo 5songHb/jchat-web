@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class StorageService {
-    constructor(){}
+    constructor() {
+        // pass
+    }
 
     public set (key: string, data: string, useCookie ?: boolean, time ?: any, path ?: any) {
         if ( localStorage && !useCookie ) {
@@ -14,17 +16,16 @@ export class StorageService {
             }
         }
         let exp = new Date();
-        
-        if(time){
+        if (time) {
             exp.setTime(exp.getTime() + time);
-        }else{
+        } else {
             exp.setTime(exp.getTime() + 23.9 * 60 * 60 * 1000);
         }
-        if(path){
-            document.cookie = key + "=" + data + ";expires=" + exp.toUTCString() + ";path=" + path;
+        if (path) {
+            document.cookie = key + '=' + data + ';expires=' + exp.toUTCString() + ';path=' + path;
             return null;
         }
-        document.cookie = key + "=" + data + ";expires=" + exp.toUTCString();
+        document.cookie = key + '=' + data + ';expires=' + exp.toUTCString();
     }
 
     public get (key: string, useCookie ?: boolean) {
@@ -55,9 +56,9 @@ export class StorageService {
         let exp = new Date();
         exp.setTime(exp.getTime() - 1);
         let value = this.get(key);
-        if(path){
-            document.cookie = key + '=' + value + ';expires=' + exp.toUTCString()+";path=" + path;
-        }else{
+        if (path) {
+            document.cookie = key + '=' + value + ';expires=' + exp.toUTCString() + ';path=' + path;
+        } else {
             document.cookie = key + '=' + value + ';expires=' + exp.toUTCString();
         }
         return value;

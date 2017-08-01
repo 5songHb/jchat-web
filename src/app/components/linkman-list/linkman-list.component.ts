@@ -15,29 +15,30 @@ export class LinkmanListComponent implements OnInit, DoCheck {
         private selectLinkmanItemEmit: EventEmitter<any> = new EventEmitter();
     private isEmpty = false;
     constructor() {
-
+        // pass
     }
     public ngOnInit() {
+        // pass
     }
-    ngDoCheck(){
-        for(let item of this.conversation){
-            if(item.data.length > 0){
+    public ngDoCheck() {
+        for (let item of this.conversation) {
+            if (item.data.length > 0) {
                 this.isEmpty = true;
                 break;
             }
         }
     }
-    private avatarErrorIcon(event){
+    private avatarErrorIcon(event) {
         event.target.src = avatarErrorIcon;
     }
-    private selectLinkmanItem(item){
+    private selectLinkmanItem(item) {
         this.selectLinkmanItemEmit.emit(item);
     }
-    private avatarLoad(event){
-        if(event.target.naturalHeight >= event.target.naturalWidth){
+    private avatarLoad(event) {
+        if (event.target.naturalHeight >= event.target.naturalWidth) {
             event.target.style.width = '100%';
             event.target.style.height = 'auto';
-        }else{
+        } else {
             event.target.style.height = '100%';
             event.target.style.width = 'auto';
         }

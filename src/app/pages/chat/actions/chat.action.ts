@@ -4,12 +4,12 @@ export const chatAction = {
     receiveMessage: '[chat] receive message',
     receiveMessageSuccess: '[chat] receive message success',
     sendSinglePic: '[chat] send single picture',
-    sendGroupPic: '[chat] send group pic', 
+    sendGroupPic: '[chat] send group pic',
     sendSingleFile: '[chat send single file',
-    sendGroupFile: 'send group file',    
-    sendSingleMessage: '[chat] send single message',    
+    sendGroupFile: 'send group file',
+    sendSingleMessage: '[chat] send single message',
     sendGroupMessage: '[chat] send group message',
-    sendMsgComplete: 'send message complete',    
+    sendMsgComplete: 'send message complete',
     getConversation: '[chat] get conversation',
     getConversationSuccess: '[chat] get conversation success',
     getAllMessage: '[chat] get all message',
@@ -43,5 +43,6 @@ export const chatAction = {
     deleteGroupMembersEvent: '[chat] delete group members event',
     exitGroupEvent: '[chat] exit group event',
     createGroupEvent: '[chat] create group event',
-    createGroupSuccessEvent: '[chat] create group success event'
-}
+    createGroupSuccessEvent: '[chat] create group success event',
+    init: '[chat] init state'
+};

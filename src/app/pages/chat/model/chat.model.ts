@@ -44,4 +44,4 @@ export const chatInit = {
     isLoaded: false,
     currentIsActive: false,
     newMessageIsActive: false
-}
+};

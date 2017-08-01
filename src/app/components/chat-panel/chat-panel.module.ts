@@ -19,7 +19,7 @@ import {
   SanitizePipeModule
 } from '../../pipes';
 
-import { myModelDirective } from '../../directives';
+import { MyModelDirective } from '../../directives';
 import { EmojiModule } from '../emoji';
 import { HoverTipModule } from '../hover-tip';
 import { HoverEventModule } from '../../directives';
@@ -30,7 +30,7 @@ import{ StorageService } from '../../services/common';
 @NgModule({
   declarations: [
     ChatPanelComponent,
-    myModelDirective
+    MyModelDirective
   ],
   imports: [
     CommonModule,

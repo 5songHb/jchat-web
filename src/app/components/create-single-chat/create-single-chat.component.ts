@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef,
+    AfterViewInit, OnInit } from '@angular/core';
 
 @Component({
     selector: 'create-single-chat-component',
@@ -6,7 +7,7 @@ import { Component, Input, Output, EventEmitter, ElementRef, AfterViewInit, OnIn
     styleUrls: ['./create-single-chat.component.scss']
 })
 
-export class CreateSingleChatComponent implements AfterViewInit {
+export class CreateSingleChatComponent implements OnInit, AfterViewInit {
     @Input()
         private info;
     private singleName = '';
@@ -19,21 +20,22 @@ export class CreateSingleChatComponent implements AfterViewInit {
     ) {
 
     }
-    ngOnInit(){
-        
+    public ngOnInit() {
+        // pass
     }
-    ngAfterViewInit(){
+    public ngAfterViewInit() {
         this.elementRef.nativeElement.querySelector('#singleChatInput').focus();
     }
-    private createSingleChatEmit(singleName){
-        if(singleName || singleName === ''){
+    private createSingleChatEmit(singleName) {
+        if (singleName || singleName === '') {
             this.createSingleChat.emit(singleName);
-        }else{
+        } else {
             this.createSingleChat.emit();
         }
     }
-    private emptyTip(){
-        if(this.info !== '')
-        this.emptySingleChatTip.emit();
+    private emptyTip() {
+        if (this.info !== '') {
+            this.emptySingleChatTip.emit();
+        }
     }
 }

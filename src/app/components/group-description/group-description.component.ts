@@ -12,17 +12,18 @@ export class GroupDescriptionComponent implements OnInit {
     @Output()
         private updateGroupInfo: EventEmitter<any> = new EventEmitter();
     constructor() {
-
+        // pass
     }
-    ngOnInit() {
+    public ngOnInit() {
+        // pass
     }
-    private stopPropagation(event){
+    private stopPropagation(event) {
         event.stopPropagation();
     }
-    private groupAction(desc){
-        if(desc){
+    private groupAction(desc) {
+        if (desc) {
             this.updateGroupInfo.emit(desc);
-        }else{
+        } else {
             this.updateGroupInfo.emit();
         }
     }
