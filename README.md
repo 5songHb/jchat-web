@@ -2,8 +2,6 @@
 
 ![Support](https://img.shields.io/badge/support-IE11-blue.svg?style=flat)
 ![Language](http://img.shields.io/badge/language-Angular2-brightgreen.svg?style=flat)
-[![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat
-		)](http://mit-license.org)
 
 		
 ### 简介
@@ -31,7 +29,7 @@ JChat 同时具备好友模式和无好友模式：
 
 一、前提：安装 node 
 
-在命令行输入：
+web jchat安装和用法：
 
 ```
 npm install
@@ -49,6 +47,7 @@ localhost:3000
 * 整个应用使用Angular2 + webpack + gulp的技术栈，使用了Angular2中的ngrx去管理应用状态
 * 当前是jchat-web v1.0.0版本，暂无好友、免打扰等功能，相关功能将在v2.0.0实现
 * 业务事件消息，如群聊成员入群消息等，目前实现方法较为复杂，在js sdk更新版本后，v2.0.0将重写相关功能
+* 浏览器兼容性: IE11+ ， Chrome ， Firefox ， Safari，后续考虑兼容IE10
 
 ### JMessage 文档
 
