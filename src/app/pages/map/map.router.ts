@@ -1,8 +1,8 @@
 import { MapComponent } from './map.component';
-export const MAPROUTER = [{
-    path: '',
-    children: [{
+export const MAPROUTER = [
+    {
         path: '',
-        component: MapComponent
-    }]
-}];
+        component: MapComponent,
+        pathMatch: 'full'
+    }
+];

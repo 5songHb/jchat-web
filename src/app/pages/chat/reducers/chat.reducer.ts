@@ -10,11 +10,12 @@ let util = new Util();
 export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+            // 初始化satate
         case chatAction.init:
             state = Object.assign({}, chatInit, {});
             break;
-        case chatAction.getConversationSuccess:
             // 初始化会话
+        case chatAction.getConversationSuccess:
             if (payload.storage) {
                 state.conversation = payload.conversation;
                 state.messageList = payload.messageList;
@@ -29,8 +30,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 addGroupShield(state, payload.shield);
             }
             break;
-        case chatAction.getAllMessageSuccess:
             // 登陆后，离线消息同步消息列表
+        case chatAction.getAllMessageSuccess:
             state.messageList = payload;
             state.imageViewer = filterImageViewer(state);
             break;
@@ -78,8 +79,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 state.msgId = filterMsgId(state, 'update', [{key: payload.key}]);
             }
             break;
+            // 切换当前会话用户
         case chatAction.changeActivePerson:
-            // 更换当前会话用户
             clearTimer(state);
             state.activePerson = Object.assign({}, payload.item, {});
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
@@ -87,8 +88,9 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
             changeActivePerson(state);
             break;
+            // 选择联系人
         case contactAction.selectContactItem:
-
+            // 选择搜索出来的本地用户
         case mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
             clearTimer(state);
@@ -110,8 +112,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             }
             deleteConversationItem(state, payload);
             break;
-        case chatAction.getResourceUrl:
             // 获取静态资源路径
+        case chatAction.getResourceUrl:
             messageListUrl(state, payload);
             break;
             // 保存草稿
@@ -125,7 +127,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 }
             }
             break;
-            // 搜索用户
+            // 搜索本地用户
         case mainAction.searchUser:
             state.searchUserResult = searchUser(state, payload);
             break;
@@ -184,11 +186,13 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             }
             state.messageList[state.activePerson.activeIndex].groupSetting.show = payload.show;
             break;
+            // 创建单聊成功
         case mainAction.createSingleChatSuccess:
             clearTimer(state);
             state.otherInfo.info = payload;
             state.otherInfo.show = true;
             break;
+            // 创建群组成功
         case mainAction.createGroupSuccess:
             clearTimer(state);
             state.activePerson = Object.assign({}, payload, {});
@@ -197,6 +201,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             changeActivePerson(state);
             state.groupList.push(payload);
             break;
+            // 从用户的个人资料创建单聊联系人会话
         case chatAction.createOtherChat:
             clearTimer(state);
             if (payload.username) {
@@ -213,9 +218,11 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             selectUserResult(state, payload);
             changeActivePerson(state);
             break;
+            // 获取群组列表成功
         case contactAction.getGroupListSuccess:
             state.groupList = payload;
             break;
+            // 退群成功
         case mainAction.exitGroupSuccess:
             let message = state.messageList[state.activePerson.activeIndex];
             if (!message.groupSetting) {
@@ -233,6 +240,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             }
             deleteConversationItem(state, payload);
             break;
+            // 加入黑名单成功
         case mainAction.addBlackListSuccess:
             if (state.activePerson.type === 3) {
                 state.defaultPanelIsShow = true;
@@ -240,9 +248,11 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.otherInfo.show = false;
             deleteConversationItem(state, payload.deleteItem);
             break;
+            // 删除群成员成功
         case mainAction.deleteMemberSuccess:
             deleteGroupItem(state, payload);
             break;
+            // 更新群描述
         case chatAction.groupDescription:
             state.groupDeacriptionShow = payload.show;
             if (payload.data) {
@@ -250,14 +260,15 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 payload.data.group_description;
             }
             break;
+            // 更新群名
         case chatAction.groupName:
             state.activePerson.name =
             state.messageList[state.activePerson.activeIndex].groupSetting.groupInfo.name =
             payload.name;
             updateGroupName(state, payload);
             break;
+            // 显示个人信息
         case mainAction.showSelfInfo:
-            // 获取个人信息成功
             if (payload.info) {
                 state.selfInfo.info = Object.assign({}, state.selfInfo.info , payload.info);
             }
@@ -265,6 +276,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 state.selfInfo.info.avatarUrl = payload.avatar.url;
             }
             break;
+            // 或者个人信息头像url
         case chatAction.getSingleAvatarUrl:
             let msgs = state.messageList[state.activePerson.activeIndex].msgs;
             for (let item of msgs) {
@@ -273,12 +285,14 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 }
             }
             break;
+            // 添加群成员成功
         case mainAction.addGroupMemberSuccess:
             let memberList =
             state.messageList[state.activePerson.activeIndex].groupSetting.memberList;
             state.messageList[state.activePerson.activeIndex].groupSetting.memberList =
             memberList.concat(payload);
             break;
+            // 切换群屏蔽
         case chatAction.changeGroupShieldSuccess:
             for (let item of state.conversation) {
                 if (Number(payload.key) === Number(item.key)) {
@@ -291,7 +305,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
                 }
             }
             break;
-        // 群聊事件
+            // 群聊事件
         case chatAction.addGroupMembersEventSuccess:
             groupMembersEvent(state, payload, '被添加进群聊了');
             state.currentIsActive = currentIsActive(state, payload);
@@ -311,13 +325,15 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.currentIsActive = currentIsActive(state, payload);
             deleteGroupMembersEvent(state, payload);
             break;
-        // 获取voice是否已经播放的状态
+            // 从localstorage获取已经播放的voice的列表
         case chatAction.getVoiceStateSuccess:
             state.voiceState = payload;
             break;
+            // 显示视频模态框
         case chatAction.playVideoShow:
             state.playVideoShow = payload;
             break;
+            // 创建群聊事件消息
         case chatAction.createGroupSuccessEvent:
             createGroupSuccessEvent(state, payload);
             break;
@@ -325,12 +341,14 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
     }
     return state;
 };
+// 判断当前用户是否是目标用户
 function currentIsActive(state, payload) {
     if (Number(state.activePerson.key) === Number(payload.gid)) {
         return true;
     }
     return false;
 }
+// 删除群成员事件
 function deleteGroupMembersEvent(state, payload) {
     for (let messageList of state.messageList) {
         if (Number(messageList.key) === Number(payload.gid)) {
@@ -346,6 +364,7 @@ function deleteGroupMembersEvent(state, payload) {
         }
     }
 }
+// 更新群名称
 function updateGroupName(state, payload) {
     for (let group of state.groupList) {
         if (Number(payload.gid) === Number(group.gid)) {
@@ -379,7 +398,6 @@ function clearTimer(state: ChatStore) {
         }
     }
 }
-
 // 被添加进群时更新群成员
 function updateGroupMembers(state: ChatStore, payload) {
     for (let messageList of state.messageList) {
@@ -423,6 +441,7 @@ function createGroupSuccessEvent(state, payload) {
         ]
     });
 }
+// 给群聊事件添加最近一条聊天消息
 function isRecentmsg(state, payload, addGroupOther, operation) {
     let flag = false;
     for (let messageList of state.messageList) {
@@ -698,6 +717,7 @@ function completionMessageList(state: ChatStore) {
         }
     }
 }
+// 添加群屏蔽
 function addGroupShield(state: ChatStore, shield) {
     for (let shieldItem of shield) {
         for (let conversation of state.conversation) {
@@ -708,6 +728,7 @@ function addGroupShield(state: ChatStore, shield) {
         }
     }
 }
+// 过滤出当前图片预览的数组
 function filterImageViewer(state: ChatStore) {
     let messageList = state.messageList[state.activePerson.activeIndex];
     if (state.activePerson.activeIndex < 0 || !messageList || !messageList.msgs) {
@@ -730,6 +751,7 @@ function filterImageViewer(state: ChatStore) {
     }
     return imgResult;
 }
+// 切换当前会话用户
 function changeActivePerson(state: ChatStore) {
     if (state.activePerson.type === 4 && state.activePerson.gid) {
         state.activePerson.key = state.activePerson.gid;
@@ -775,6 +797,7 @@ function changeActivePerson(state: ChatStore) {
     }
     state.imageViewer = filterImageViewer(state);
 }
+// 添加最近一条聊天消息
 function filterRecentMsg(state: ChatStore) {
     for (let conversation of state.conversation) {
         for (let messageList of state.messageList) {
@@ -790,6 +813,7 @@ function filterRecentMsg(state: ChatStore) {
         }
     }
 }
+// 更新msgId(用来判断消息未读数量)
 function filterMsgId(state: ChatStore, operation: string, payload?) {
     if (operation === 'init') {
         let msgId = [];
@@ -861,6 +885,7 @@ function sortGroupMember(memberList) {
         }
     }
 }
+// 初始化消息未读数量
 function unreadNum(state: ChatStore, payload) {
     if (!payload.msgId) {
         return ;
@@ -931,7 +956,7 @@ function unreadNum(state: ChatStore, payload) {
         }
     }
 }
-// 完成消息的发送接口的调用后返回状态
+// 完成消息的发送接口的调用后，返回成功或者失败状态
 function sendMsgComplete(state: ChatStore, payload) {
     for (let messageList of state.messageList) {
         if (Number(messageList.key) === Number(payload.key)) {

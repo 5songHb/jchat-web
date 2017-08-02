@@ -9,37 +9,45 @@ let util = new Util();
 export const contactReducer = (state: ContactStore = contactInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+            // 初始化state
         case contactAction.init:
             state = Object.assign({}, contactInit, {});
             break;
+            // 成功获取群列表
         case contactAction.getGroupListSuccess:
             state.groupList = util.sortByLetter(payload);
             break;
+            // 创建群聊事件
         case chatAction.createGroupSuccessEvent:
-
+            // 创建群组
         case mainAction.createGroupSuccess:
             state.groupList = util.insertSortByLetter(state.groupList, payload);
             state.conversation = flagGroup(util.insertSortByLetter(state.conversation, payload));
             break;
+            // 从chatState获取conversation
         case chatAction.dispatchConversationList:
             state.conversation = flagGroup(util.sortByLetter(payload));
             break;
+            // 接收消息
         case chatAction.receiveMessageSuccess:
             addStranger(state, payload);
             break;
+            // 创建单聊成功
         case mainAction.createSingleChatSuccess:
             if (!isSingleExist(state, payload)) {
                 state.conversation =
                     flagGroup(util.insertSortByLetter(state.conversation, payload));
             }
             break;
+            // 退群成功
         case mainAction.exitGroupSuccess:
             exitGroup(state, payload);
             break;
+            // 删除本地会话
         case chatAction.deleteConversationItem:
             addInfoToGroup(state, payload);
             break;
-        // 修改群名称后重新排序
+            // 修改群名称后重新排序
         case chatAction.updateContactInfo:
             state.groupList = util.sortByLetter(payload.groupList);
             state.conversation = flagGroup(util.sortByLetter(payload.conversation));

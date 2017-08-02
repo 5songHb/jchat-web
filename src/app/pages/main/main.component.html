@@ -43,7 +43,6 @@
     <black-menu-component [hidden]="!blackMenu.show" [menuInfo]="blackMenu.menu" (blockMenuConfirm)="blackMenuConfirmEmit()" (delSingleBlack)="delSingleBlackEmit($event)"></black-menu-component>
     <logout-kick-component *ngIf="logoutKick.show" [info]="logoutKick.info" (modalTipEmit)="logoutKickEmit($event)"></logout-kick-component>
 </div>
-
 <div class="copyright-container">
     <img src="../../../assets/images/copyright.png" alt="">
     <p>

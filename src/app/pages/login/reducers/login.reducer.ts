@@ -40,6 +40,7 @@ export const loginReducer = (state: LoginStore = loginInit, {type, payload}) => 
     }
     return state;
 };
+// 判断按钮是否可以点击的状态
 function isButtonAvailable(state, payload) {
     if (payload.password.length > 0 && payload.username.length > 0) {
         state.isButtonAvailable = true;

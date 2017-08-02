@@ -4,7 +4,7 @@ import { Actions, Effect, toPayload } from '@ngrx/effects';
 import { Store, Action } from '@ngrx/store';
 import { Http } from '@angular/Http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { indexAction } from '../../index/actions';
+import { appAction } from '../../../actions';
 
 import { global, authPayload } from '../../../services/common';
 import { AppStore } from '../../../app.store';
@@ -46,7 +46,7 @@ export class ContactEffect {
                             });
                         }).onFail((error) => {
                             that.store$.dispatch({
-                                type: indexAction.errorApiTip,
+                                type: appAction.errorApiTip,
                                 payload: error
                             });
                             group.name = '#群名获取失败';
@@ -65,7 +65,7 @@ export class ContactEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));

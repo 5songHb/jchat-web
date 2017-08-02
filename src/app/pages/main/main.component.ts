@@ -262,12 +262,14 @@ export class MainComponent implements OnInit, OnDestroy {
 
         }
     }
+    // 切换聊天面板和联系人面板
     private changeListTab(index) {
         this.store$.dispatch({
             type: mainAction.changeListTab,
             payload: index
         });
     }
+    // 获取个人信息
     private getSelfInfo(event) {
         this.store$.dispatch({
             type: mainAction.showSelfInfo,
@@ -276,6 +278,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 个人信息模态框里传递的事件
     private selfInfoEmit(newInfo) {
         if (!newInfo) {
             this.store$.dispatch({
@@ -298,6 +301,7 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 创建群聊
     private createGroupEmit(info) {
         if (info && info.add) {
             this.store$.dispatch({
@@ -319,6 +323,7 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 修改密码
     private modifyPasswordEmit(info) {
         if (info) {
             this.store$.dispatch({
@@ -401,6 +406,7 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 清空单聊模态框错误提示
     private emptySingleChatTipEmit() {
         this.store$.dispatch({
             type: mainAction.emptySingleChatTip,
@@ -419,6 +425,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 加入黑名单列表
     private delSingleBlackEmit(user) {
         this.store$.dispatch({
             type: mainAction.delSingleBlack,
@@ -476,6 +483,7 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 点击左下角 创建按钮
     private chatMenuShow(event) {
         event.stopPropagation();
         this.settingMenu.show = false;
@@ -505,6 +513,7 @@ export class MainComponent implements OnInit, OnDestroy {
         }
         this.chatMenu.show = false;
     }
+    // 点击左下角设置按钮
     private settingMenuShow(event) {
         event.stopPropagation();
         this.chatMenu.show = false;
@@ -577,6 +586,7 @@ export class MainComponent implements OnInit, OnDestroy {
             this.router.navigate(['/login']);
         }
     }
+    // 选择的不是图片
     private selectIsNotImageEmit() {
         this.store$.dispatch({
             type: mainAction.showModalTip,

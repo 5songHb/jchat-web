@@ -7,6 +7,7 @@ import { chatAction } from '../../chat/actions';
 export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+            // 初始化state
         case mainAction.init:
             state = Object.assign({}, mainInit, {});
             break;
@@ -23,22 +24,23 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
                 state.selfInfo.info.avatarUrl = payload.avatar.url;
             }
             break;
-        case mainAction.changeListTab:
             // 切换好友或者最近列表
+        case mainAction.changeListTab:
             state.listTab = payload;
             break;
         case contactAction.selectContactItem:
             state.listTab = 0;
             break;
-        case mainAction.createGroupShow:
             // 是否显示创建群组模块
+        case mainAction.createGroupShow:
             state.createGroup = payload;
             break;
-        case mainAction.createGroupSuccess:
             // 创建群组成功
+        case mainAction.createGroupSuccess:
             state.createGroup.show = false;
             state.listTab = 0;
             break;
+            // 添加群成员成功
         case mainAction.addGroupMemberSuccess:
             state.createGroup.show = false;
             state.listTab = 0;
@@ -47,9 +49,11 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
         case mainAction.modifyPasswordShow:
             state.modifyPasswordShow = payload;
             break;
+            // 搜索本地用户成功
         case chatAction.searchUserSuccess:
             state.searchUserResult = payload;
             break;
+            // 选择搜索出来的本地用户
         case mainAction.selectSearchUser:
             state.listTab = 0;
             state.searchUserResult = {
@@ -84,6 +88,7 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
             };
             state.listTab = 0;
             break;
+            // 清除单聊模态框的提示信息
         case mainAction.emptySingleChatTip:
             state.createSingleChat.info = payload.info;
             break;
@@ -99,12 +104,15 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
         case mainAction.hideBlackMenu:
             state.blackMenu = payload;
             break;
+            // 删除黑名单列表
         case mainAction.delSingleBlack:
             delSingleBlackLoading(state, payload, true);
             break;
+            // 删除黑名单列表成功
         case mainAction.delSingleBlackSuccess:
             delSingleBlackLoading(state, payload, false);
             break;
+            // 被其他设备登录踢掉的提示
         case mainAction.logoutKickShow:
             state.logoutKick = payload;
             break;
@@ -112,6 +120,7 @@ export const mainReducer = (state: MainStore = mainInit, {type, payload}) => {
     }
     return state;
 };
+// 切换删除黑名单列表的loading状态
 function delSingleBlackLoading(state, payload, loadingValue) {
     for (let black of state.blackMenu.menu) {
         if (black.username === payload.username) {

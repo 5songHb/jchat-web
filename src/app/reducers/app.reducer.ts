@@ -1,4 +1,4 @@
-import { indexAction } from '../actions';
+import { appAction } from '../actions';
 interface IndexStore {
     actionType: string;
     errorApiTip: object;
@@ -12,10 +12,10 @@ let indexInit = {
 export const indexReducer = (state: IndexStore = indexInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
-        case indexAction.errorApiTip:
+        case appAction.errorApiTip:
             state.errorApiTip = payload;
             break;
-        case indexAction.tipModal:
+        case appAction.tipModal:
             state.tipModal = payload;
             break;
         default:

@@ -7,7 +7,7 @@ import { Actions, Effect, toPayload } from '@ngrx/effects';
 import { Store, Action } from '@ngrx/store';
 import { Http } from '@angular/Http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { indexAction } from '../../index/actions';
+import { appAction } from '../../../actions';
 import { global, authPayload, StorageService } from '../../../services/common';
 import { AppStore } from '../../../app.store';
 import { chatAction } from '../actions';
@@ -107,7 +107,7 @@ export class ChatEffect {
                             });
                         }
                         that.store$.dispatch({
-                            type: indexAction.errorApiTip,
+                            type: appAction.errorApiTip,
                             payload: error
                         });
                     });
@@ -337,13 +337,13 @@ export class ChatEffect {
                     });
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -386,7 +386,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -429,7 +429,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -438,7 +438,7 @@ export class ChatEffect {
                         return {type: '[chat] send group message useless'};
                     });
         });
-    // 发送单个图片
+    // 发送单聊图片
     @Effect()
     private sendSinglePic$: Observable<Action> = this.actions$
         .ofType(chatAction.sendSinglePic)
@@ -466,7 +466,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -503,7 +503,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -540,7 +540,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -577,7 +577,7 @@ export class ChatEffect {
                     }
                 });
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -655,7 +655,7 @@ export class ChatEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -687,7 +687,7 @@ export class ChatEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -717,7 +717,7 @@ export class ChatEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -754,7 +754,7 @@ export class ChatEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -779,7 +779,7 @@ export class ChatEffect {
                     });
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -792,7 +792,7 @@ export class ChatEffect {
                     });
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -916,7 +916,7 @@ export class ChatEffect {
                         });
                     }).onFail((error) => {
                         that.store$.dispatch({
-                            type: indexAction.errorApiTip,
+                            type: appAction.errorApiTip,
                             payload: error
                         });
                         that.store$.dispatch({
@@ -927,7 +927,7 @@ export class ChatEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });

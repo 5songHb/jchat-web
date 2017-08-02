@@ -11,7 +11,7 @@ import { global, authPayload } from '../../../services/common';
 import * as moment from 'moment';
 import { md5 } from '../../../services/tools';
 import { Util } from '../../../services/util';
-import { indexAction } from '../../index/actions';
+import { appAction } from '../../../actions';
 let util = new Util();
 
 @Injectable()
@@ -60,7 +60,7 @@ export class MainEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -101,7 +101,7 @@ export class MainEffect {
                     });
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -128,7 +128,7 @@ export class MainEffect {
                     });
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -171,7 +171,7 @@ export class MainEffect {
                         });
                     }).onFail((error) => {
                         that.store$.dispatch({
-                            type: indexAction.errorApiTip,
+                            type: appAction.errorApiTip,
                             payload: error
                         });
                         console.log('error:' + JSON.stringify(error));
@@ -184,7 +184,7 @@ export class MainEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -211,7 +211,7 @@ export class MainEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -257,7 +257,7 @@ export class MainEffect {
                 console.log(data);
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -319,7 +319,7 @@ export class MainEffect {
                     });
                 } else {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 }
@@ -378,7 +378,7 @@ export class MainEffect {
                     });
                 } else {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 }
@@ -430,7 +430,7 @@ export class MainEffect {
                 }
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -459,7 +459,7 @@ export class MainEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -498,7 +498,7 @@ export class MainEffect {
                 console.log('success:' + JSON.stringify(data));
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -541,7 +541,7 @@ export class MainEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
                 console.log('error:' + JSON.stringify(error));
@@ -580,7 +580,7 @@ export class MainEffect {
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });
@@ -589,7 +589,7 @@ export class MainEffect {
                         return {type: '[main] delete group member useless'};
                     });
     });
-    // 退出登录后重新登录
+    // 被踢后重新登录
     @Effect()
     private login$: Observable<Action> = this.actions$
         .ofType(mainAction.login)
@@ -616,13 +616,13 @@ export class MainEffect {
                     }
                 }).onFail((error) => {
                     that.store$.dispatch({
-                        type: indexAction.errorApiTip,
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
             }).onFail((error) => {
                 that.store$.dispatch({
-                    type: indexAction.errorApiTip,
+                    type: appAction.errorApiTip,
                     payload: error
                 });
             });

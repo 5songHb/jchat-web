@@ -72,6 +72,7 @@ export class ContactComponent implements OnInit, OnDestroy {
             default:
         }
     }
+    // 点击联系人
     private selectContactItemEmit(item) {
         if (!item.type) {
             item.group = true;

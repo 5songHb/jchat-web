@@ -6,8 +6,6 @@ import { RouterModule } from '@angular/router';
 import { MAPROUTER } from './map.router';
 import { MapComponent } from './map.component';
 
-console.log('`List` bundle loaded asynchronously');
-
 @NgModule({
   declarations: [
     // Components / Directives/ Pipes

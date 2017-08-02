@@ -1,8 +1,8 @@
 import { LoginComponent } from './login.component';
-export const LOGIN_ROUTER = [{
-    path: '',
-    children: [{
+export const LOGIN_ROUTER = [
+    {
         path: '',
-        component: LoginComponent
-    }]
-}];
+        component: LoginComponent,
+        pathMatch: 'full'
+    }
+];

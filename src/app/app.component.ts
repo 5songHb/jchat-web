@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { indexAction } from './actions';
-import { global } from '../../services/common/global';
-import '../../../assets/static/js/jmessage-sdk-web.2.3.0.1.min.js';
+import { appAction } from './actions';
+import { global } from './services/common/global';
+import '../assets/static/js/jmessage-sdk-web.2.3.0.1.min.js';
 declare function JMessage(obj ?: Object): void;
 
 @Component({
     selector: 'my-app',
-    templateUrl: './index.component.html',
-    styleUrls: ['./index.component.scss']
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
     private indexStream$;
@@ -25,11 +25,11 @@ export class AppComponent implements OnInit, OnDestroy {
         this.indexStream$ = this.store$.select((state) => {
             let indexState = state['indexReducer'];
             switch (indexState.actionType) {
-                case indexAction.errorApiTip:
+                case appAction.errorApiTip:
                     console.log('errorAipTip', indexState.errorApiTip);
                     this.errorApiTip(indexState.errorApiTip);
                     break;
-                case indexAction.tipModal:
+                case appAction.tipModal:
                     this.tipModal = indexState.tipModal;
                     break;
                 default:
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     private modalTipEmit() {
         this.store$.dispatch({
-            type: indexAction.tipModal,
+            type: appAction.tipModal,
             payload: {
                 show: false,
                 info: {}
@@ -229,7 +229,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 tip = '操作失败';
         }
         this.store$.dispatch({
-            type: indexAction.tipModal,
+            type: appAction.tipModal,
             payload: {
                 show: true,
                 info: {

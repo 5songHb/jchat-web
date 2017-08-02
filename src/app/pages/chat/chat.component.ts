@@ -462,6 +462,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
         }
     }
+    // 存储消息id(用来计算消息未读数)
     private storageMsgId(msgId) {
         this.storageKey = 'msgId' + global.user;
         this.storageService.set(this.storageKey, JSON.stringify(msgId));
@@ -511,6 +512,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 删除本地会话列表
     private deleteConversationItemEmit(item) {
         this.store$.dispatch({
             type: chatAction.deleteConversationItem,
@@ -519,9 +521,9 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 发送文本消息
     private sendMsgEmit(data) {
         // repeatSend = true重发消息
-        // 发送单聊消息
         /**
          * success
          * 取值 状态
@@ -542,6 +544,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             success: 1,
             msgKey: this.msgKey ++
         };
+        // 发送单聊消息
         if (this.active.type === 3 && !data.repeatSend) {
             let singleMsg = {
                 target_username: this.active.name,
@@ -595,6 +598,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 发送图片消息
     private sendPicEmit(data) {
         let msgs;
         const that = this;
@@ -621,7 +625,6 @@ export class ChatComponent implements OnInit, OnDestroy {
             });
             return ;
         }
-        // 发送消息
         this.util.imgReader(file, () => {
             that.store$.dispatch({
                 type: mainAction.showModalTip,
@@ -691,7 +694,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
     private sendFileEmit(data) {
         // repeatSend = true重发消息
-        // 发送单聊文件
         let msgs;
         if (!data.repeatSend) {
             const ext = this.util.getExt(data.fileData.name);
@@ -714,6 +716,7 @@ export class ChatComponent implements OnInit, OnDestroy {
                 msgKey: this.msgKey ++
             };
         }
+        // 发送单聊文件
         if (this.active.type === 3 && !data.repeatSend) {
             const ext = this.util.getExt(data.fileData.name);
             let singleFile = {
@@ -778,12 +781,14 @@ export class ChatComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 保存草稿
     private saveDraftEmit(tempArr) {
         this.store$.dispatch({
             type: chatAction.saveDraft,
             payload: tempArr
         });
     }
+    // 查看用户个人信息
     private watchOtherInfoEmit(info) {
         this.store$.dispatch({
             type: chatAction.watchOtherInfo,
@@ -793,6 +798,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 查看个人信息
     private watchSelfInfoEmit() {
         this.store$.dispatch({
             type: mainAction.showSelfInfo,
@@ -801,6 +807,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 用户信息面板中，关闭面板或者建立单聊
     private OtherInfoEmit(item) {
         if (item && Number(item.key) !== Number(this.active.key)) {
             this.store$.dispatch({
@@ -816,6 +823,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 查看群设置
     private groupSettingEmit() {
         this.store$.dispatch({
             type: chatAction.groupSetting,
@@ -826,6 +834,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 关闭群设置
     private closeGroupSettingEmit() {
         this.store$.dispatch({
             type: chatAction.groupSetting,
@@ -834,6 +843,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 退出群聊
     private exitGroupEmit(groupInfo) {
         this.store$.dispatch({
             type: mainAction.showModalTip,
@@ -848,6 +858,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 添加黑名单
     private addBlackListEmit(otherInfo) {
         this.store$.dispatch({
             type: mainAction.showModalTip,
@@ -862,6 +873,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 删除群成员
     private deleteMemberEmit(item) {
         this.store$.dispatch({
             type: mainAction.showModalTip,
@@ -877,6 +889,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 显示群描述模态框
     private modifyGroupDescriptionEmit() {
         this.store$.dispatch({
             type: chatAction.groupDescription,
@@ -885,6 +898,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 更新群信息
     private updateGroupInfoEmit(newGroupInfo) {
         if (newGroupInfo) {
             this.store$.dispatch({
@@ -900,6 +914,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             });
         }
     }
+    // 多人会话
     private addGroupEmit() {
         this.store$.dispatch({
             type: mainAction.createGroupShow,
@@ -913,6 +928,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 添加群成员
     private addMemberEmit() {
         this.store$.dispatch({
             type: mainAction.createGroupShow,
@@ -926,6 +942,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 修改群名
     private modifyGroupNameEmit(newGroupName) {
         let groupSetting = Object.assign({}, this.groupSetting.groupInfo,
             {name: newGroupName, actionType: 'modifyName'});
@@ -934,6 +951,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             payload: groupSetting
         });
     }
+    // 显示视频模态框
     private playVideoEmit(url) {
         this.store$.dispatch({
             type: chatAction.playVideoShow,
@@ -943,6 +961,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 关闭视频模态框
     private closeVideoEmit() {
         this.store$.dispatch({
             type: chatAction.playVideoShow,
@@ -952,6 +971,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
         });
     }
+    // 用户已经存在黑名单
     private alreadyBlackEmit() {
         this.store$.dispatch({
             type: mainAction.showModalTip,
