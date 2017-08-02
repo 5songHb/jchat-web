@@ -146,10 +146,6 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     public ngOnDestroy() {
         this.mainStream$.unsubscribe();
-        // this.store$.dispatch({
-        //     type: mainAction.logoutAction,
-        //     payload: null
-        // });
     }
     @HostListener('window:click') private onClickWindow() {
         this.settingMenu.show = false;
@@ -200,9 +196,11 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.isModifyPasswordShow = mainState.modifyPasswordShow.show;
                 if (mainState.modifyPasswordShow.repeatLogin !== '') {
                     global.password = mainState.modifyPasswordShow.repeatLogin;
-                    let time = 5 * 60 * 1000;
-                    this.storageService.set(md5('afterFiveMinutes-username'), global.user, true, time);
-                    this.storageService.set(md5('afterFiveMinutes-password'), global.password, true, time);
+                    const time = 5 * 60 * 1000;
+                    const usernameKey = md5('afterFiveMinutes-username');
+                    const passwordKey = md5('afterFiveMinutes-password');
+                    this.storageService.set(usernameKey, global.user, true, time);
+                    this.storageService.set(passwordKey, global.password, true, time);
                     this.store$.dispatch({
                         type: mainAction.login,
                         payload: {

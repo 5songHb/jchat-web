@@ -73,8 +73,10 @@ function addStranger(state, payload) {
         let flag = false;
         for (let i=0;i<state.conversation.length;i++) {
             for(let j=0;j<state.conversation[i].data.length;j++){
+                let conversationKey = Number(state.conversation[i].data[j].key);
+                let messageKey = Number(payload.messages[a].from_uid);
                 let singleFlag = (payload.messages[a].msg_type === 3 &&
-                    (Number(state.conversation[i].data[j].key) === Number(payload.messages[a].from_uid)));
+                    (conversationKey === messageKey));
                 if (singleFlag) {
                     flag = true;
                     break;

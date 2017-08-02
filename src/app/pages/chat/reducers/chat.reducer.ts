@@ -1135,7 +1135,8 @@ function addMessage(state: ChatStore, payload) {
                         // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
                         if (messageList.addGroupOther &&
                             messageList.addGroupOther.length > 0) {
-                            let ctime = messageList.addGroupOther[0].ctime_ms;
+                            let addMtime = messageList.addGroupOther;
+                            let ctime = addMtime[addMtime.length - 1].ctime_ms;
                             let fiveMinutes = util.fiveMinutes(ctime, payload.messages[j].ctime_ms);
                             if (fiveMinutes) {
                                 payload.messages[j].time_show = 'today';
@@ -1143,19 +1144,20 @@ function addMessage(state: ChatStore, payload) {
                         } else {
                             payload.messages[j].time_show = 'today';
                         }
-                    }
-                    let msgMtime = msgs[msgs.length - 1].ctime_ms;
-                    if (msgs.length > 0 &&
-                        util.fiveMinutes(msgMtime, payload.messages[j].ctime_ms)) {
-                        // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
-                        if (msgs[msgs.length - 1].addGroupOther &&
-                            msgs[msgs.length - 1].addGroupOther.length > 0) {
-                            let addMtime = msgs[msgs.length - 1].addGroupOther.ctime_ms;
-                            if (util.fiveMinutes(addMtime, payload.messages[j].ctime_ms)) {
+                    } else {
+                        let msgMtime = msgs[msgs.length - 1].ctime_ms;
+                        if (msgs.length > 0 &&
+                            util.fiveMinutes(msgMtime, payload.messages[j].ctime_ms)) {
+                            // 如果有群聊事件消息在前，需要判断一下与群聊事件消息的事件间隔
+                            if (msgs[msgs.length - 1].addGroupOther &&
+                                msgs[msgs.length - 1].addGroupOther.length > 0) {
+                                let addMtime = msgs[msgs.length - 1].addGroupOther.ctime_ms;
+                                if (util.fiveMinutes(addMtime, payload.messages[j].ctime_ms)) {
+                                    payload.messages[j].time_show = 'today';
+                                }
+                            } else {
                                 payload.messages[j].time_show = 'today';
                             }
-                        } else {
-                            payload.messages[j].time_show = 'today';
                         }
                     }
                     msgs.push(payload.messages[j]);
@@ -1238,7 +1240,6 @@ function addMessage(state: ChatStore, payload) {
                 state.conversation[0].recentMsg = payload.messages[j];
             }
         }
-
     }
 }
 // 添加资源路径

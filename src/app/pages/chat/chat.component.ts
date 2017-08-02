@@ -263,6 +263,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
     }
     private stateChanged(chatState, mainState) {
+        console.log('chatState', chatState);
         let activeIndex = chatState.activePerson.activeIndex;
         let messageListActive = chatState.messageList[activeIndex];
         switch (chatState.actionType) {

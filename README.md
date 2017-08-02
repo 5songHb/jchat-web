@@ -1,6 +1,6 @@
 # JChat-web
-
-![Support](https://img.shields.io/badge/support-IE11-blue.svg?style=flat)
+![Release](https://img.shields.io/badge/release-1.0.0-blue.svg?style=flat)
+![Support](https://img.shields.io/badge/support-IE11+-blue.svg?style=flat)
 ![Language](http://img.shields.io/badge/language-Angular2-brightgreen.svg?style=flat)
 
 		
@@ -27,7 +27,7 @@ JChat 同时具备好友模式和无好友模式：
 
 ### 环境配置
 
-一、前提：安装 node 
+前提：安装 node 
 
 web jchat安装和用法：
 
