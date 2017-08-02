@@ -33,7 +33,7 @@ export class LoginEffect {
                     payload: data
                 });
             }).onTimeout((data) => {
-                console.log('timeout:' + JSON.stringify(data));
+                // pass
             });
             return Observable.of(loginObj)
                     .map((data) => {

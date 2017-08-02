@@ -16,6 +16,9 @@ const registerInit = {
 export const registerReducer = (state: RegisterStore = registerInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
+        case registerAction.initState:
+            state = Object.assign({}, registerInit, {});
+            break;
         case registerAction.register:
             break;
         case registerAction.registerSuccess:
@@ -38,20 +41,6 @@ export const registerReducer = (state: RegisterStore = registerInit, {type, payl
             break;
         case registerAction.repeatPasswordTip:
             state.repeatPasswordTip = payload;
-            break;
-        case registerAction.initState:
-            state = {
-                actionType: '',
-                isRegisterSuccess: false,
-                usernameTip: '',
-                passwordTip: '',
-                repeatPasswordTip: '',
-                isButtonAvailable: false,
-                tipModal: {
-                    show: false,
-                    info: {}
-                }
-            };
             break;
         case registerAction.emptyTip:
             switch (payload) {

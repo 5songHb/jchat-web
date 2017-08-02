@@ -150,7 +150,6 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         });
     }
     private stateChanged(chatState) {
-        console.log('chat-panel', chatState.actionType);
         switch (chatState.actionType) {
             case chatAction.receiveMessageSuccess:
                 this.messageList = chatState.messageList;

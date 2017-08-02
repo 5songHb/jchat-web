@@ -68,7 +68,6 @@ export class ContactEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(groupListObj)
                     .map(() => {

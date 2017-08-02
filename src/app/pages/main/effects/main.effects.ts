@@ -63,7 +63,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(usrInfoObj)
                     .map(() => {
@@ -174,7 +173,6 @@ export class MainEffect {
                             type: appAction.errorApiTip,
                             payload: error
                         });
-                        console.log('error:' + JSON.stringify(error));
                     });
                 } else {
                     that.store$.dispatch({
@@ -187,7 +185,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(createGroupObj)
                     .map(() => {
@@ -214,7 +211,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(addGroupMemberObj)
                     .map(() => {
@@ -254,13 +250,11 @@ export class MainEffect {
                         }
                     }
                 });
-                console.log(data);
             }).onFail((error) => {
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(passwordInfoObj)
                     .map(() => {
@@ -323,7 +317,6 @@ export class MainEffect {
                         payload: error
                     });
                 }
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(createSingleChatObj)
                     .map(() => {
@@ -433,7 +426,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(blackMenuObj)
                     .map(() => {
@@ -462,7 +454,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(delSingleBlackObj)
                     .map(() => {
@@ -495,13 +486,11 @@ export class MainEffect {
                         }
                     }
                 });
-                console.log('success:' + JSON.stringify(data));
             }).onFail((error) => {
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(addBlackListObj)
                     .map(() => {
@@ -544,7 +533,6 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
-                console.log('error:' + JSON.stringify(error));
             });
             return Observable.of(exitGroupObj)
                     .map(() => {

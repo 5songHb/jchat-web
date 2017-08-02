@@ -21,12 +21,12 @@ export const ROUTES: Routes = [
     },
     {
         path: '',
-        redirectTo: '/login',
+        redirectTo: '/main',
         pathMatch: 'full'
     },
     {
         path: '**',
-        redirectTo: '/login',
+        redirectTo: '/main',
         pathMatch: 'full'
     }
 ];

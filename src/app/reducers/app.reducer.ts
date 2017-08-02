@@ -1,15 +1,15 @@
 import { appAction } from '../actions';
-interface IndexStore {
+interface AppStore {
     actionType: string;
     errorApiTip: object;
     tipModal: object;
 }
-let indexInit = {
+let appInit = {
     actionType: '',
     errorApiTip: {},
     tipModal: {}
 };
-export const indexReducer = (state: IndexStore = indexInit, {type, payload}) => {
+export const appReducer = (state: AppStore = appInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
         case appAction.errorApiTip:

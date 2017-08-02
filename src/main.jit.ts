@@ -7,4 +7,4 @@ import { global } from './app/services/common/global';
 platformBrowserDynamic().bootstrapModule(AppModule)
   .then((componentRef: any) => {
     global.injector = componentRef.injector;
-  })
+  });

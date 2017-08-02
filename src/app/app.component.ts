@@ -11,7 +11,7 @@ declare function JMessage(obj ?: Object): void;
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-    private indexStream$;
+    private appStream$;
     private tipModal = {
         show: false,
         info: {}
@@ -22,15 +22,14 @@ export class AppComponent implements OnInit, OnDestroy {
     public ngOnInit() {
         // 创建JIM 对象
         global.JIM = new JMessage({debug: true});
-        this.indexStream$ = this.store$.select((state) => {
-            let indexState = state['indexReducer'];
-            switch (indexState.actionType) {
+        this.appStream$ = this.store$.select((state) => {
+            let appState = state['appReducer'];
+            switch (appState.actionType) {
                 case appAction.errorApiTip:
-                    console.log('errorAipTip', indexState.errorApiTip);
-                    this.errorApiTip(indexState.errorApiTip);
+                    this.errorApiTip(appState.errorApiTip);
                     break;
                 case appAction.tipModal:
-                    this.tipModal = indexState.tipModal;
+                    this.tipModal = appState.tipModal;
                     break;
                 default:
             }
@@ -40,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
         });
     }
     public ngOnDestroy() {
-        this.indexStream$.unsubscribe();
+        this.appStream$.unsubscribe();
     }
     private modalTipEmit() {
         this.store$.dispatch({

@@ -2,7 +2,6 @@ import { RegisterComponent } from './register.component';
 export const REGISTER_ROUTER = [
     {
         path: '',
-        component: RegisterComponent,
-        pathMatch: 'full'
+        component: RegisterComponent
     }
 ];

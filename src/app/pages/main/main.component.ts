@@ -146,10 +146,10 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     public ngOnDestroy() {
         this.mainStream$.unsubscribe();
-        this.store$.dispatch({
-            type: mainAction.logoutAction,
-            payload: null
-        });
+        // this.store$.dispatch({
+        //     type: mainAction.logoutAction,
+        //     payload: null
+        // });
     }
     @HostListener('window:click') private onClickWindow() {
         this.settingMenu.show = false;
@@ -168,7 +168,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.mainStream$ = this.store$.select((state) => {
             const mainState = state['mainReducer'];
             const contactState = state['contactReducer'];
-            console.log('main', mainState);
             this.stateChanged(mainState, contactState);
             return state;
         }).subscribe((state) => {
@@ -176,13 +175,11 @@ export class MainComponent implements OnInit, OnDestroy {
         });
     }
     private stateChanged(mainState, contactState) {
-        console.log('main', mainState.actionType);
         switch (mainState.actionType) {
             case contactAction.selectContactItem:
                 this.listTab = mainState.listTab;
                 break;
             case mainAction.showSelfInfo:
-                console.log(5555, this.self);
                 if (mainState.selfInfo.info) {
                     this.self.info = mainState.selfInfo.info;
                 }

@@ -83,7 +83,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         // 订阅state状态 方法2
         // this.loginStream$ = this.store$.select('loginReducer');
         // this.loginStream$.subscribe((data) => {
-        //         console.log(data);
         //         if(!data.isLoginSuccess){
         //         this.loginTip = data.loginTip;
         //     }
@@ -128,11 +127,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 that.password = '';
                 that.passwordPlaceholderText = '请输入密码';
             }
-            console.log('success:' + JSON.stringify(data));
         }).onFail((data) => {
-            console.log('error:' + JSON.stringify(data));
+            // pass
         }).onTimeout((data) => {
-            console.log(data);
+            // pass
         });
     }
     // 点击登陆、keyup.enter登陆、keyup判断button是否可用

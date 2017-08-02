@@ -37,7 +37,6 @@ export class ContactComponent implements OnInit, OnDestroy {
     private subscribeStore() {
         this.contactStream$ = this.store$.select((state) => {
             const contactState = state['contactReducer'];
-            console.log('contact', contactState);
             this.stateChanged(contactState);
             return state;
         }).subscribe((state) => {
@@ -45,7 +44,6 @@ export class ContactComponent implements OnInit, OnDestroy {
         });
     }
     private stateChanged(contactState) {
-        console.log('contact', contactState.actionType);
         switch (contactState.actionType) {
             case contactAction.getGroupListSuccess:
                 this.groupList = contactState.groupList;

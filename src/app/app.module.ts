@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 // import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { indexReducer } from './reducers';
+import { appReducer } from './reducers';
 import { loginReducer } from './pages/login/reducers';
 import { LoginEffect } from './pages/login/effects';
 import { registerReducer } from './pages/register/reducers';
@@ -36,7 +36,7 @@ import '../assets/css/common.scss';
         FormsModule,
         HttpModule,
         routing,
-        StoreModule.provideStore({ indexReducer, loginReducer, registerReducer,
+        StoreModule.provideStore({ appReducer, loginReducer, registerReducer,
             mainReducer, chatReducer, contactReducer }),
         EffectsModule.run(LoginEffect),
         EffectsModule.run(RegisterEffect),
@@ -44,6 +44,7 @@ import '../assets/css/common.scss';
         EffectsModule.run(ChatEffect),
         EffectsModule.run(ContactEffect),
         TipModalModule
+        // 是否启用ngrx调试工具
         // StoreDevtoolsModule.instrumentOnlyWithExtension(),
     ],
     declarations: [

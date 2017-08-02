@@ -36,6 +36,10 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
         private elementRef: ElementRef
     ) {}
     public ngOnInit() {
+        this.store$.dispatch({
+            type: registerAction.initState,
+            payload: null
+        });
         this.JIMInit();
         this.registerStream = this.store$.select((state) => {
             const registerState = state['registerReducer'];
@@ -58,10 +62,6 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
         this.elementRef.nativeElement.querySelector('#registerUsername').focus();
     }
     public ngOnDestroy() {
-        this.store$.dispatch({
-            type: registerAction.initState,
-            payload: null
-        });
         this.registerStream.unsubscribe();
     }
     private JIMInit() {
@@ -74,11 +74,11 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
             timestamp,
             flag: authPayload.flag
         }).onSuccess((data) => {
-            console.log('success:' + JSON.stringify(data));
+            // pass
         }).onFail((data) => {
-            console.log('error:' + JSON.stringify(data));
+            // pass
         }).onTimeout((data) => {
-            console.log(data);
+            // pass
         });
     }
     private register() {

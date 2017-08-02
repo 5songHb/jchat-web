@@ -36,7 +36,9 @@ JChat 同时具备好友模式和无好友模式：
 ```
 npm install
 ```
-依赖安装成功后：
+```
+npm run dll
+```
 ```
 npm run dev
 ```

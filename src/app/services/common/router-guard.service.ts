@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { Location, LocationStrategy, PathLocationStrategy,
-    HashLocationStrategy } from '@angular/common';
 import { StorageService } from './storage.service';
 import { global } from './global';
 import { authPayload } from './config';
@@ -15,11 +13,10 @@ export class RouterGuard implements CanActivate {
     private password = '';
     constructor(
         private router: Router,
-        private location: LocationStrategy,
         private storageService: StorageService
     ) {}
     public canActivate(): boolean | Promise<boolean> {
-        // 如果是从登陆界面跳转过来的就不执行以下代码
+        // 如果是从登陆界面跳转过来的就直接return
         if (window.location.href.match(/\/login$/g)) {
             return true;
         }
@@ -50,11 +47,10 @@ export class RouterGuard implements CanActivate {
             flag: authPayload.flag
         }).onSuccess((data) => {
             that.autoLogin(resolve);
-            console.log('success:' + JSON.stringify(data));
         }).onFail((data) => {
-            console.log('error:' + JSON.stringify(data));
+            resolve(false);
         }).onTimeout((data) => {
-            console.log(data);
+            resolve(false);
         });
     }
     private autoLogin(resolve) {
@@ -65,15 +61,12 @@ export class RouterGuard implements CanActivate {
             is_md5: true
         })
         .onSuccess((data) => {
-            console.log('success:' + JSON.stringify(data));
             global.user = data.username;
             global.password = that.password;
             resolve(true);
         }).onFail((data) => {
-            console.log('error:' + JSON.stringify(data));
             resolve(false);
         }).onTimeout((data) => {
-            console.log('timeout:' + JSON.stringify(data));
             resolve(false);
         });
     }

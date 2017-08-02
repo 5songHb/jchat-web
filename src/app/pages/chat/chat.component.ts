@@ -95,7 +95,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
         const that = this;
         global.JIM.onMsgReceive((data) => {
-            console.log('收到的消息', data);
             that.store$.dispatch({
                 type: chatAction.receiveMessage,
                 payload: {
@@ -119,10 +118,8 @@ export class ChatComponent implements OnInit, OnDestroy {
                     }
                 });
             }, 2000);
-            console.log('【disconnect】');
         });
         global.JIM.onEventNotification((data) => {
-            console.log('event', data);
             switch (data.event_type) {
                 case 1:
                     that.store$.dispatch({
@@ -156,7 +153,6 @@ export class ChatComponent implements OnInit, OnDestroy {
                 if (data.event_type >= 8 && data.event_type <= 11) {
                     that.eventArr.push(data);
                 }
-                console.log(4444, that.eventArr);
             }
             if (that.eventArr.length === 0) {
                 switch (data.event_type) {
@@ -195,7 +191,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         // 离线业务消息监听，加载完数据之后才执行
         this.isLoaded$.subscribe((isLoaded) => {
             if (isLoaded) {
-                console.log(8888, this.eventArr);
                 for (let i = 0; i < this.eventArr.length; i++) {
                     if (i === this.eventArr.length - 1) {
                         this.eventArr[i].isLast = true;
@@ -237,7 +232,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
         // 离线消息同步监听
         global.JIM.onSyncConversation((data) => {
-            console.log('离线消息列表', data);
             that.hasOffline = true;
             that.store$.dispatch({
                 type: chatAction.getAllMessage,
@@ -256,12 +250,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
     public ngOnDestroy() {
         this.chatStream$.unsubscribe();
+        this.isLoadedSubject.unsubscribe();
     }
     private subscribeStore() {
         this.chatStream$ = this.store$.select((state) => {
             const chatState = state['chatReducer'];
             const mainState = state['mainReducer'];
-            console.log('chat', chatState);
             this.stateChanged(chatState, mainState);
             return state;
         }).subscribe((state) => {
@@ -269,7 +263,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
     }
     private stateChanged(chatState, mainState) {
-        console.log('chat', chatState);
         let activeIndex = chatState.activePerson.activeIndex;
         let messageListActive = chatState.messageList[activeIndex];
         switch (chatState.actionType) {
