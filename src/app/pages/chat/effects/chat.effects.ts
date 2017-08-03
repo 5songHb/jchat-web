@@ -40,8 +40,8 @@ export class ChatEffect {
                                 type: chatAction.receiveMessageSuccess,
                                 payload: obj.data
                             });
-                            return;
                         }
+                        return;
                     }
                     global.JIM.getResource({media_id: user.user_info.avatar})
                     .onSuccess((urlInfo) => {
@@ -84,12 +84,13 @@ export class ChatEffect {
                         count ++;
                         let name = '';
                         for (let list of data.member_list) {
-                            name += (list.nickName !== '' ? list.nickName : list.username) + '、';
+                            name += ((list.nickName !== '' ? list.nickName : list.username) + '、');
                         }
                         if (name.length > 20) {
                             obj.data.messages[i].content.target_name = name.substr(0, 20);
                         } else {
-                            obj.data.messages[i].content.target_name = name;
+                            obj.data.messages[i].content.target_name =
+                                name.substr(0, name.length - 1);
                         }
                         if (count === messages.length + increase) {
                             that.store$.dispatch({
@@ -244,36 +245,7 @@ export class ChatEffect {
             }
             let conversationObj = global.JIM.getConversation()
             .onSuccess((info) => {
-                // 退出群聊的会话，如果退出群聊后还有其他人在聊天，顺序与实际不符
-                for (let conversation of info.conversations) {
-                    let flag = false;
-                    for (let dataItem of data) {
-                        if (Number(conversation.key) === Number(dataItem.key)) {
-                            conversation.lastMsgTime =
-                                dataItem.msgs[dataItem.msgs.length - 1].ctime_ms;
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (!flag) {
-                        conversation.lastMsgTime = 0;
-                    }
-                }
-                let len = info.conversations.length;
-                let maxIndex;
-                let temp;
-                for (let i = 0; i < len - 1; i++) {
-                    maxIndex = i;
-                    for (let j = i + 1; j < len; j++) {
-                        if (info.conversations[j].lastMsgTime >
-                            info.conversations[maxIndex].lastMsgTime) {
-                            maxIndex = j;
-                        }
-                    }
-                    temp = Object.assign({}, info.conversations[i], {});
-                    info.conversations[i] = Object.assign({}, info.conversations[maxIndex], {});
-                    info.conversations[maxIndex] = temp;
-                }
+                info.conversations = info.conversations.reverse();
                 // 获取头像url
                 let count = 0;
                 for (let conversation of info.conversations) {
@@ -833,6 +805,43 @@ export class ChatEffect {
                             username: userList.username
                         }).onSuccess((user) => {
                             userList.key = user.uid;
+                            if (user.user_info.avatar === '') {
+                                count ++;
+                                if (count === eventData.to_usernames.length) {
+                                    that.store$.dispatch({
+                                        type: chatAction.updateGroupMembersEvent,
+                                        payload: {
+                                            eventData
+                                        }
+                                    });
+                                }
+                            } else {
+                                global.JIM.getResource({media_id: user.user_info.avatar})
+                                .onSuccess((urlInfo) => {
+                                    userList.avatarUrl = urlInfo.url;
+                                    count ++;
+                                    if (count === eventData.to_usernames.length) {
+                                        that.store$.dispatch({
+                                            type: chatAction.updateGroupMembersEvent,
+                                            payload: {
+                                                eventData
+                                            }
+                                        });
+                                    }
+                                }).onFail((error) => {
+                                    count ++;
+                                    if (count === eventData.to_usernames.length) {
+                                        that.store$.dispatch({
+                                            type: chatAction.updateGroupMembersEvent,
+                                            payload: {
+                                                eventData
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }).onFail((error) => {
+                            count ++;
                             if (count === eventData.to_usernames.length) {
                                 that.store$.dispatch({
                                     type: chatAction.updateGroupMembersEvent,
@@ -841,31 +850,6 @@ export class ChatEffect {
                                     }
                                 });
                             }
-                            global.JIM.getResource({media_id: user.user_info.avatar})
-                            .onSuccess((urlInfo) => {
-                                userList.avatarUrl = urlInfo.url;
-                                count ++;
-                                if (count === eventData.to_usernames.length) {
-                                    that.store$.dispatch({
-                                        type: chatAction.updateGroupMembersEvent,
-                                        payload: {
-                                            eventData
-                                        }
-                                    });
-                                }
-                            }).onFail((error) => {
-                                count ++;
-                                if (count === eventData.to_usernames.length) {
-                                    that.store$.dispatch({
-                                        type: chatAction.updateGroupMembersEvent,
-                                        payload: {
-                                            eventData
-                                        }
-                                    });
-                                }
-                            });
-                        }).onFail((error) => {
-                            // pass
                         });
                     }
                 } else {
@@ -877,8 +861,7 @@ export class ChatEffect {
                             name += (member.nickName !== '' ?
                                 member.nickName : member.username) + '、';
                             for (let userList of eventData.to_usernames) {
-                                if (userList.username ===
-                                    member.username) {
+                                if (userList.username === member.username) {
                                     global.JIM.getResource({media_id: member.avatar})
                                     .onSuccess((urlInfo) => {
                                         userList.avatarUrl = urlInfo.url;
@@ -906,9 +889,9 @@ export class ChatEffect {
                             }
                         }
                         if (name.length > 20) {
-                            eventData.name = name.slice(0, 20);
+                            eventData.name = name.substr(0, 20);
                         } else {
-                            eventData.name = name.slice(0, name.length - 1);
+                            eventData.name = name.substr(0, name.length - 1);
                         }
                         that.store$.dispatch({
                             type: chatAction.addGroupMembersEventSuccess,

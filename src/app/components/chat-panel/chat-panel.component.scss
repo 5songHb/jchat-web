@@ -10,6 +10,13 @@
         .chat-panel-setting{
             height: 40px;
             line-height: 40px;
+            .chat-panel-name{
+                max-width: 80%;
+                float: left;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
             .chat-panel-username{
                 cursor: pointer;
                 &:hover{
@@ -90,6 +97,7 @@
                     padding: 2px 9px;
                     background: #F2F6FB;
                     border-radius: 5px;
+                    display: inline-block;
                 }
             }
             .chat-panel-msg{
@@ -274,6 +282,19 @@
                                 .three{
                                     height: 15px;
                                     margin-top: 11px;
+                                }
+                                .one.active, .five.active{
+                                    animation: playVoice 1.5s 0.2s infinite;
+                                    -webkit-animation: playVoice 1.5s 0.2s infinite;
+                                    -moz-animation: playVoice 1.5s 0.2s infinite;
+                                }
+                                .two.active, .four.active{
+                                    animation: playVoice 1.5s 0.2s infinite;
+                                    -webkit-animation: playVoice 1.5s 0.2s infinite;
+                                    -moz-animation: playVoice 1.5s 0.2s infinite;
+                                }
+                                span.no-active{
+                                    animation-play-state: paused;
                                 }
                             }
                         }
@@ -740,5 +761,38 @@
 @media (max-width: 900px){
     .chat-panel-text-msg{
         max-width: 300px !important;
+    }
+}
+@keyframes playVoice{
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+@-webkit-keyframes playVoice{
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+@-moz-keyframes playVoice{
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
     }
 }

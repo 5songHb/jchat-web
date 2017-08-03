@@ -160,9 +160,9 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                     } else {
                         this.msg = msg;
                     }
+                    // 经纬度转换成地图
+                    this.pointerToMap(chatState);
                 }
-                // 经纬度转换成地图
-                this.pointerToMap(chatState);
                 break;
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
@@ -253,7 +253,12 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 if (timeout) {
                     const that = this;
                     ((indexNum) => {
-                        setTimeout(() => {
+                        setTimeout(function () {
+                            if (!that.msg[indexNum] || !that.msg[indexNum].content ||
+                                !that.msg[indexNum].content.msg_body.longitude) {
+                                    clearInterval(this);
+                                    return ;
+                            }
                             that.util.theLocation({
                                 id: 'allmap' + indexNum,
                                 longitude: that.msg[indexNum].content.msg_body.longitude,
@@ -273,11 +278,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
     // 接收到地图消息渲染地图
     private pointerToMap(chatState) {
-        const single = (Number(this.active.key) === Number(chatState.newMessage.from_uid)
-            && chatState.newMessage.msg_type === 3);
-        let group = (Number(this.active.key) === Number(chatState.newMessage.from_gid)
-            && chatState.newMessage.msg_type === 4);
-        if (chatState.newMessage.content.msg_type === 'location' && (single || group)) {
+        if (chatState.newMessage.content.msg_type === 'location') {
             setTimeout(() => {
                 this.util.theLocation({
                     id: 'allmap' + (this.msg.length - 1).toString(),
@@ -515,26 +516,9 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
     private playVoice(index) {
         const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
         if (audio.paused) {
-            this.clearTimer(index);
+            this.clearVoicePlay(index);
             audio.play();
-            this.msg[index].content.playing = {
-                single: false,
-                double: false,
-                max: true
-            };
-            this.msg[index].content.timer1 = setInterval(() => {
-                this.msg[index].content.playing.double = true;
-            }, 300);
-            this.msg[index].content.timer2 = setInterval(() => {
-                this.msg[index].content.playing.single = true;
-            }, 600);
-            this.msg[index].content.timer3 = setInterval(() => {
-                this.msg[index].content.playing = {
-                    single: false,
-                    double: false,
-                    max: true
-                };
-            }, 900);
+            this.msg[index].content.playing = true;
             // 如果是未读
             if (!this.msg[index].content.havePlay) {
                 let voiceState = {
@@ -549,54 +533,38 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
             }
         } else {
             audio.pause();
-            clearInterval(this.msg[index].content.timer1);
-            clearInterval(this.msg[index].content.timer2);
-            clearInterval(this.msg[index].content.timer3);
-            this.msg[index].content.playing = {
-                single: true,
-                double: true,
-                max: true
-            };
+            this.msg[index].content.playing = false;
         }
     }
-    // 清除语音定时器
-    private clearTimer(index) {
+    // 清除语音播放
+    private clearVoicePlay(index) {
         for (let i = 0; i < this.msg.length; i++) {
             if (this.msg[i].content.msg_type === 'voice' &&
-                this.msg[i].content.timer1 && i !== index) {
-                clearInterval(this.msg[i].content.timer1);
-                clearInterval(this.msg[i].content.timer2);
-                clearInterval(this.msg[i].content.timer3);
+                this.msg[i].content.playing && i !== index) {
                 const otherAudio = this.elementRef.nativeElement.querySelector('#audio' + i);
                 otherAudio.pause();
                 otherAudio.currentTime = 0;
-                this.msg[i].content.playing = {
-                    single: true,
-                    double: true,
-                    max: true
-                };
+                this.msg[i].content.playing = false;
             }
         }
     }
     // 语音播放完成
     private voiceEnded(index) {
         const audio = this.elementRef.nativeElement.querySelector('#audio' + index);
-        clearInterval(this.msg[index].content.timer1);
-        clearInterval(this.msg[index].content.timer2);
-        clearInterval(this.msg[index].content.timer3);
-        this.msg[index].content.playing = {
-            single: true,
-            double: true,
-            max: true
-        };
+        this.msg[index].content.playing = false;
         audio.currentTime = 0;
         audio.pause();
     }
     // 视频开始加载
     private videoLoadStart(index) {
-        this.msg[index].content.timer4 = setInterval(() => {
-            if (this.msg[index].content.range < 90) {
-                this.msg[index].content.range ++;
+        const that = this;
+        this.msg[index].content.timer4 = setInterval(function () {
+            if (!that.msg[index] || !that.msg[index].content) {
+                clearInterval(this);
+                return ;
+            }
+            if (that.msg[index].content.range < 90) {
+                that.msg[index].content.range ++;
             }
         }, 100);
     }

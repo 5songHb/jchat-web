@@ -1,8 +1,8 @@
 <div class="chat-panel-container display-flex flex-direction-vertical">
     <div class="chat-panel-board flex-1 display-flex flex-direction-vertical">
         <div class="chat-panel-setting">
-            <span *ngIf="active.type === 3" (click)="watchOtherInfo(active.name)" class="chat-panel-username">{{active.nickName ? active.nickName : active.name}}</span>
-            <span *ngIf="active.type === 4">{{active.nickName ? active.nickName : active.name}}</span>
+            <span *ngIf="active.type === 3" (click)="watchOtherInfo(active.name)" class="chat-panel-username chat-panel-name">{{active.nickName ? active.nickName : active.name}}</span>
+            <span *ngIf="active.type === 4" class="chat-panel-name">{{active.nickName ? active.nickName : active.name}}</span>
             <div class="chat-panel-setting-btn" [hoverEvent]="groupConversationHover" *ngIf="active.type === 3" (click)="addGroupAction()">
                 <hover-tip-component [hidden]="!groupConversationHover.show" [hoverInfo]="groupConversationHover"></hover-tip-component>
             </div>
@@ -150,19 +150,19 @@
                                         <span class="float-right">{{i.content.msg_body.duration | floor}}''</span>
                                         <div>
                                             <p class="float-left">
-                                                <span [hidden]="i.content.playing && !i.content.playing.single" class="one float-left"></span>
+                                                <span class="one float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>
                                             </p>
                                             <p class="float-left">
-                                                <span [hidden]="i.content.playing && !i.content.playing.double" class="two float-left"></span>                                            
+                                                <span class="two float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                             </p>
                                             <p class="float-left">
-                                                <span [hidden]="i.content.playing && !i.content.playing.max" class="three float-left"></span>                                            
+                                                <span class="three float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                             </p>
                                             <p class="float-left">
-                                                <span [hidden]="i.content.playing && !i.content.playing.double" class="four float-left"></span>                                            
+                                                <span class="four float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                             </p>
                                             <p class="float-left">
-                                                <span [hidden]="i.content.playing && !i.content.playing.single" class="five float-left"></span>                                            
+                                                <span class="five float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                             </p>
                                         </div>
                                         <b *ngIf="!i.content.havePlay"></b>
@@ -281,19 +281,19 @@
                                     <span class="float-right">{{i.content.msg_body.duration | floor}}''</span>
                                     <div>
                                         <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.single" class="one float-left"></span>
+                                            <span class="one float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>
                                         </p>
                                         <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.double" class="two float-left"></span>                                            
+                                            <span class="two float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                         </p>
                                         <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.max" class="three float-left"></span>                                            
+                                            <span class="three float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                         </p>
                                         <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.double" class="four float-left"></span>                                            
+                                            <span class="four float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                         </p>
                                         <p class="float-left">
-                                            <span [hidden]="i.content.playing && !i.content.playing.single" class="five float-left"></span>                                            
+                                            <span class="five float-left" [ngClass]="{'active': i.content.playing, 'no-active': !i.content.playing}"></span>                                            
                                         </p>
                                     </div>
                                     <b *ngIf="!i.content.havePlay && global.user !== i.content.from_id"></b>

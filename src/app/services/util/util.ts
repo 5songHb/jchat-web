@@ -179,10 +179,10 @@ export class Util {
             let flag = false;
             for (let re of result) {
                 let name = (item.nickName && item.nickName !== '') ? item.nickName : item.name;
-                let firstLetter = name.charAt(0);
-                if (name === '') {
+                if (!name || name.length === 0) {
                     break;
                 }
+                let firstLetter = name.charAt(0);
                 if (name.match(/^[a-zA-Z]/)) {
                     if (firstLetter.toUpperCase() === re.letter) {
                         re.data.push(item);

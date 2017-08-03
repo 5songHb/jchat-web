@@ -217,6 +217,8 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             state.defaultPanelIsShow = false;
             selectUserResult(state, payload);
             changeActivePerson(state);
+            emptyUnreadNum(state, payload);
+            state.msgId = filterMsgId(state, 'update', [{key: state.activePerson.key}]);
             break;
             // 获取群组列表成功
         case contactAction.getGroupListSuccess:
@@ -387,14 +389,7 @@ function clearTimer(state: ChatStore) {
     let msgs = state.messageList[state.activePerson.activeIndex].msgs;
     for (let msg of msgs) {
         if (msg.content.msg_type === 'voice' && msg.content.timer1) {
-            clearInterval(msg.content.timer1);
-            clearInterval(msg.content.timer2);
-            clearInterval(msg.content.timer3);
-            msg.content.playing = {
-                single: true,
-                double: true,
-                max: true
-            };
+            msg.content.playing = false;
         }
     }
 }
@@ -440,6 +435,9 @@ function createGroupSuccessEvent(state, payload) {
             }
         ]
     });
+    if (payload.isOffline) {
+        sortConversationByRecentMsg(state);
+    }
 }
 // 给群聊事件添加最近一条聊天消息
 function isRecentmsg(state, payload, addGroupOther, operation) {
@@ -476,6 +474,30 @@ function isRecentmsg(state, payload, addGroupOther, operation) {
             conversation_time_show: util.reducerDate(payload.ctime * 1000),
             msg_type: 4
         };
+    }
+}
+function sortConversationByRecentMsg(state) {
+    for (let conversation of state.conversation) {
+        if (conversation.recentMsg) {
+            conversation.lastMsgTime = conversation.recentMsg.ctime_ms;
+        } else {
+            conversation.lastMsgTime = 0;
+        }
+    }
+    let len = state.conversation.length;
+    let maxIndex;
+    let temp;
+    for (let i = 0; i < len - 1; i++) {
+        maxIndex = i;
+        for (let j = i + 1; j < len; j++) {
+            if (state.conversation[j].lastMsgTime >
+                state.conversation[maxIndex].lastMsgTime) {
+                maxIndex = j;
+            }
+        }
+        temp = Object.assign({}, state.conversation[i], {});
+        state.conversation[i] = Object.assign({}, state.conversation[maxIndex], {});
+        state.conversation[maxIndex] = temp;
     }
 }
 // 被添加进群、移出群、退出群的事件
@@ -551,29 +573,8 @@ function groupMembersEvent(state: ChatStore, payload, operation) {
         state.conversation.unshift(conversation);
     }
     // 重新对conversation排序
-    if (payload.isLast) {
-        for (let conversation of state.conversation) {
-            if (conversation.recentMsg) {
-                conversation.lastMsgTime = conversation.recentMsg.ctime_ms;
-            } else {
-                conversation.lastMsgTime = 0;
-            }
-        }
-        let len = state.conversation.length;
-        let maxIndex;
-        let temp;
-        for (let i = 0; i < len - 1; i++) {
-            maxIndex = i;
-            for (let j = i + 1; j < len; j++) {
-                if (state.conversation[j].lastMsgTime >
-                    state.conversation[maxIndex].lastMsgTime) {
-                    maxIndex = j;
-                }
-            }
-            temp = Object.assign({}, state.conversation[i], {});
-            state.conversation[i] = Object.assign({}, state.conversation[maxIndex], {});
-            state.conversation[maxIndex] = temp;
-        }
+    if (payload.isOffline) {
+        sortConversationByRecentMsg(state);
     }
     let flag2 = true;
     for (let messageList of state.messageList){
@@ -665,8 +666,8 @@ function groupMembersEvent(state: ChatStore, payload, operation) {
                         // 如果与其之后的普通消息时间间隔小于五分钟，取消显示群聊消息之后的普通消息的时间
                         let fiveMinutes =
                         util.fiveMinutes(payload.ctime * 1000, msgs[i + 1].ctime_ms);
-                        if (!fiveMinutes && msgs[i + 1].ctime_ms.time_show) {
-                            msgs[i + 1].ctime_ms.time_show = '';
+                        if (!fiveMinutes && msgs[i + 1].time_show) {
+                            msgs[i + 1].time_show = '';
                         }
                         return ;
                     }
@@ -772,11 +773,7 @@ function changeActivePerson(state: ChatStore) {
             msg.content.range = 0;
         } else if (msg.content.msg_type === 'voice') {
             // voice 播放时的动画
-            msg.content.playing = {
-                single: true,
-                double: true,
-                max: true
-            };
+            msg.content.playing = false;
         }
     }
     // 初始化已读语音消息的状态
@@ -812,6 +809,7 @@ function filterRecentMsg(state: ChatStore) {
             }
         }
     }
+    sortConversationByRecentMsg(state);
 }
 // 更新msgId(用来判断消息未读数量)
 function filterMsgId(state: ChatStore, operation: string, payload?) {
@@ -1091,11 +1089,7 @@ function addMessage(state: ChatStore, payload) {
             }
             // 接收到语音初始化播放动画
             if (payload.messages[j].content.msg_type === 'voice') {
-                payload.messages[j].content.playing = {
-                    single: true,
-                    double: true,
-                    max: true
-                };
+                payload.messages[j].content.playing = false;
                 payload.messages[j].content.havePlay = false;
             }
             // 接收到小视频初始化loading

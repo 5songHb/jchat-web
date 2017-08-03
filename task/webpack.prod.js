@@ -28,13 +28,15 @@ module.exports = function (config, v) {
         module: {
             rules: [{
                 test: /\.ts$/,
-                loaders: [{
-                    loader: '@angularclass/hmr-loader',
-                    options: {
-                        pretty: false,
-                        prod: true
-                    }
-                }, {
+                loaders: [
+                //     {
+                //     loader: '@angularclass/hmr-loader',
+                //     options: {
+                //         pretty: false,
+                //         prodprod: true
+                //     }
+                // }, 
+                {
                     loader: 'ng-router-loader',
                     options: {
                         loader: 'async-import',

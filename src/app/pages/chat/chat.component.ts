@@ -19,7 +19,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     private isLoaded = false;
     private util: Util = new Util();
     private chatStream$;
-    private conversationList;
+    private conversationList = [];
     private messageList = [
         {
             key: 0,
@@ -85,10 +85,6 @@ export class ChatComponent implements OnInit, OnDestroy {
             payload: null
         });
         this.subscribeStore();
-        // this.store$.dispatch({
-        //     type: chatAction.getConversation,
-        //     payload: null
-        // });
         this.store$.dispatch({
             type: chatAction.getVoiceState,
             payload: 'voiceState' + global.user
@@ -149,12 +145,20 @@ export class ChatComponent implements OnInit, OnDestroy {
                 default:
             }
             // 如果是离线业务消息则存在数组里
-            if (data.ctime * 1000 < (new Date()).getTime() - 3000) {
+            if (data.ctime * 1000 < (new Date()).getTime() - 3000 && !this.isLoaded) {
                 if (data.event_type >= 8 && data.event_type <= 11) {
+                    // 在加载离线消息时离线事件消息触发了
+                    data.isOffline = true;
                     that.eventArr.push(data);
                 }
-            }
-            if (that.eventArr.length === 0) {
+            } else {
+                // 离线消息加载完了之后离线事件消息触发了
+                if (data.ctime * 1000 < (new Date()).getTime() - 3000) {
+                    data.isOffline = true;
+                // 在线事件消息
+                } else {
+                    data.isOffline = false;
+                }
                 switch (data.event_type) {
                     case 8:
                         if (data.from_username === '') {
@@ -191,37 +195,34 @@ export class ChatComponent implements OnInit, OnDestroy {
         // 离线业务消息监听，加载完数据之后才执行
         this.isLoaded$.subscribe((isLoaded) => {
             if (isLoaded) {
-                for (let i = 0; i < this.eventArr.length; i++) {
-                    if (i === this.eventArr.length - 1) {
-                        this.eventArr[i].isLast = true;
-                    }
-                    switch (this.eventArr[i].event_type) {
+                for (let item of this.eventArr) {
+                    switch (item.event_type) {
                         case 8:
-                            if (this.eventArr[i].from_username === '') {
+                            if (item.from_username === '') {
                                 that.store$.dispatch({
                                     type: chatAction.createGroupEvent,
-                                    payload: this.eventArr[i]
+                                    payload: item
                                 });
                             }
                             break;
                         case 9:
-                            if (this.eventArr[i].to_usernames[0].username !== global.user) {
+                            if (item.to_usernames[0].username !== global.user) {
                                 that.store$.dispatch({
                                     type: chatAction.exitGroupEvent,
-                                    payload: this.eventArr[i]
+                                    payload: item
                                 });
                             }
                             break;
                         case 10:
                             that.store$.dispatch({
                                 type: chatAction.addGroupMembersEvent,
-                                payload: this.eventArr[i]
+                                payload: item
                             });
                             break;
                         case 11:
                             that.store$.dispatch({
                                 type: chatAction.deleteGroupMembersEvent,
-                                payload: this.eventArr[i]
+                                payload: item
                             });
                             break;
                         default:
@@ -263,7 +264,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
     }
     private stateChanged(chatState, mainState) {
-        console.log('chatState', chatState);
         let activeIndex = chatState.activePerson.activeIndex;
         let messageListActive = chatState.messageList[activeIndex];
         switch (chatState.actionType) {
@@ -369,6 +369,9 @@ export class ChatComponent implements OnInit, OnDestroy {
             case chatAction.createOtherChat:
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
+                if (chatState.msgId.length > 0) {
+                    this.storageMsgId(chatState.msgId);
+                }
                 this.store$.dispatch({
                     type: chatAction.groupSetting,
                     payload: {
