@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { loginAction } from './actions';
+import { appAction } from '../../actions';
 import { AppStore } from '../../app.store';
 import { global, authPayload, StorageService } from '../../services/common';
 import { md5 } from '../../services/tools';
@@ -38,30 +39,27 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         // JIM 初始化
         this.JIMInit();
-        // 订阅state状态 方法1
         this.loginStream$ = this.store$.select((state) => {
             let loginState = state['loginReducer'];
             switch (loginState.actionType) {
                 case loginAction.loginSuccess:
+                    const md5Username = md5('jchat-remember-username');
+                    const md5Password = md5('jchat-remember-password');
                     // 是否记住密码
                     if (loginState.loginRemember) {
-                        let md5Username = md5('jchat-remember-username');
-                        let md5Password = md5('jchat-remember-password');
                         this.storageService.set(md5Username, loginState.userInfo.username, true);
                         this.storageService.set(md5Password, loginState.userInfo.password, true);
-                    }
-                    // 不记住密码移除cookie
-                    let rememberUsername =
-                        this.storageService.get(md5('jchat-remember-username'), true);
-                    if (!this.loginRemember && this.username === rememberUsername) {
-                        this.storageService.remove(md5('jchat-remember-username'));
-                        this.storageService.remove(md5('jchat-remember-password'));
+                    } else {
+                        // 不记住密码移除cookie
+                        const rememberUsername = this.storageService.get(md5Username, true);
+                        if (this.username === rememberUsername) {
+                            this.storageService.remove(md5Username);
+                            this.storageService.remove(md5Password);
+                        }
                     }
                     global.password = loginState.userInfo.password;
                     this.router.navigate(['main']);
-                    setTimeout(() => {
-                        this.loginLoading = false;
-                    }, 2000);
+                    this.loginLoading = false;
                     break;
                 case loginAction.isButtonAvailableAction:
                     this.isButtonAvailable = loginState.isButtonAvailable;
@@ -80,13 +78,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         }).subscribe((state) => {
             // pass
         });
-        // 订阅state状态 方法2
-        // this.loginStream$ = this.store$.select('loginReducer');
-        // this.loginStream$.subscribe((data) => {
-        //         if(!data.isLoginSuccess){
-        //         this.loginTip = data.loginTip;
-        //     }
-        // })
     }
     public ngAfterViewInit() {
         if (this.username !== '' && this.password === '') {
@@ -109,8 +100,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
             timestamp,
             flag: authPayload.flag
         }).onSuccess((data) => {
-            let username = that.storageService.get(md5('jchat-remember-username'), true);
-            let password = that.storageService.get(md5('jchat-remember-password'), true);
+            const username = that.storageService.get(md5('jchat-remember-username'), true);
+            const password = that.storageService.get(md5('jchat-remember-password'), true);
             if (username && password) {
                 that.username = username;
                 that.rememberPassword = password;
@@ -127,13 +118,20 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 that.password = '';
                 that.passwordPlaceholderText = '请输入密码';
             }
-        }).onFail((data) => {
-            // pass
+        }).onFail((error) => {
+            that.store$.dispatch({
+                type: appAction.errorApiTip,
+                payload: error
+            });
         }).onTimeout((data) => {
-            // pass
+            const error = {code: 910000};
+            that.store$.dispatch({
+                type: appAction.errorApiTip,
+                payload: error
+            });
         });
     }
-    // 点击登陆、keyup.enter登陆、keyup判断button是否可用
+    // 点击登陆、keyup.enter登陆、keyup, change判断button是否可用
     private login(event) {
         let password;
         if (this.rememberPassword) {
@@ -174,6 +172,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 payload: type
             });
         }
+        // 密码被记住后修改用户名，清空密码
         if (type === 'usernameKeyup' && this.emptyPassword) {
             this.password = '';
             this.emptyPassword = false;

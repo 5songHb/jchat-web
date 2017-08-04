@@ -224,6 +224,9 @@ export class AppComponent implements OnInit, OnDestroy {
             case 898000:
                 tip = '服务器内部错误';
                 break;
+            case 910000:
+                tip = '请求超时';
+                break;
             default:
                 tip = '操作失败';
         }

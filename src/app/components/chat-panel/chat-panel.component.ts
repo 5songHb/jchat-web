@@ -130,7 +130,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
     }
     public ngAfterViewInit() {
-        this.allPointerToMap(true);
+        this.allPointerToMap();
         this.contentDiv = this.elementRef.nativeElement.querySelector('#contentDiv');
     }
     public ngOnDestroy() {
@@ -173,7 +173,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 } else if (message && message.length <= 20) {
                     this.msg = message;
                 }
-                this.allPointerToMap(true);
+                this.allPointerToMap();
                 this.imageViewer.result = chatState.imageViewer;
                 this.voiceState = chatState.voiceState;
                 break;
@@ -219,7 +219,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 } else if (msg && msg.length <= 20) {
                     this.msg = msg;
                 }
-                this.allPointerToMap(true);
+                this.allPointerToMap();
                 this.imageViewer.result = chatState.imageViewer;
                 break;
             case chatAction.getAllMessageSuccess:
@@ -236,8 +236,8 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
     // 图片预览
     private imageViewerShow(src, index) {
         for (let i = 0; i < this.imageViewer.result.length; i++) {
-            if (this.imageViewer.result[i].index ===
-                index + (this.messageList[this.active.activeIndex].msgs.length - this.msg.length)) {
+            let messageListLength = this.messageList[this.active.activeIndex].msgs.length;
+            if (this.imageViewer.result[i].index === index + messageListLength - this.msg.length) {
                 this.imageViewer.active = Object.assign({}, this.imageViewer.result[i], {});
                 this.imageViewer.active.index = i;
                 break;
@@ -246,33 +246,25 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         this.imageViewer.show = true;
     }
     // 切换会话人渲染地图
-    private allPointerToMap(timeout: boolean, index ?: number) {
+    private allPointerToMap(index ?: number) {
         const num = index ? index : this.msg.length;
         for (let i = 0 ; i < num; i++) {
             if (this.msg[i].content.msg_type === 'location') {
-                if (timeout) {
-                    const that = this;
-                    ((indexNum) => {
-                        setTimeout(function () {
-                            if (!that.msg[indexNum] || !that.msg[indexNum].content ||
-                                !that.msg[indexNum].content.msg_body.longitude) {
-                                    clearInterval(this);
-                                    return ;
-                            }
-                            that.util.theLocation({
-                                id: 'allmap' + indexNum,
-                                longitude: that.msg[indexNum].content.msg_body.longitude,
-                                latitude: that.msg[indexNum].content.msg_body.latitude
-                            });
-                        }, 0);
-                    })(i);
-                } else {
-                    this.util.theLocation({
-                        id: 'allmap' + i,
-                        longitude: this.msg[i].content.msg_body.longitude,
-                        latitude: this.msg[i].content.msg_body.latitude
-                    });
-                }
+                const that = this;
+                ((indexNum) => {
+                    setTimeout(function () {
+                        if (!that.msg[indexNum] || !that.msg[indexNum].content ||
+                            !that.msg[indexNum].content.msg_body.longitude) {
+                                clearInterval(this);
+                                return ;
+                        }
+                        that.util.theLocation({
+                            id: 'allmap' + indexNum,
+                            longitude: that.msg[indexNum].content.msg_body.longitude,
+                            latitude: that.msg[indexNum].content.msg_body.latitude
+                        });
+                    }, 0);
+                })(i);
             }
         }
     }
@@ -488,7 +480,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                         }, 0);
                     }
                     const newLength = this.msg.length;
-                    this.allPointerToMap(true, newLength - oldLength);
+                    this.allPointerToMap(newLength - oldLength);
                     const that = this;
                     return new Promise ((resolve, reject) => {
                         setTimeout(() => {

@@ -8,6 +8,6 @@ export const registerAction = {
     password: '[register] password',
     passwordTip: '[register] password tip',
     repeatPasswordTip: '[register] repeat password tip',
-    initState: '[register] init state',
+    init: '[register] init state',
     emptyTip: '[register] empty tip'
 };

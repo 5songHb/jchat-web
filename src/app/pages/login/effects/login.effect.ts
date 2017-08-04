@@ -4,6 +4,7 @@ import { Actions, Effect, toPayload } from '@ngrx/effects';
 import { Store, Action } from '@ngrx/store';
 import { AppStore } from '../../../app.store';
 import { loginAction } from '../actions';
+import { appAction } from '../../../actions';
 import { global } from '../../../services/common/global';
 
 @Injectable()
@@ -15,8 +16,8 @@ export class LoginEffect {
         .ofType(loginAction.login)
         .map(toPayload)
         .switchMap((val) => {
-            let that = this;
-            let loginObj = global.JIM.login({
+            const that = this;
+            const loginObj = global.JIM.login({
                 username: val.username,
                 password: val.password,
                 is_md5: val.md5
@@ -27,13 +28,17 @@ export class LoginEffect {
                     type: loginAction.loginSuccess,
                     payload: val
                 });
-            }).onFail((data) => {
+            }).onFail((error) => {
                 that.store$.dispatch({
                     type: loginAction.loginFailed,
-                    payload: data
+                    payload: error
                 });
             }).onTimeout((data) => {
-                // pass
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(loginObj)
                     .map((data) => {

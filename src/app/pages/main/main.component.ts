@@ -131,13 +131,13 @@ export class MainComponent implements OnInit, OnDestroy {
         private storageService: StorageService,
         private router: Router
     ) {
+        // 避免频繁切换用户时，store的数据依然还保留上一用户的状态
         this.store$.dispatch({
             type: mainAction.init,
             payload: null
         });
     }
     public ngOnInit() {
-        let that = this;
         this.subscribeStore();
         this.store$.dispatch({
             type: mainAction.getSelfInfo,
@@ -372,6 +372,7 @@ export class MainComponent implements OnInit, OnDestroy {
         }
         // 点击确定
         if (singleName === global.user) {
+            // 如果单聊搜索到自己
             this.store$.dispatch({
                 type: mainAction.showSelfInfo,
                 payload: {
@@ -520,7 +521,7 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     private selectSettingItemEmit(item) {
         switch (item.key) {
-            case 0 :
+            case 0:
                 this.store$.dispatch({
                     type: mainAction.modifyPasswordShow,
                     payload: {
@@ -545,7 +546,7 @@ export class MainComponent implements OnInit, OnDestroy {
                             title: '退出',          // 模态框标题
                             tip: '确定要退出web jchat吗？',   // 模态框内容
                             actionType: '[main] logout show'// 哪种操作，点击确定时可以执行对应操作
-                            // success: 1 / 2               // 成功的提示框/失败的提示框，会自动消失
+                            // success: 1 / 2               // 成功的提示框/失败的提示框，1.5s后会自动消失
                         }
                     }
                 });

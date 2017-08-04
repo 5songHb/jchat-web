@@ -5,6 +5,7 @@ import { global, authPayload, StorageService } from '../../services/common';
 import { AppStore } from '../../app.store';
 import { registerAction } from './actions';
 import { Util } from '../../services/util';
+import { appAction } from '../../actions';
 
 @Component({
     selector: 'app-register',
@@ -34,12 +35,13 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
         private router: Router,
         private storageService: StorageService,
         private elementRef: ElementRef
-    ) {}
-    public ngOnInit() {
+    ) {
         this.store$.dispatch({
-            type: registerAction.initState,
+            type: registerAction.init,
             payload: null
         });
+    }
+    public ngOnInit() {
         this.JIMInit();
         this.registerStream = this.store$.select((state) => {
             const registerState = state['registerReducer'];
@@ -65,8 +67,9 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
         this.registerStream.unsubscribe();
     }
     private JIMInit() {
-        let timestamp = new Date().getTime();
-        let signature = this.util.createSignature(timestamp);
+        const that = this;
+        const timestamp = new Date().getTime();
+        const signature = this.util.createSignature(timestamp);
         global.JIM.init({
             appkey: authPayload.appKey,
             random_str: authPayload.randomStr,
@@ -75,10 +78,17 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
             flag: authPayload.flag
         }).onSuccess((data) => {
             // pass
-        }).onFail((data) => {
-            // pass
+        }).onFail((error) => {
+            that.store$.dispatch({
+                type: appAction.errorApiTip,
+                payload: error
+            });
         }).onTimeout((data) => {
-            // pass
+            const error = {code: 910000};
+            that.store$.dispatch({
+                type: appAction.errorApiTip,
+                payload: error
+            });
         });
     }
     private register() {

@@ -19,12 +19,13 @@ export class ContactComponent implements OnInit, OnDestroy {
     private conversation = [];
     constructor(
         private store$: Store<AppStore>
-    ) {}
-    public ngOnInit() {
+    ) {
         this.store$.dispatch({
             type: contactAction.init,
             payload: null
         });
+    }
+    public ngOnInit() {
         this.subscribeStore();
         this.store$.dispatch({
             type: contactAction.getGroupList,
@@ -73,7 +74,6 @@ export class ContactComponent implements OnInit, OnDestroy {
     // 点击联系人
     private selectContactItemEmit(item) {
         if (!item.type) {
-            item.group = true;
             item.type = 4;
         }
         this.store$.dispatch({

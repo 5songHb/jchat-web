@@ -182,19 +182,27 @@ export class ChatEffect {
                 global.JIM.getUserInfo({
                     username: msg.content.from_id
                 }).onSuccess((data) => {
-                    global.JIM.getResource({media_id: data.user_info.avatar})
-                    .onSuccess((urlInfo) => {
-                        msg.content.avatarUrl = urlInfo.url;
+                    if (data.user_info.avatar === '') {
+                        msg.content.avatarUrl = '';
                         that.store$.dispatch({
                             type: chatAction.getAllMessageSuccess,
                             payload: info.messageList
                         });
-                    }).onFail((error) => {
-                        that.store$.dispatch({
-                            type: chatAction.getAllMessageSuccess,
-                            payload: info.messageList
+                    } else {
+                        global.JIM.getResource({media_id: data.user_info.avatar})
+                        .onSuccess((urlInfo) => {
+                            msg.content.avatarUrl = urlInfo.url;
+                            that.store$.dispatch({
+                                type: chatAction.getAllMessageSuccess,
+                                payload: info.messageList
+                            });
+                        }).onFail((error) => {
+                            that.store$.dispatch({
+                                type: chatAction.getAllMessageSuccess,
+                                payload: info.messageList
+                            });
                         });
-                    });
+                    }
                 }).onFail((error) => {
                     that.store$.dispatch({
                         type: chatAction.getAllMessageSuccess,
@@ -361,6 +369,20 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: text.msgs.msgKey,
+                        key: text.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(msgObj)
                     .map(() => {
@@ -404,6 +426,20 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: text.msgs.msgKey,
+                        key: text.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(groupMessageObj)
                     .map(() => {
@@ -416,7 +452,7 @@ export class ChatEffect {
         .ofType(chatAction.sendSinglePic)
         .map(toPayload)
         .switchMap((img) => {
-            let that = this;
+            const that = this;
             let singlePicObj = global.JIM.sendSinglePic(img.singlePicFormData)
             .onSuccess((info, msgs) => {
                 that.store$.dispatch({
@@ -437,6 +473,20 @@ export class ChatEffect {
                         success: 3
                     }
                 });
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: img.msgs.msgKey,
+                        key: img.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -478,6 +528,20 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: img.msgs.msgKey,
+                        key: img.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(sendGroupPicObj)
                     .map(() => {
@@ -511,6 +575,20 @@ export class ChatEffect {
                         success: 3
                     }
                 });
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: file.msgs.msgKey,
+                        key: file.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -552,6 +630,20 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                that.store$.dispatch({
+                    type: chatAction.sendMsgComplete,
+                    payload: {
+                        msgKey: file.msgs.msgKey,
+                        key: file.key,
+                        success: 3
+                    }
+                });
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(sendgroupFileObj)
                     .map(() => {
@@ -588,7 +680,7 @@ export class ChatEffect {
                         }
                     });
                     that.store$.dispatch({
-                        type: '[index] error api tip',
+                        type: appAction.errorApiTip,
                         payload: error
                     });
                 });
@@ -604,28 +696,41 @@ export class ChatEffect {
                     return ;
                 }
                 if (data.user_info.avatar === '') {
-                    return ;
+                    that.store$.dispatch({
+                        type: chatAction.watchOtherInfoSuccess,
+                        payload: {
+                            info: data.user_info,
+                            show: true
+                        }
+                    });
+                } else {
+                    global.JIM.getResource({media_id: data.user_info.avatar})
+                    .onSuccess((urlInfo) => {
+                        data.user_info.avatarUrl = urlInfo.url;
+                        that.store$.dispatch({
+                            type: chatAction.watchOtherInfoSuccess,
+                            payload: {
+                                info: data.user_info,
+                                show: true
+                            }
+                        });
+                    }).onFail((error) => {
+                        that.store$.dispatch({
+                            type: chatAction.watchOtherInfoSuccess,
+                            payload: {
+                                info: data.user_info,
+                                show: true
+                            }
+                        });
+                    });
                 }
-                global.JIM.getResource({media_id: data.user_info.avatar})
-                .onSuccess((urlInfo) => {
-                    data.user_info = Object.assign({}, data.user_info, {avatarUrl: urlInfo.url});
-                    that.store$.dispatch({
-                        type: chatAction.watchOtherInfoSuccess,
-                        payload: {
-                            info: data.user_info,
-                            show: true
-                        }
-                    });
-                }).onFail((error) => {
-                    that.store$.dispatch({
-                        type: chatAction.watchOtherInfoSuccess,
-                        payload: {
-                            info: data.user_info,
-                            show: true
-                        }
-                    });
-                });
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -662,6 +767,12 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             let groupMemberObj = global.JIM.getGroupMembers({gid: info.active.key})
             .onSuccess((data) => {
@@ -688,6 +799,12 @@ export class ChatEffect {
                     }
                 }
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -729,6 +846,12 @@ export class ChatEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(groupInfoObj)
                     .map(() => {
@@ -743,7 +866,8 @@ export class ChatEffect {
         .switchMap((active) => {
             const that = this;
             if (active.shield === 'switchRight') {
-                global.JIM.delGroupShield({gid: active.key}).onSuccess((data) => {
+                global.JIM.delGroupShield({gid: active.key})
+                .onSuccess((data) => {
                     active.shield = 'switchLeft';
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
@@ -754,15 +878,28 @@ export class ChatEffect {
                         type: appAction.errorApiTip,
                         payload: error
                     });
+                }).onTimeout((data) => {
+                    const error = {code: 910000};
+                    that.store$.dispatch({
+                        type: appAction.errorApiTip,
+                        payload: error
+                    });
                 });
             } else {
-                global.JIM.addGroupShield({gid: active.key}).onSuccess((data) => {
+                global.JIM.addGroupShield({gid: active.key})
+                .onSuccess((data) => {
                     active.shield = 'switchRight';
                     that.store$.dispatch({
                         type: chatAction.changeGroupShieldSuccess,
                         payload: active
                     });
                 }).onFail((error) => {
+                    that.store$.dispatch({
+                        type: appAction.errorApiTip,
+                        payload: error
+                    });
+                }).onTimeout((data) => {
+                    const error = {code: 910000};
                     that.store$.dispatch({
                         type: appAction.errorApiTip,
                         payload: error

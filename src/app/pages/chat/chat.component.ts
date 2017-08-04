@@ -78,12 +78,13 @@ export class ChatComponent implements OnInit, OnDestroy {
         private store$: Store<AppStore>,
         private storageService: StorageService,
         private elementRef: ElementRef
-    ) {}
-    public ngOnInit() {
+    ) {
         this.store$.dispatch({
             type: chatAction.init,
             payload: null
         });
+    }
+    public ngOnInit() {
         this.subscribeStore();
         this.store$.dispatch({
             type: chatAction.getVoiceState,
@@ -101,7 +102,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
         // 异常断线监听
         global.JIM.onDisconnect(() => {
-            // 定时器是为了解决火狐下刷新时弹出断线提示
+            // 定时器是为了解决火狐下刷新时先弹出断线提示
             setTimeout(() => {
                 that.store$.dispatch({
                     type: mainAction.logoutKickShow,
@@ -325,9 +326,6 @@ export class ChatComponent implements OnInit, OnDestroy {
                 this.changeActivePerson(chatState);
                 this.defaultPanelIsShow = chatState.defaultPanelIsShow;
                 this.storageMsgId(chatState.msgId);
-                break;
-            case chatAction.getResourceUrl:
-                this.messageList = chatState.messageList;
                 break;
             case chatAction.saveDraft:
                 this.messageList = chatState.messageList;
@@ -827,6 +825,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             payload: {
                 active: this.active,
                 show: true,
+                // 是否已经请求过
                 isCache: this.messageList[this.active.activeIndex].groupSetting
             }
         });

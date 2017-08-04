@@ -4,6 +4,7 @@ import { Actions, Effect, toPayload } from '@ngrx/effects';
 import { Store, Action } from '@ngrx/store';
 import { AppStore } from '../../../app.store';
 import { registerAction } from '../actions';
+import { appAction } from '../../../actions';
 import { Http } from '@angular/Http';
 import { global } from '../../../services/common/global';
 import { md5 } from '../../../services/tools';
@@ -48,9 +49,9 @@ export class RegisterEffect {
         .switchMap((val) => {
             const that = this;
             let registerObj = global.JIM.register({
-                'username': val.username,
-                'password': md5(val.password),
-                'is_md5': true
+                username: val.username,
+                password: md5(val.password),
+                is_md5: true
             }).onSuccess((data) => {
                 that.store$.dispatch({
                     type: registerAction.registerSuccess,
@@ -74,6 +75,12 @@ export class RegisterEffect {
                 that.store$.dispatch({
                     type: registerAction.registerFailed,
                     payload: usernameTip
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
                 });
             });
             return Observable.of(registerObj)

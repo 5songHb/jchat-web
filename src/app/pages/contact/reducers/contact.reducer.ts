@@ -69,14 +69,13 @@ function exitGroup(state, payload) {
 }
 // 陌生人发消息给自己将其添加到联系人中
 function addStranger(state, payload) {
-    for (let a=0;a<payload.messages.length;a++) {
+    for (let message of payload.messages) {
         let flag = false;
-        for (let i=0;i<state.conversation.length;i++) {
-            for(let j=0;j<state.conversation[i].data.length;j++){
-                let conversationKey = Number(state.conversation[i].data[j].key);
-                let messageKey = Number(payload.messages[a].from_uid);
-                let singleFlag = (payload.messages[a].msg_type === 3 &&
-                    (conversationKey === messageKey));
+        for (let conversation of state.conversation) {
+            for (let item of conversation.data) {
+                let conversationKey = Number(item.key);
+                let messageKey = Number(message.from_uid);
+                let singleFlag = (message.msg_type === 3 && (conversationKey === messageKey));
                 if (singleFlag) {
                     flag = true;
                     break;
@@ -84,13 +83,13 @@ function addStranger(state, payload) {
             }
         }
         // 单聊
-        if (!flag && payload.messages[a].msg_type === 3) {
-            payload.messages[a].name = payload.messages[a].content.from_id;
-            payload.messages[a].type = 3;
-            payload.messages[a].avatarUrl = payload.messages[a].content.avatarUrl;
-            payload.messages[a].key = payload.messages[a].from_uid;
+        if (!flag) {
+            message.name = message.content.from_id;
+            message.type = 3;
+            message.avatarUrl = message.content.avatarUrl;
+            message.key = message.from_uid;
             state.conversation =
-                flagGroup(util.insertSortByLetter(state.conversation, payload.messages[a]));
+                flagGroup(util.insertSortByLetter(state.conversation, message));
         }
     }
 }
@@ -109,9 +108,9 @@ function addInfoToGroup(state, payload) {
 }
 // 判断是否已经存在这个单聊
 function isSingleExist(state, payload) {
-    for (let i=0;i<state.conversation.length;i++) {
-        for (let j=0;j<state.conversation[i].data.length;j++) {
-            if (Number(state.conversation[i].data[j].key) === Number(payload.key)) {
+    for (let conversation of state.conversation) {
+        for (let item of conversation) {
+            if (Number(item.key) === Number(payload.key)) {
                 return true;
             }
         }

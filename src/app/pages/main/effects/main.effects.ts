@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppStore } from '../../../app.store';
 import { mainAction } from '../actions';
 import { global, authPayload } from '../../../services/common';
-import * as moment from 'moment';
 import { md5 } from '../../../services/tools';
 import { Util } from '../../../services/util';
 import { appAction } from '../../../actions';
@@ -63,6 +62,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(usrInfoObj)
                     .map(() => {
@@ -103,6 +108,12 @@ export class MainEffect {
                         type: appAction.errorApiTip,
                         payload: error
                     });
+                }).onTimeout((data) => {
+                    const error = {code: 910000};
+                    that.store$.dispatch({
+                        type: appAction.errorApiTip,
+                        payload: error
+                    });
                 });
             return Observable.of(updateSelfInfo)
                     .map(() => {
@@ -130,6 +141,12 @@ export class MainEffect {
                         type: appAction.errorApiTip,
                         payload: error
                     });
+                }).onTimeout((data) => {
+                    const error = {code: 910000};
+                    that.store$.dispatch({
+                        type: appAction.errorApiTip,
+                        payload: error
+                    });
                 });
             return Observable.of(updateSelfAvatar)
                     .map(() => {
@@ -147,15 +164,12 @@ export class MainEffect {
                 group_name:  groupInfo.groupName,
                 group_description: groupInfo.groupDescription
             }).onSuccess((data) => {
-                data.ctime = moment().format('YYYY-MM-DD HH:mm:ss');
                 let groupObj = {
                     appkey: authPayload.appKey,
-                    ctime: data.ctime,
                     desc: data.group_description,
                     gid: data.gid,
                     mtime: data.ctime,
                     name: data.group_name,
-                    group: true,
                     type: 4
                 };
                 // 如果有其他成员
@@ -181,6 +195,12 @@ export class MainEffect {
                     });
                 }
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -211,6 +231,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(addGroupMemberObj)
                     .map(() => {
@@ -225,9 +251,9 @@ export class MainEffect {
         .switchMap((passwordInfo) => {
             const that = this;
             let passwordInfoObj = global.JIM.updateSelfPwd({
-                'old_pwd' : md5(passwordInfo.old_pwd),
-                'new_pwd': md5(passwordInfo.new_pwd),
-                'is_md5' : true
+                old_pwd: md5(passwordInfo.old_pwd),
+                new_pwd: md5(passwordInfo.new_pwd),
+                is_md5: true
             })
             .onSuccess((data) => {
                 global.JIM.loginOut();
@@ -255,6 +281,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(passwordInfoObj)
                     .map(() => {
@@ -268,9 +300,8 @@ export class MainEffect {
         .map(toPayload)
         .switchMap((singleName) => {
             const that = this;
-            let createSingleChatObj = global.JIM.getUserInfo({
-                username: singleName
-            }).onSuccess((data) => {
+            let createSingleChatObj = global.JIM.getUserInfo({username: singleName})
+            .onSuccess((data) => {
                 let user = data.user_info;
                 let item = {
                     avatar: user.avatar,
@@ -317,6 +348,12 @@ export class MainEffect {
                         payload: error
                     });
                 }
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(createSingleChatObj)
                     .map(() => {
@@ -354,7 +391,7 @@ export class MainEffect {
                     }).onFail((error) => {
                         that.store$.dispatch({
                             type: mainAction.createGroupSearchComplete,
-                            payload: null
+                            payload: item
                         });
                     });
                 } else {
@@ -375,6 +412,12 @@ export class MainEffect {
                         payload: error
                     });
                 }
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(createGroupSearchObj)
                     .map(() => {
@@ -426,6 +469,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(blackMenuObj)
                     .map(() => {
@@ -450,6 +499,12 @@ export class MainEffect {
                     payload: user
                 });
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -487,6 +542,12 @@ export class MainEffect {
                     }
                 });
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error
@@ -533,6 +594,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(exitGroupObj)
                     .map(() => {
@@ -571,6 +638,12 @@ export class MainEffect {
                     type: appAction.errorApiTip,
                     payload: error
                 });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
             });
             return Observable.of(deleteMember)
                     .map(() => {
@@ -583,9 +656,9 @@ export class MainEffect {
         .ofType(mainAction.login)
         .map(toPayload)
         .switchMap((val) => {
-            let that = this;
-            let timestamp = new Date().getTime();
-            let signature = util.createSignature(timestamp);
+            const that = this;
+            const timestamp = new Date().getTime();
+            const signature = util.createSignature(timestamp);
             let loginObj = global.JIM.init({
                 appkey: authPayload.appKey,
                 random_str: authPayload.randomStr,
@@ -609,6 +682,12 @@ export class MainEffect {
                     });
                 });
             }).onFail((error) => {
+                that.store$.dispatch({
+                    type: appAction.errorApiTip,
+                    payload: error
+                });
+            }).onTimeout((data) => {
+                const error = {code: 910000};
                 that.store$.dispatch({
                     type: appAction.errorApiTip,
                     payload: error

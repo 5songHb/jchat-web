@@ -16,7 +16,7 @@ const registerInit = {
 export const registerReducer = (state: RegisterStore = registerInit, {type, payload}) => {
     state.actionType = type;
     switch (type) {
-        case registerAction.initState:
+        case registerAction.init:
             state = Object.assign({}, registerInit, {});
             break;
         case registerAction.register:

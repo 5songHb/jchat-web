@@ -20,15 +20,14 @@ export class RouterGuard implements CanActivate {
         if (window.location.href.match(/\/login$/g)) {
             return true;
         }
-        const that = this;
         // 不是从登陆界面跳转过来的，如刷新时或者是关闭窗口五分钟内重新打开则自动登录
-        const leaveLogin = this.storageService.get(md5('afterFiveMinutes-username'), true) &&
-                this.storageService.get(md5('afterFiveMinutes-password'));
-        if (leaveLogin) {
-            this.username = this.storageService.get(md5('afterFiveMinutes-username'), true);
-            this.password = this.storageService.get(md5('afterFiveMinutes-password'), true);
+        const storageUsername = this.storageService.get(md5('afterFiveMinutes-username'), true);
+        const storagePassword = this.storageService.get(md5('afterFiveMinutes-password'), true);
+        if (storageUsername && storagePassword) {
+            this.username = storageUsername;
+            this.password = storagePassword;
             return new Promise<boolean>((resolve, reject) => {
-                that.JIMInit(resolve);
+                this.JIMInit(resolve);
             });
         } else {
             this.router.navigate(['/login']);
@@ -59,8 +58,7 @@ export class RouterGuard implements CanActivate {
             username: this.username,
             password: this.password,
             is_md5: true
-        })
-        .onSuccess((data) => {
+        }).onSuccess((data) => {
             global.user = data.username;
             global.password = that.password;
             resolve(true);

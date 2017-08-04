@@ -58,7 +58,7 @@
                             </div>
                         </div>
                         <!-- 图片消息 -->
-                        <div *ngIf="i.content.msg_type === 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 20 + 'px' : 300 + 20 + 'px' ) : i.content.msg_body.height + 20 + 'px'}" class="clearfix">
+                        <div *ngIf="i.content.msg_type === 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + (active.type === 4 ? 20 : 0) + 'px' : 300 + (active.type === 4 ? 20 : 0) + 'px' ) : i.content.msg_body.height + (active.type === 4 ? 20 : 0) + 'px'}" class="clearfix chat-panel-img">
                             <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
                                 <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
@@ -197,7 +197,7 @@
                             </div>
                         </div>
                         <!-- 图片消息 -->
-                        <div class="chat-panel-img-me clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 20 + 'px' : 300 + 20 + 'px' ) : i.content.msg_body.height + 20 + 'px'}">
+                        <div class="chat-panel-img-me chat-panel-img clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
                                 <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                                 <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">

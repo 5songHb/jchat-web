@@ -14,8 +14,6 @@ export const chatAction = {
     getConversationSuccess: '[chat] get conversation success',
     getAllMessage: '[chat] get all message',
     getAllMessageSuccess: '[chat] get all message success',
-    getResourceUrl: '[chat] get resource url',
-    getResourceUrlSuccess: '[chat] get resource url success',
     saveDraft: '[chat] save draft',
     watchOtherInfo: '[chat] watch other info',
     watchOtherInfoSuccess: '[chat] watch other info success',
