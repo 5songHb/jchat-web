@@ -18,11 +18,11 @@ JChat 无需成为好友也可以聊天
 
 目前已覆盖 [Android](https://github.com/jpush/jchat-android) 、 [iOS](https://github.com/jpush/jchat-swift) 和 web 平台，开发者可参照 JChat 快速打造自己的产品，提高开发效率。
 
-![jiguang](./images/webjchat.gif)
+![jiguang](./screenshot/webjchat.gif)
 
 ### 应用截图
 
-![jiguang](./images/webjchat2.png)
+![jiguang](./screenshot/webjchat2.png)
 
 ### 环境配置
 

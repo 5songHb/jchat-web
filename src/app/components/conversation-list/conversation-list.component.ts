@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { global } from '../../services/common';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
-const groupAvatar = require('../../../assets/images/group-avatar.png');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'conversation-list-component',
@@ -19,7 +18,6 @@ export class ConversationListComponent implements OnInit {
     @Output()
         private deleteConversationItem: EventEmitter<any> = new EventEmitter();
     private global = global;
-    private groupAvatar = groupAvatar;
     constructor() {
         // pass
     }

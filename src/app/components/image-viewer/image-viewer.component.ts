@@ -90,7 +90,7 @@ export class ImageViewerComponent implements OnInit {
         } else if (event.detail) {
             delta = event.detail > 0 ? 1 : -1;
         }
-        this.zoomTo(this.ratio + 0.2 * -delta);
+        this.zoomTo(this.ratio + 0.2 * - delta);
     }
     private imgMousedown(event) {
         this.moveFlag = true;

@@ -13,7 +13,7 @@ export interface MainStore {
         info: object;
     };
     logoutShow: boolean;
-    modifyPasswordShow: boolean;
+    modifyPasswordShow: object;
     searchUserResult: {
         result: {
             groupArr: Array<any>;

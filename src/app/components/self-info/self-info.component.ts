@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, ElementRef } from '@angular/core';
-
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 import { Util } from '../../services/util';
 
 @Component({

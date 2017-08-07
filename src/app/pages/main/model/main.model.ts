@@ -13,7 +13,10 @@ export const mainInit = {
         info: {}
     },
     logoutShow: false,
-    modifyPasswordShow: false,
+    modifyPasswordShow: {
+        repeatLogin: '',
+        show: false
+    },
     searchUserResult: {
         result: {
             singleArr: [],

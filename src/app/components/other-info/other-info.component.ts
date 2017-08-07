@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, DoCheck } from '@angular/core';
 
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'other-info-component',

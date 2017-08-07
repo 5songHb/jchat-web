@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter,ViewChild, OnInit,
+import { Component, Input, Output, EventEmitter, ViewChild, OnInit,
         OnChanges, AfterViewInit, OnDestroy, HostListener,
         ElementRef, SimpleChanges } from '@angular/core';
 import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
@@ -9,10 +9,10 @@ import { contactAction } from '../../pages/contact/actions';
 import { mainAction } from '../../pages/main/actions';
 import { global, emojiConfig, jpushConfig, imgRouter } from '../../services/common';
 import { Util } from '../../services/util';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import{ StorageService } from '../../services/common';
 import { Emoji } from '../../services/tools';
 let download = require('downloadjs');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'chat-panel-component',
@@ -20,7 +20,7 @@ let download = require('downloadjs');
     styleUrls: ['./chat-panel.component.scss']
 })
 
-export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy{
+export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
     private util: Util = new Util();
     @ViewChild(PerfectScrollbarComponent) private componentScroll;
     @Input()

@@ -11,7 +11,7 @@ import { md5 } from '../../services/tools';
 
 import { Util } from '../../services/util';
 
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'app-main',
@@ -195,20 +195,7 @@ export class MainComponent implements OnInit, OnDestroy {
             case mainAction.modifyPasswordShow:
                 this.isModifyPasswordShow = mainState.modifyPasswordShow.show;
                 if (mainState.modifyPasswordShow.repeatLogin !== '') {
-                    global.password = mainState.modifyPasswordShow.repeatLogin;
-                    const time = 5 * 60 * 1000;
-                    const usernameKey = md5('afterFiveMinutes-username');
-                    const passwordKey = md5('afterFiveMinutes-password');
-                    this.storageService.set(usernameKey, global.user, true, time);
-                    this.storageService.set(passwordKey, global.password, true, time);
-                    this.store$.dispatch({
-                        type: mainAction.login,
-                        payload: {
-                            username: global.user,
-                            password: global.password,
-                            md5: true
-                        }
-                    });
+                    this.repeatLogin(mainState);
                 }
                 break;
             case chatAction.searchUserSuccess:
@@ -256,6 +243,23 @@ export class MainComponent implements OnInit, OnDestroy {
             default:
 
         }
+    }
+    // 修改密码后重新登录
+    private repeatLogin(mainState) {
+        global.password = mainState.modifyPasswordShow.repeatLogin;
+        const time = 5 * 60 * 1000;
+        const usernameKey = md5('afterFiveMinutes-username');
+        const passwordKey = md5('afterFiveMinutes-password');
+        this.storageService.set(usernameKey, global.user, true, time);
+        this.storageService.set(passwordKey, global.password, true, time);
+        this.store$.dispatch({
+            type: mainAction.login,
+            payload: {
+                username: global.user,
+                password: global.password,
+                md5: true
+            }
+        });
     }
     // 切换聊天面板和联系人面板
     private changeListTab(index) {

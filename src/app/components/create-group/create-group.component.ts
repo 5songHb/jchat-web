@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 import { global, authPayload } from '../../services/common';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppStore } from '../../app.store';
 import { mainAction } from '../../pages/main/actions';
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'create-group-component',

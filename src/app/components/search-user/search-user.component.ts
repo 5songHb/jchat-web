@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition,
         animate, HostListener, ElementRef, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
+const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
     selector: 'search-user-component',

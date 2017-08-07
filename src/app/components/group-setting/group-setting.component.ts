@@ -7,7 +7,6 @@ import { PerfectScrollbarComponent, PerfectScrollbarDirective } from 'ngx-perfec
 import { AppStore } from '../../app.store';
 import { chatAction } from '../../pages/chat/actions';
 import { global } from '../../services/common';
-const avatarErrorIcon = require('../../../assets/images/single-avatar.png');
 
 @Component({
     selector: 'group-setting-component',
@@ -112,9 +111,6 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         } else {
             this.searchResult.show = false;
         }
-    }
-    private avatarErrorIcon(event) {
-        event.target.src = avatarErrorIcon;
     }
     private addMemberAction() {
         this.addMember.emit();
