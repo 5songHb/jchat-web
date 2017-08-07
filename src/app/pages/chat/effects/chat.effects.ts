@@ -13,8 +13,6 @@ import { AppStore } from '../../../app.store';
 import { chatAction } from '../actions';
 import { Util } from '../../../services/util';
 
-// const storageKey = 'msgId' + global.user;
-
 @Injectable()
 
 export class ChatEffect {
@@ -684,18 +682,8 @@ export class ChatEffect {
                         payload: error
                     });
                 });
-                // 如多当前会话是要查看资料的人的话，不用请求avatarUrl, 直接使用单聊会话的avatarUrl
-                if (other.active.type === 3) {
-                    that.store$.dispatch({
-                        type: chatAction.watchOtherInfoSuccess,
-                        payload: {
-                            info: data.user_info,
-                            show: true
-                        }
-                    });
-                    return ;
-                }
-                if (data.user_info.avatar === '') {
+                if (other.hasOwnProperty('avatarUrl') || data.user_info.avatar === '') {
+                    data.user_info.avatarUrl = other.avatarUrl ? other.avatarUrl : '';
                     that.store$.dispatch({
                         type: chatAction.watchOtherInfoSuccess,
                         payload: {

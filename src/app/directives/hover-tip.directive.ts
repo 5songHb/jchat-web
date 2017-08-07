@@ -9,7 +9,7 @@ export class HoverEventDirective implements OnInit {
     @Input()
         private hoverEvent;
     constructor(private el: ElementRef) {
-    //    pass
+        // pass
     }
     public ngOnInit() {
         // pass

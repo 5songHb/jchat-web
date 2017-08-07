@@ -7,8 +7,7 @@
         <ul class="black-menu-wrap" *ngIf="menuInfo && menuInfo.length > 0">
             <li *ngFor="let item of menuInfo" class="display-flex">
                 <div class="black-menu-avatar">
-                    <img *ngIf="item.avatarUrl && item.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="item.avatarUrl" alt="" (error)="avatarErrorIcon($event)">
-                    <img *ngIf="!item.avatarUrl || item.avatarUrl === ''" style="width: 100%;" src="../../../assets/images/single-avatar.png" alt="">
+                    <img (load)="avatarLoad($event)" [src]="item.avatarUrl" alt="" (error)="avatarErrorIcon($event)">
                 </div>
                 <span class="flex-1">{{item.nickname !== '' ? item.nickname : item.username}}</span>
                 <button *ngIf="item.loading !== false" type="button" (click)="delSingleBlackAction(item)" [ngClass]="{'loading': item.loading}">移出</button>

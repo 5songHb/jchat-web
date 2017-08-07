@@ -12,12 +12,12 @@ const groupAvatar = require('../../../assets/images/group-avatar.png');
 export class ConversationListComponent implements OnInit {
     @Input()
         private conversationList;
+    @Input()
+        private active;
     @Output()
         private changeActive: EventEmitter<any> = new EventEmitter();
     @Output()
         private deleteConversationItem: EventEmitter<any> = new EventEmitter();
-    @Input()
-        private active;
     private global = global;
     private groupAvatar = groupAvatar;
     constructor() {

@@ -134,7 +134,7 @@ export class Util {
      * @param obj: Object  输入框dom对象
      */
     public focusLast(obj) {
-        if (window.getSelection) { // ie11 10 9 ff safari
+        if (window.getSelection) { // ie11 10 ff safari
             let range = window.getSelection(); // 创建range
             range.selectAllChildren(obj); // range 选择obj下所有子内容
             range.collapse(obj, obj.childNodes.length); // 光标移至最后
@@ -145,7 +145,7 @@ export class Util {
      * @param str: string  需要操作的字符串
      * @return boolean
      */
-    public firstLetterIsChinese(str) {
+    public firstLetterIsChinese(str: string) {
       const re = /^[\\u4e00-\\u9fa5]/;
       if (re.test(str)) {
           return false ;
@@ -234,11 +234,11 @@ export class Util {
         return arr;
     }
     /**
-     * 将接收到的地理定位坐标转化为百度地图
+     * 将接收到的地理定位坐标转化为地图
      * @param obj: Object 坐标对象
      */
     public theLocation(obj) {
-        // 百度地图API功能
+        // 地图API功能
         let point = new BMap.Point(obj.longitude, obj.latitude);
         let map = new BMap.Map(obj.id);
         map.centerAndZoom(point, 13);

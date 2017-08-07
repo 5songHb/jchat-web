@@ -20,7 +20,7 @@ import { ChatEffect } from './pages/chat/effects';
 import { contactReducer } from './pages/contact/reducers';
 import { ContactEffect } from './pages/contact/effects';
 
-import { RouterGuard } from './services/common';
+import { MainCanActivate } from './services/common';
 import { TipModalModule } from './components/tip-modal';
 
 import { HMR } from '../config/hmr';
@@ -52,7 +52,7 @@ import '../assets/css/common.scss';
     ],
     bootstrap: [AppComponent],
     providers: [
-        RouterGuard,
+        MainCanActivate,
         StorageService
     ]
 })

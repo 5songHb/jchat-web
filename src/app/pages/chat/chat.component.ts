@@ -787,10 +787,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     private watchOtherInfoEmit(info) {
         this.store$.dispatch({
             type: chatAction.watchOtherInfo,
-            payload: {
-                username: info.username,
-                active: this.active
-            }
+            payload: info
         });
     }
     // 查看个人信息

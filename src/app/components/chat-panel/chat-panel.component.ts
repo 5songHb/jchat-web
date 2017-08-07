@@ -164,6 +164,14 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                     this.pointerToMap(chatState);
                 }
                 break;
+            case mainAction.selectSearchUser:
+
+            case mainAction.createGroupSuccess:
+
+            case chatAction.createOtherChat:
+
+            case contactAction.selectContactItem:
+
             case chatAction.changeActivePerson:
                 this.loadingFlag = 1;
                 this.loadingCount = 1;
@@ -177,11 +185,13 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 this.imageViewer.result = chatState.imageViewer;
                 this.voiceState = chatState.voiceState;
                 break;
+                // 发送群组文件消息
             case chatAction.sendGroupFile:
 
+                // 发送单聊文本消息
             case chatAction.sendSingleMessage:
 
-            // 发送群组文本消息
+                // 发送群组文本消息
             case chatAction.sendGroupMessage:
 
                 // 发送单聊图片消息
@@ -203,24 +213,6 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 }
                 this.imageViewer.result = chatState.imageViewer;
                 this.messageList = chatState.messageList;
-                break;
-            case mainAction.selectSearchUser:
-
-            case mainAction.createGroupSuccess:
-
-            case chatAction.createOtherChat:
-
-            case contactAction.selectContactItem:
-                this.loadingFlag = 1;
-                this.loadingCount = 1;
-                let msg = chatState.messageList[chatState.activePerson.activeIndex].msgs;
-                if (msg && msg.length > 20) {
-                    this.msg = msg.slice(msg.length - 20);
-                } else if (msg && msg.length <= 20) {
-                    this.msg = msg;
-                }
-                this.allPointerToMap();
-                this.imageViewer.result = chatState.imageViewer;
                 break;
             case chatAction.getAllMessageSuccess:
                 if (chatState.imageViewer !== []) {
@@ -293,7 +285,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
     // 发送文本
     private sendMsgAction() {
-        let draft = this.elementRef.nativeElement.querySelector('#contentDiv').innerHTML;
+        let draft = this.contentDiv.innerHTML;
         if (draft) {
             draft = draft.replace(/^(<br>){1,}$/g, '');
             draft = draft.replace(/&nbsp;/g, ' ');
@@ -340,7 +332,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         let file = this.util.getFileFormData(fileData);
         this.sendFile.emit({
             file,
-            fileData: this.elementRef.nativeElement.querySelector('#sendFile').files[0]
+            fileData: fileData.files[0]
         });
         this.contentDiv.focus();
         this.util.focusLast(this.contentDiv);
@@ -364,10 +356,15 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
     private msgContentFocus() {
         this.flag = false;
     }
-    private watchOtherInfo(fromId) {
-        this.otherInfo.emit({
-            username: fromId
-        });
+    private watchOtherInfo(content) {
+        let username = content.from_id ? content.from_id : content.name;
+        let info: any = {
+            username
+        };
+        if (content.hasOwnProperty('avatarUrl')) {
+            info.avatarUrl = content.avatarUrl;
+        }
+        this.otherInfo.emit(info);
     }
     private watchSelfInfo() {
         this.selfInfoEmit.emit();
@@ -419,7 +416,7 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                 }
             }
             this.util.insertAtCursor(contentId, insertHtml, false);
-        }else if (event.keyCode === 13) {
+        } else if (event.keyCode === 13) {
             this.sendMsgAction();
             event.preventDefault();
         }

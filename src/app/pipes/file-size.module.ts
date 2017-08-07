@@ -2,19 +2,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
-import { VideoTimePipe } from './videoTime.pipe';
+import { FileSizePipe } from './file-size.pipe';
 
 @NgModule({
   declarations: [
-    VideoTimePipe
+    FileSizePipe
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-      VideoTimePipe
+      FileSizePipe
   ],
   providers: []
 })
-export class VideoTimePipeModule {}
+export class FileSizePipeModule {}

@@ -1,5 +1,5 @@
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
-import { RouterGuard } from './services/common';
+import { MainCanActivate } from './services/common';
 
 export const ROUTES: Routes = [
     {
@@ -12,7 +12,7 @@ export const ROUTES: Routes = [
     },
     {
         path: 'main',
-        canActivate: [RouterGuard],
+        canActivate: [MainCanActivate],
         loadChildren: './pages/main#MainModule'
     },
     {

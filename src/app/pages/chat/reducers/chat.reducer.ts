@@ -81,7 +81,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 切换当前会话用户
         case chatAction.changeActivePerson:
-            clearTimer(state);
+            clearVoiceTimer(state);
             state.activePerson = Object.assign({}, payload.item, {});
             state.defaultPanelIsShow = payload.defaultPanelIsShow;
             emptyUnreadNum(state, payload.item);
@@ -93,7 +93,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             // 选择搜索出来的本地用户
         case mainAction.selectSearchUser:
             state.defaultPanelIsShow = false;
-            clearTimer(state);
+            clearVoiceTimer(state);
             state.activePerson = Object.assign({}, payload, {});
             selectUserResult(state, payload);
             changeActivePerson(state);
@@ -129,9 +129,6 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 成功查看别人的信息
         case chatAction.watchOtherInfoSuccess:
-            if (state.activePerson.type === 3) {
-                payload.info.avatarUrl = state.activePerson.avatarUrl;
-            }
             if (payload.black) {
                 state.otherInfo.black = payload.black;
             }
@@ -184,13 +181,13 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 创建单聊成功
         case mainAction.createSingleChatSuccess:
-            clearTimer(state);
+            clearVoiceTimer(state);
             state.otherInfo.info = payload;
             state.otherInfo.show = true;
             break;
             // 创建群组成功
         case mainAction.createGroupSuccess:
-            clearTimer(state);
+            clearVoiceTimer(state);
             state.activePerson = Object.assign({}, payload, {});
             state.defaultPanelIsShow = false;
             selectUserResult(state, payload);
@@ -199,7 +196,7 @@ export const chatReducer = (state: ChatStore = chatInit, {type, payload}) => {
             break;
             // 从用户的个人资料创建单聊联系人会话
         case chatAction.createOtherChat:
-            clearTimer(state);
+            clearVoiceTimer(state);
             if (payload.username) {
                 payload.name = payload.username;
             }
@@ -369,12 +366,13 @@ function updateGroupName(state, payload) {
     }
 }
 // 切换用户前清除语音的定时器
-function clearTimer(state: ChatStore) {
-    if (state.activePerson.activeIndex < 0 || !state.messageList[state.activePerson.activeIndex]) {
+function clearVoiceTimer(state: ChatStore) {
+    let activeIndex = state.activePerson.activeIndex;
+    let activeMessageList = state.messageList[activeIndex];
+    if (activeIndex < 0 || !activeMessageList) {
         return;
     }
-    let msgs = state.messageList[state.activePerson.activeIndex].msgs;
-    for (let msg of msgs) {
+    for (let msg of activeMessageList.msgs) {
         if (msg.content.msg_type === 'voice') {
             msg.content.playing = false;
         }

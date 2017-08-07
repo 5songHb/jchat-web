@@ -99,8 +99,8 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
                 member.checked = false;
                 member.disabled = false;
                 member.show = true;
-                let keyFlag = this.createGroup.info.activeSingle &&
-                    Number(this.createGroup.info.activeSingle.key) === Number(member.key);
+                let activeSingle = this.createGroup.info.activeSingle;
+                let keyFlag = activeSingle && Number(activeSingle.key) === Number(member.key);
                 if (keyFlag) {
                     member.checked = true;
                     member.disabled = true;
@@ -112,18 +112,14 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
        }
         // 添加群成员
         if (this.createGroup.info.filter) {
-            for(let i=0;i<this.createGroup.list.length;i++){
-                for(let j=0;j<this.createGroup.list[i].data.length;j++){
-                    for(let a=0;a<this.createGroup.info.filter.length;a++){
-                        let keyFlag = Number(this.createGroup.info.filter[a].uid) ===
-                            Number(this.createGroup.list[i].data[j].key)
-                            || Number(this.createGroup.info.filter[a].key) ===
-                            Number(this.createGroup.list[i].data[j].key);
-                        let nameFlag = this.createGroup.info.filter[a].username ===
-                            this.createGroup.list[i].data[j].name
-                            && this.createGroup.list[i].data[j].type === 3;
+            for (let list of this.createGroup.list) {
+                for (let data of list.data) {
+                    for (let filter of this.createGroup.info.filter) {
+                        let keyFlag = Number(filter.uid) === Number(data.key)
+                                        || Number(filter.key) === Number(data.key);
+                        let nameFlag = filter.username === data.name && data.type === 3;
                         if (keyFlag || nameFlag) {
-                            this.createGroup.list[i].data[j].show = false;
+                            data.show = false;
                             break;
                         }
                     }

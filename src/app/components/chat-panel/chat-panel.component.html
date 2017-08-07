@@ -1,7 +1,7 @@
 <div class="chat-panel-container display-flex flex-direction-vertical">
     <div class="chat-panel-board flex-1 display-flex flex-direction-vertical">
         <div class="chat-panel-setting">
-            <span *ngIf="active.type === 3" (click)="watchOtherInfo(active.name)" class="chat-panel-username chat-panel-name">{{active.nickName ? active.nickName : active.name}}</span>
+            <span *ngIf="active.type === 3" (click)="watchOtherInfo(active)" class="chat-panel-username chat-panel-name">{{active.nickName ? active.nickName : active.name}}</span>
             <span *ngIf="active.type === 4" class="chat-panel-name">{{active.nickName ? active.nickName : active.name}}</span>
             <div class="chat-panel-setting-btn" [hoverEvent]="groupConversationHover" *ngIf="active.type === 3" (click)="addGroupAction()">
                 <hover-tip-component [hidden]="!groupConversationHover.show" [hoverInfo]="groupConversationHover"></hover-tip-component>
@@ -46,9 +46,8 @@
                         </p>
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_type === 'text'" class="clearfix">
-                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -59,9 +58,8 @@
                         </div>
                         <!-- 图片消息 -->
                         <div *ngIf="i.content.msg_type === 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + (active.type === 4 ? 20 : 0) + 'px' : 300 + (active.type === 4 ? 20 : 0) + 'px' ) : i.content.msg_body.height + (active.type === 4 ? 20 : 0) + 'px'}" class="clearfix chat-panel-img">
-                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div *ngIf="!i.content.msg_body.extras || (i.content.msg_body.extras && !i.content.msg_body.extras.kLargeEmoticon)" class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -79,9 +77,8 @@
                         </div>
                         <!-- 文件消息 -->
                         <div *ngIf="i.content.msg_type === 'file' && (!i.content.msg_body.extras || !i.content.msg_body.extras.video)" class="clearfix">
-                            <div class="chat-panel-fromId-you float-left chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="chat-panel-fromId-you float-left chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left clearfix">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -104,9 +101,8 @@
                         </div>
                         <!-- 视频消息 -->
                         <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video" class="clearfix">
-                            <div class="chat-panel-fromId-you float-left chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="chat-panel-fromId-you float-left chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -123,9 +119,8 @@
                         </div>
                         <!-- 地理定位 -->
                         <div *ngIf="i.content.msg_type === 'location'" class="chat-panel-location clearfix">
-                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -139,9 +134,8 @@
                         </div>
                         <!-- 语音 -->
                         <div *ngIf="i.content.msg_type === 'voice'" class="chat-panel-voice clearfix">
-                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content.from_id)" [title]="i.content.from_id">
-                                <img *ngIf="i.content.avatarUrl && i.content.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!i.content.avatarUrl || i.content.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                            <div class="float-left chat-panel-fromId-you chat-panel-avatar" (click)="watchOtherInfo(i.content)" [title]="i.content.from_id">
+                                <img (load)="avatarLoad($event)" [src]="i.content.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-left">
                                 <div *ngIf="active.type === 4" class="group-username">{{i.content.from_name !== '' ? i.content.from_name : i.content.from_id}}</div>
@@ -187,8 +181,7 @@
                         <!-- 文本消息 -->
                         <div *ngIf="i.content.msg_type === 'text'" class="clearfix">
                             <div class="float-right chat-panel-fromId-me chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="chat-panel-msgText-me float-right" [ngClass]="{'jpush-emoji-container': i.content.msg_body.text.indexOf('jpush-emoji') !== -1}">
                                 <div *ngIf="i.success === 1" class="chat-panel-send-loading"></div>                                
@@ -199,8 +192,7 @@
                         <!-- 图片消息 -->
                         <div class="chat-panel-img-me chat-panel-img clearfix" *ngIf="i.content.msg_type == 'image'" [ngStyle]="{height: i.content.msg_body.width > 219 || i.content.msg_body.height > 300 ? (i.content.msg_body.width/i.content.msg_body.height > 219/300 ? 219/i.content.msg_body.width * i.content.msg_body.height + 'px' : 300 + 'px' ) : i.content.msg_body.height + 'px'}">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div *ngIf="!i.content.msg_body.extras || (i.content.msg_body.extras && !i.content.msg_body.extras.kLargeEmoticon)" class="float-right chat-panel-message-img-wrap" [ngClass]="{'chat-panel-message-img-loading': i.success === 1}">
                                 <div *ngIf="i.success === 3" class="chat-panel-send-error" (click)="repeatSendPicAction(i)"></div>
@@ -218,8 +210,7 @@
                         <!-- 文件消息 -->
                         <div *ngIf="i.content.msg_type === 'file' && (!i.content.msg_body.extras || (i.content.msg_body.extras && !i.content.msg_body.extras.video))" class="clearfix">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-right chat-panel-file-me">
                                 <div *ngIf="i.success === 1" class="chat-panel-send-loading"></div>
@@ -244,8 +235,7 @@
                         <!-- 视频消息 -->
                         <div *ngIf="i.content.msg_type === 'file' && i.content.msg_body.extras && i.content.msg_body.extras.video" class="clearfix">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-right chat-panel-video">
                                 <video (click)="playVideo(i.content.msg_body.media_url)" [src]="i.content.msg_body.media_url | sanitize: 'url'" (loadstart)="videoLoadStart(num)" (loadeddata)="videoLoad(num)" [id]="'video' + num">
@@ -260,8 +250,7 @@
                         <!-- 地理定位 -->
                         <div *ngIf="i.content.msg_type === 'location'" class="chat-panel-location clearfix">
                             <div class="chat-panel-fromId-me float-right chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="chat-panel-map-wrap float-right">
                                 <a [routerLink]="['/map', i.content.msg_body.longitude + '&' + i.content.msg_body.latitude]" target="_blank">                                
@@ -273,8 +262,7 @@
                         <!-- 语音 -->
                         <div *ngIf="i.content.msg_type === 'voice'" class="chat-panel-voice clearfix">
                             <div class="float-right chat-panel-fromId-me chat-panel-avatar" (click)="watchSelfInfo()">
-                                <img *ngIf="selfInfo.avatarUrl && selfInfo.avatarUrl !== ''" (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
-                                <img *ngIf="!selfInfo.avatarUrl || selfInfo.avatarUrl === ''" style="width: 100%" src="../../../assets/images/single-avatar.png" alt="">
+                                <img (load)="avatarLoad($event)" [src]="selfInfo.avatarUrl | sanitize: 'url'" (error)="avatarErrorIcon($event)" alt="">
                             </div>
                             <div class="float-right chat-panel-voice-sound chat-panel-voice-sound-me">
                                 <div (click)="playVoice(num)" [ngStyle]="{'width': i.content.msg_body.duration * 20 + 'px'}">

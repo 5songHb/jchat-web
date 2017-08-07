@@ -156,13 +156,17 @@ export class GroupSettingComponent implements OnInit, DoCheck {
         this.searchResult.result = [];
         this.searchResult.show = false;
     }
-    private watchInfoAction(username) {
-        if (username === global.user) {
+    private watchInfoAction(item) {
+        if (item.username === global.user) {
             this.watchSelfInfo.emit();
         } else {
-            this.watchOtherInfo.emit({
-                username
-            });
+            let info: any = {
+                username: item.username
+            };
+            if (item.hasOwnProperty('avatarUrl')) {
+                info.avatarUrl = item.avatarUrl;
+            }
+            this.watchOtherInfo.emit(info);
         }
     }
     private deleteMemberAction(item) {

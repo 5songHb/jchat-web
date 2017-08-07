@@ -7,7 +7,7 @@ import { md5 } from '../../services/tools';
 import { Util } from '../../services/util';
 
 @Injectable()
-export class RouterGuard implements CanActivate {
+export class MainCanActivate implements CanActivate {
     private util: Util = new Util();
     private username = '';
     private password = '';

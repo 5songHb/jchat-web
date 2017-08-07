@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input, OnInit, HostListener, OnChanges } from '@angular/core';
 /**
- * 实现非表单元素的双向绑定
+ * 实现非表单元素的数据双向绑定
  */
 
 @Directive({ selector: '[myModel]' })

@@ -18,7 +18,9 @@ body {
 button{
     border: none;
 }
-input::-ms-clear{display:none;}
+input::-ms-clear{
+    display:none;
+}
 input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0px 1000px white inset;
     border: 1px solid #CCC!important;
@@ -221,12 +223,11 @@ ul,li,ol{
     visibility: hidden;
 }
 /* 百度地图*/
-.BMap_cpyCtrl  
-{  
-    display:none;   
+.BMap_cpyCtrl{  
+    display: none;   
 }
 .anchorBL{  
-    display:none;   
+    display: none;   
 }
 /* 模态框*/
 .modal-shadow{
@@ -308,32 +309,22 @@ ul,li,ol{
 .chat-panel-scroll .ps-content{
     padding-right: 20px;
 }
-.conversation-recentMsg img{
-    vertical-align: middle;
+/* emoji*/
+.emoji-normal .emoji{
+    position: relative;
+    top: -3px;
+}
+.conversation-recentMsg .emoji{
     position: relative;
     top: -1px;
-}
-.chat-panel-msgText-me img{
-    vertical-align: middle;
-    position: relative;
-    top: -2px;
-}
-.chat-panel-msgText-you img{
-    vertical-align: middle;
-    position: relative;
-    top: -2px;
 }
 .chat-panel-jpush-emoji{
     img{
         width: 100%;
     }
 }
-/* emoji*/
-.emoji{
-    position: relative;
-    top: -3px;
-}
 .chat-panel-content-text .emoji, .conversation-draft .emoji{
+    position: relative;
     top: -1px;
     vertical-align: middle;
 }
