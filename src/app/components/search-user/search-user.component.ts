@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, trigger, state, style, transition,
-        animate, HostListener, ElementRef, OnChanges } from '@angular/core';
+        animate, HostListener, ElementRef, OnChanges, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PerfectScrollbarComponent } from 'ngx-perfect-scrollbar';
 const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
@@ -18,6 +19,7 @@ const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 })
 
 export class SearchUserComponent implements OnInit, OnChanges {
+    @ViewChild(PerfectScrollbarComponent) private componentScroll;
     private searchKeyword;
     private searchInputIsShow = true;
     private inputAnimate = 'out';
@@ -60,18 +62,22 @@ export class SearchUserComponent implements OnInit, OnChanges {
         if (this.singleShowText === '显示全部') {
             this.singleShowText = '收起';
             this.singleHeight = 'none';
+            this.componentScroll.directiveRef.update();
         } else {
             this.singleShowText = '显示全部';
             this.singleHeight = '200px';
+            this.componentScroll.directiveRef.update();
         }
     }
     private groupShowAll() {
         if (this.groupShowText === '显示全部') {
             this.groupShowText = '收起';
             this.groupHeight = 'none';
+            this.componentScroll.directiveRef.update();
         } else {
             this.groupShowText = '显示全部';
             this.groupHeight = '200px';
+            this.componentScroll.directiveRef.update();
         }
     }
     private avatarErrorIcon(event) {

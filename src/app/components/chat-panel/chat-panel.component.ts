@@ -11,7 +11,7 @@ import { global, emojiConfig, jpushConfig, imgRouter } from '../../services/comm
 import { Util } from '../../services/util';
 import{ StorageService } from '../../services/common';
 import { Emoji } from '../../services/tools';
-let download = require('downloadjs');
+import * as download from 'downloadjs';
 const avatarErrorIcon = '../../../assets/images/single-avatar.png';
 
 @Component({
@@ -121,8 +121,8 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (changes.scrollBottom) {
             this.loadFlag = false;
             setTimeout(() => {
-                this.componentScroll.update();
-                this.componentScroll.scrollToBottom();
+                this.componentScroll.directiveRef.update();
+                this.componentScroll.directiveRef.scrollToBottom();
                 this.contentDiv.focus();
                 this.util.focusLast(this.contentDiv);
                 this.loadFlag = true;
@@ -452,14 +452,14 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
          */
         if (this.loadingFlag === 1 && this.msg.length >= 20) {
             this.loadingFlag = 2;
-            const oldContentHeight = this.componentScroll.contentHeight;
+            const oldContentHeight = this.componentScroll.directiveRef.geometry().h;
             const activeKey = this.active.key;
             setTimeout(() => {
                 if (activeKey !== this.active.key || !this.messageList[this.active.activeIndex]) {
                     return;
                 }
-                this.componentScroll.update();
-                this.componentScroll.scrollTo(0, 10);
+                this.componentScroll.directiveRef.update();
+                this.componentScroll.directiveRef.scrollTo(0, 10);
                 let msgs = this.messageList[this.active.activeIndex].msgs;
                 if (msgs.length === this.msg.length) {
                     this.loadingFlag = 3;
@@ -481,8 +481,9 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
                     const that = this;
                     return new Promise ((resolve, reject) => {
                         setTimeout(() => {
-                            const newContentHeight = that.componentScroll.contentHeight;
-                            that.componentScroll.scrollTo(0, newContentHeight - oldContentHeight);
+                            const newContentHeight = that.componentScroll.directiveRef.geometry().h;
+                            let gap = newContentHeight - oldContentHeight;
+                            that.componentScroll.directiveRef.scrollTo(0, gap);
                             resolve();
                         }, 0);
                     }).catch(() => {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter,
     HostListener, ElementRef } from '@angular/core';
-let download = require('downloadjs');
+import * as download from 'downloadjs';
 @Component({
     selector: 'image-viewer-component',
     templateUrl: './image-viewer.component.html',

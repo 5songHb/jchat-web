@@ -309,6 +309,9 @@ ul,li,ol{
 .chat-panel-scroll .ps-content{
     padding-right: 20px;
 }
+.search-user-result .ps-content,.search-user-result .ps--active-y{
+    max-height: 452px;
+}
 /* emoji*/
 .emoji-normal .emoji{
     position: relative;
