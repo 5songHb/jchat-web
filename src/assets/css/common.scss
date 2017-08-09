@@ -312,6 +312,9 @@ ul,li,ol{
 .search-user-result .ps-content,.search-user-result .ps--active-y{
     max-height: 452px;
 }
+.search-member-scroll-search .ps-content, .search-member-scroll-search .ps--active-y{
+    max-height: 275px;
+}
 /* emoji*/
 .emoji-normal .emoji{
     position: relative;

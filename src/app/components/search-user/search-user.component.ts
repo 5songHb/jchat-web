@@ -94,6 +94,10 @@ export class SearchUserComponent implements OnInit, OnChanges {
     private showSearchInput() {
         this.searchInputIsShow = false;
         this.inputAnimate = 'in';
+        this.groupShowText = '显示全部';
+        this.groupHeight = '200px';
+        this.singleShowText = '显示全部';
+        this.singleHeight = '200px';
         setTimeout(() => {
             this.fileDom.focus();
         }, 200);
