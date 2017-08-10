@@ -119,13 +119,11 @@ export class ChatPanelComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
         // 消息面板滚动条向下滚动
         if (changes.scrollBottom) {
-            this.loadFlag = false;
             setTimeout(() => {
                 this.componentScroll.directiveRef.update();
                 this.componentScroll.directiveRef.scrollToBottom();
                 this.contentDiv.focus();
                 this.util.focusLast(this.contentDiv);
-                this.loadFlag = true;
             }, 150);
         }
     }
